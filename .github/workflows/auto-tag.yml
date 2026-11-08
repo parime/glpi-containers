@@ -1,0 +1,46 @@
+name: Auto-tag de version
+
+# Tague automatiquement `vX.Y.Z` à chaque fusion sur main si PLUGIN_DOCKERINVENTORY_VERSION
+# (setup.php) a changé et que ce tag n'existe pas encore. Repris du même workflow en place sur
+# Configuration GLPI Auto (seule la constante de version change). Séparation volontaire : ce
+# fichier ne fait QUE décider s'il faut taguer, toute la validation (construction, installation
+# réelle sur GLPI, publication) reste dans release.yml.
+#
+# Le tag est poussé puis release.yml est explicitement déclenché via workflow_dispatch (pas
+# seulement via son déclencheur `push: tags`) : un push de tag effectué avec le GITHUB_TOKEN (comme
+# ici) ne déclenche PAS les autres workflows (protection anti-boucle de GitHub Actions).
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupère le code du plugin
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7 (SHA pinned)
+
+      - name: Tague si PLUGIN_DOCKERINVENTORY_VERSION est une nouvelle version
+        # git ls-remote (pas `git tag -l` local) : le checkout par défaut est peu profond et ne
+        # récupère aucun tag, une vérification locale laisserait toujours passer.
+        run: |
+          VERSION="$(grep -oP "define\('PLUGIN_DOCKERINVENTORY_VERSION', '\K[^']+" setup.php)"
+          TAG="v${VERSION}"
+
+          if git ls-remote --tags origin "refs/tags/$TAG" | grep -q "refs/tags/$TAG$"; then
+            echo "Le tag $TAG existe déjà, rien à publier."
+            exit 0
+          fi
+
+          echo "Nouvelle version détectée : $TAG"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
+          gh workflow run release.yml --ref "$TAG"
+        env:
+          GH_TOKEN: ${{ github.token }}

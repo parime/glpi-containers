@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <name>Inventaire Docker</name>
+    <key>dockerinventory</key>
+    <state>stable</state>
+    <description>
+        <short>
+            <fr>Inventaire en lecture seule des applications en conteneurs : stacks, services et nœuds Docker Swarm importés depuis Portainer</fr>
+            <en>Read-only inventory of containerised applications: Docker Swarm stacks, services and nodes imported from Portainer</en>
+        </short>
+        <long>
+            <fr>
+                Inventaire Docker donne à GLPI une vue en lecture seule sur les applications en conteneurs.
+                Il répond à la question « qu'est-ce qui tourne, en quelle version, est-ce à jour, est-ce
+                vulnérable ? », que GLPI ne sait pas traiter seul : son onglet « Virtualisation » liste des
+                conteneurs isolés, sans stack, sans service, sans réplicas ni version.
+
+                Depuis Portainer, le plugin importe les stacks Docker Swarm en Applications GLPI, les services
+                (image, tag, empreinte, réplicas, ports publiés, réseaux, noms des secrets) et les nœuds du
+                cluster, rattachés aux ordinateurs inventoriés. Il ne redéploie, ne redémarre et ne supprime
+                jamais rien : un service disparu est marqué « retiré », pas supprimé. Les clés d'API sont
+                chiffrées avec la clé de GLPI et seuls les noms des secrets Docker sont importés, jamais leur
+                contenu.
+            </fr>
+            <en>
+                Docker Inventory gives GLPI a read-only view of containerised applications. It answers
+                "what is running, in which version, is it up to date, is it vulnerable?", which GLPI cannot do
+                on its own: its "Virtualization" tab lists isolated containers, with no stack, service,
+                replicas or version.
+
+                From Portainer, the plugin imports Docker Swarm stacks as GLPI Appliances, services (image,
+                tag, digest, replicas, published ports, networks, secret names) and cluster nodes, linked to
+                inventoried computers. It never redeploys, restarts or deletes anything: a service that
+                disappears is marked "retired", not deleted. API keys are encrypted with the GLPI key and only
+                Docker secret names are imported, never their content.
+            </en>
+        </long>
+    </description>
+    <homepage>https://github.com/parime/glpi-docker-inventory</homepage>
+    <download>https://github.com/parime/glpi-docker-inventory/releases</download>
+    <issues>https://github.com/parime/glpi-docker-inventory/issues</issues>
+    <readme>https://raw.githubusercontent.com/parime/glpi-docker-inventory/main/README.md</readme>
+    <changelog>https://github.com/parime/glpi-docker-inventory/releases</changelog>
+    <authors>
+        <author>Vincent GUILLOTTE</author>
+    </authors>
+    <versions>
+    </versions>
+    <langs>
+        <lang>fr_FR</lang>
+        <lang>en_GB</lang>
+        <lang>de_DE</lang>
+        <lang>it_IT</lang>
+        <lang>es_ES</lang>
+        <lang>pt_BR</lang>
+        <lang>pl_PL</lang>
+        <lang>pt_PT</lang>
+        <lang>en_US</lang>
+        <lang>es_MX</lang>
+        <lang>fr_CA</lang>
+    </langs>
+    <license>GPL-3.0-or-later</license>
+    <tags>
+        <fr>
+            <tag>docker</tag>
+            <tag>swarm</tag>
+            <tag>portainer</tag>
+            <tag>conteneurs</tag>
+            <tag>inventaire</tag>
+        </fr>
+        <en>
+            <tag>docker</tag>
+            <tag>swarm</tag>
+            <tag>portainer</tag>
+            <tag>containers</tag>
+            <tag>inventory</tag>
+        </en>
+    </tags>
+</root>

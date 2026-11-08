@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace GlpiPlugin\Containers;
+namespace GlpiPlugin\Dockerinventory;
 
 use CommonDBTM;
 use CommonGLPI;
@@ -34,7 +34,7 @@ class Node extends CommonDBTM
 {
     public static function getTypeName($nb = 0)
     {
-        return $nb > 1 ? __('Nœuds Swarm', 'containers') : __('Nœud Swarm', 'containers');
+        return $nb > 1 ? __('Nœuds Swarm', 'dockerinventory') : __('Nœud Swarm', 'dockerinventory');
     }
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
@@ -47,7 +47,9 @@ class Node extends CommonDBTM
             $count = countElementsInTable(static::getTable(), ['computers_id' => (int) $item->getID()]);
         }
 
-        return self::createTabEntry(__('Services du nœud', 'containers'), $count, static::class, Service::getIcon());
+        $label = __('Services du nœud', 'dockerinventory');
+
+        return self::createTabEntry($label, $count, static::class, Service::getIcon());
     }
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
@@ -70,11 +72,11 @@ class Node extends CommonDBTM
             $node['services'] = [];
             $iterator = $DB->request([
                 'SELECT'     => ['s.*', 'sn.running_tasks'],
-                'FROM'       => 'glpi_plugin_containers_services_nodes AS sn',
+                'FROM'       => 'glpi_plugin_dockerinventory_services_nodes AS sn',
                 'INNER JOIN' => [
-                    $serviceTable . ' AS s' => ['ON' => ['sn' => 'plugin_containers_services_id', 's' => 'id']],
+                    $serviceTable . ' AS s' => ['ON' => ['sn' => 'plugin_dockerinventory_services_id', 's' => 'id']],
                 ],
-                'WHERE'      => ['sn.plugin_containers_nodes_id' => (int) $nodeRow['id']]
+                'WHERE'      => ['sn.plugin_dockerinventory_nodes_id' => (int) $nodeRow['id']]
                     + (new DbUtils())->getEntitiesRestrictCriteria('s', '', '', true),
                 'ORDER'      => ['s.is_retired', 's.name'],
             ]);
@@ -83,7 +85,7 @@ class Node extends CommonDBTM
             }
             $nodes[] = $node;
         }
-        TemplateRenderer::getInstance()->display('@containers/computer_nodes.html.twig', [
+        TemplateRenderer::getInstance()->display('@dockerinventory/computer_nodes.html.twig', [
             'nodes' => $nodes,
         ]);
 

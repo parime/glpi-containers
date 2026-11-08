@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -15,7 +15,7 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Containers\Connection;
+use GlpiPlugin\Dockerinventory\Connection;
 
 // Liste des connexions Portainer : administrateurs de la configuration de GLPI seulement.
 Session::checkRight(Connection::RIGHTNAME, UPDATE);

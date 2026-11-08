@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -17,9 +17,9 @@
 
 declare(strict_types=1);
 
-namespace GlpiPlugin\Containers\Portainer;
+namespace GlpiPlugin\Dockerinventory\Portainer;
 
-use GlpiPlugin\Containers\Compat\Http;
+use GlpiPlugin\Dockerinventory\Compat\Http;
 
 /**
  * Lecture seule de l'API Portainer : uniquement des requêtes GET, authentifiées par l'en-tête

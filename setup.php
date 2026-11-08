@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -16,33 +16,33 @@
  */
 
 use Glpi\Plugin\Hooks;
-use GlpiPlugin\Containers\Connection;
-use GlpiPlugin\Containers\Node;
-use GlpiPlugin\Containers\Profile;
-use GlpiPlugin\Containers\Service;
+use GlpiPlugin\Dockerinventory\Connection;
+use GlpiPlugin\Dockerinventory\Node;
+use GlpiPlugin\Dockerinventory\Profile;
+use GlpiPlugin\Dockerinventory\Service;
 
-define('PLUGIN_CONTAINERS_VERSION', '0.1.0');
-define('PLUGIN_CONTAINERS_MIN_GLPI', '11.0.0');
+define('PLUGIN_DOCKERINVENTORY_VERSION', '0.1.0');
+define('PLUGIN_DOCKERINVENTORY_MIN_GLPI', '11.0.0');
 // GLPI 11 et 12 depuis un seul code source (voir src/Compat/).
-define('PLUGIN_CONTAINERS_MAX_GLPI', '12.99.99');
-define('PLUGIN_CONTAINERS_MIN_PHP', '8.2.0');
+define('PLUGIN_DOCKERINVENTORY_MAX_GLPI', '12.99.99');
+define('PLUGIN_DOCKERINVENTORY_MIN_PHP', '8.2.0');
 
-function plugin_init_containers(): void
+function plugin_init_dockerinventory(): void
 {
     global $PLUGIN_HOOKS;
 
     // Clé littérale : GLPI 12 a supprimé la constante Hooks::CSRF_COMPLIANT (la clé reste la même).
-    $PLUGIN_HOOKS['csrf_compliant']['containers'] = true;
+    $PLUGIN_HOOKS['csrf_compliant']['dockerinventory'] = true;
 
     // Version majeure de GLPI non vérifiée : rien n'est déclaré (les classes pourraient ne pas
     // se charger). Comparaison de version et non isPluginActive() : cette fonction sert aussi
     // pendant l'installation, avant l'activation.
-    if (version_compare(GLPI_VERSION, PLUGIN_CONTAINERS_MAX_GLPI, '>')) {
+    if (version_compare(GLPI_VERSION, PLUGIN_DOCKERINVENTORY_MAX_GLPI, '>')) {
         return;
     }
 
     // Clé d'API Portainer chiffrée avec la clé de GLPI : rechiffrée par « glpi:security:change_key ».
-    $PLUGIN_HOOKS[Hooks::SECURED_FIELDS]['containers'] = ['glpi_plugin_containers_connections.api_key'];
+    $PLUGIN_HOOKS[Hooks::SECURED_FIELDS]['dockerinventory'] = ['glpi_plugin_dockerinventory_connections.api_key'];
 
     // Onglet « Services » sur les applications, « Services du nœud » sur les ordinateurs, droits
     // du plugin sur les profils.
@@ -53,44 +53,44 @@ function plugin_init_containers(): void
 
     // Liste des services dans Parc ; connexions Portainer dans Configuration (et depuis le nom du
     // plugin dans Configuration > Plugins).
-    $PLUGIN_HOOKS[Hooks::MENU_TOADD]['containers'] = [
+    $PLUGIN_HOOKS[Hooks::MENU_TOADD]['dockerinventory'] = [
         'assets' => [Service::class],
         'config' => [Connection::class],
     ];
-    $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['containers'] = 'front/connection.php';
+    $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['dockerinventory'] = 'front/connection.php';
 }
 
-function plugin_version_containers(): array
+function plugin_version_dockerinventory(): array
 {
     return [
-        'name'         => 'Containers',
-        'version'      => PLUGIN_CONTAINERS_VERSION,
+        'name'         => 'Inventaire Docker',
+        'version'      => PLUGIN_DOCKERINVENTORY_VERSION,
         'author'       => 'Vincent GUILLOTTE',
         'license'      => 'GPL-3.0-or-later',
-        'homepage'     => 'https://github.com/parime/glpi-containers',
+        'homepage'     => 'https://github.com/parime/glpi-docker-inventory',
         'requirements' => [
             'glpi' => [
-                'min' => PLUGIN_CONTAINERS_MIN_GLPI,
-                'max' => PLUGIN_CONTAINERS_MAX_GLPI,
+                'min' => PLUGIN_DOCKERINVENTORY_MIN_GLPI,
+                'max' => PLUGIN_DOCKERINVENTORY_MAX_GLPI,
             ],
             'php'  => [
-                'min' => PLUGIN_CONTAINERS_MIN_PHP,
+                'min' => PLUGIN_DOCKERINVENTORY_MIN_PHP,
             ],
         ],
     ];
 }
 
-function plugin_containers_check_prerequisites(): bool
+function plugin_dockerinventory_check_prerequisites(): bool
 {
-    if (version_compare(PHP_VERSION, PLUGIN_CONTAINERS_MIN_PHP, '<')) {
-        echo sprintf('PHP %s or later is required.', PLUGIN_CONTAINERS_MIN_PHP);
+    if (version_compare(PHP_VERSION, PLUGIN_DOCKERINVENTORY_MIN_PHP, '<')) {
+        echo sprintf('PHP %s or later is required.', PLUGIN_DOCKERINVENTORY_MIN_PHP);
         return false;
     }
 
     return true;
 }
 
-function plugin_containers_check_config($verbose = false): bool
+function plugin_dockerinventory_check_config($verbose = false): bool
 {
     return true;
 }

@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace GlpiPlugin\Containers\Compat;
+namespace GlpiPlugin\Dockerinventory\Compat;
 
 /**
  * Requête GET sortante par le client HTTP de GLPI lui-même, en GLPI 11 (Toolbox::getGuzzleClient())

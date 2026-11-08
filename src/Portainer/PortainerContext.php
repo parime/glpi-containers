@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -15,7 +15,7 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Containers\Portainer;
+namespace GlpiPlugin\Dockerinventory\Portainer;
 
 /**
  * Contexte des appels sortants vers Portainer. GLPI 12 refuse par défaut les appels vers un réseau
@@ -24,7 +24,7 @@ namespace GlpiPlugin\Containers\Portainer;
  * ouvrir les réseaux privés aux autres appels de GLPI :
  *
  *     define('GLPI_SERVERSIDE_URL_ALLOWED_PRIVATE_NETWORKS_CONTEXTS', [
- *         \GlpiPlugin\Containers\Portainer\PortainerContext::class,
+ *         \GlpiPlugin\Dockerinventory\Portainer\PortainerContext::class,
  *     ]);
  */
 class PortainerContext extends \CommonGLPI

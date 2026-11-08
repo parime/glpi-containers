@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -17,14 +17,14 @@
 
 declare(strict_types=1);
 
-namespace GlpiPlugin\Containers;
+namespace GlpiPlugin\Dockerinventory;
 
 use CronTask;
 use Glpi\Application\View\TemplateRenderer;
-use GlpiPlugin\Containers\Compat\Base\ConnectionBase;
-use GlpiPlugin\Containers\Portainer\PortainerClient;
-use GlpiPlugin\Containers\Portainer\PortainerException;
-use GlpiPlugin\Containers\Portainer\UrlPolicy;
+use GlpiPlugin\Dockerinventory\Compat\Base\ConnectionBase;
+use GlpiPlugin\Dockerinventory\Portainer\PortainerClient;
+use GlpiPlugin\Dockerinventory\Portainer\PortainerException;
+use GlpiPlugin\Dockerinventory\Portainer\UrlPolicy;
 use GLPIKey;
 use Session;
 
@@ -48,7 +48,7 @@ class Connection extends ConnectionBase
 
     public static function getTypeName($nb = 0)
     {
-        return $nb > 1 ? __('Connexions Portainer', 'containers') : __('Connexion Portainer', 'containers');
+        return $nb > 1 ? __('Connexions Portainer', 'dockerinventory') : __('Connexion Portainer', 'dockerinventory');
     }
 
     public static function getIcon()
@@ -96,7 +96,7 @@ class Connection extends ConnectionBase
             'id'         => 3,
             'table'      => static::getTable(),
             'field'      => 'url',
-            'name'       => __('Adresse de Portainer', 'containers'),
+            'name'       => __('Adresse de Portainer', 'dockerinventory'),
             'datatype'   => 'string',
         ];
         $options[] = [
@@ -110,7 +110,7 @@ class Connection extends ConnectionBase
             'id'         => 5,
             'table'      => static::getTable(),
             'field'      => 'last_import_date',
-            'name'       => __('Dernier import', 'containers'),
+            'name'       => __('Dernier import', 'dockerinventory'),
             'datatype'   => 'datetime',
             'massiveaction' => false,
         ];
@@ -118,7 +118,7 @@ class Connection extends ConnectionBase
             'id'         => 6,
             'table'      => 'glpi_applianceenvironments',
             'field'      => 'name',
-            'name'       => __('Environnement des applications créées', 'containers'),
+            'name'       => __('Environnement des applications créées', 'dockerinventory'),
             'datatype'   => 'dropdown',
         ];
         $options[] = [
@@ -139,13 +139,13 @@ class Connection extends ConnectionBase
         $report = json_decode((string) ($this->fields['last_import_report'] ?? ''), true);
 
         $renderer = TemplateRenderer::getInstance();
-        $renderer->display('@containers/connection_form.html.twig', [
+        $renderer->display('@dockerinventory/connection_form.html.twig', [
             'item'        => $this,
             'params'      => $options,
             'has_api_key' => trim((string) ($this->fields['api_key'] ?? '')) !== '',
         ]);
         if (!$this->isNewItem()) {
-            $renderer->display('@containers/connection_actions.html.twig', [
+            $renderer->display('@dockerinventory/connection_actions.html.twig', [
                 'item'          => $this,
                 'status_label'  => self::statusLabel((int) ($this->fields['last_import_status'] ?? 0)),
                 'report'        => is_array($report) ? $report : null,
@@ -161,7 +161,7 @@ class Connection extends ConnectionBase
     {
         if (trim((string) ($input['api_key'] ?? '')) === '') {
             Session::addMessageAfterRedirect(
-                __("La clé d'API Portainer est obligatoire.", 'containers'),
+                __("La clé d'API Portainer est obligatoire.", 'dockerinventory'),
                 false,
                 ERROR
             );
@@ -241,7 +241,7 @@ class Connection extends ConnectionBase
         return [
             'ok'      => true,
             'message' => sprintf(
-                __('Connexion réussie : %d environnement(s) Portainer visible(s) avec cette clé.', 'containers'),
+                __('Connexion réussie : %d environnement(s) Portainer visible(s) avec cette clé.', 'dockerinventory'),
                 count($endpoints)
             ),
         ];
@@ -250,10 +250,10 @@ class Connection extends ConnectionBase
     public static function statusLabel(int $status): string
     {
         return match ($status) {
-            self::STATUS_OK      => __('Réussi', 'containers'),
-            self::STATUS_PARTIAL => __('Partiel', 'containers'),
-            self::STATUS_ERROR   => __('Échec', 'containers'),
-            default              => __('Jamais lancé', 'containers'),
+            self::STATUS_OK      => __('Réussi', 'dockerinventory'),
+            self::STATUS_PARTIAL => __('Partiel', 'dockerinventory'),
+            self::STATUS_ERROR   => __('Échec', 'dockerinventory'),
+            default              => __('Jamais lancé', 'dockerinventory'),
         };
     }
 
@@ -263,22 +263,25 @@ class Connection extends ConnectionBase
     public static function errorLabels(): array
     {
         return [
-            PortainerException::UNAUTHORIZED => __("Clé d'API refusée par Portainer (401).", 'containers'),
-            PortainerException::FORBIDDEN => __('Accès refusé par Portainer (403) pour cette clé.', 'containers'),
-            PortainerException::NOT_FOUND => __("Adresse introuvable (404) : vérifier l'adresse.", 'containers'),
-            PortainerException::NOT_SWARM => __("Cet environnement n'est pas un cluster Swarm.", 'containers'),
-            PortainerException::PRIVATE_NETWORK => __('Réseau privé refusé par GLPI (voir le README).', 'containers'),
-            PortainerException::UNEXPECTED => __("Réponse inattendue : est-ce bien Portainer ?", 'containers'),
-            PortainerException::UNREACHABLE => __('Portainer injoignable (réseau, certificat, délai).', 'containers'),
+            PortainerException::UNAUTHORIZED => __("Clé d'API refusée par Portainer (401).", 'dockerinventory'),
+            PortainerException::FORBIDDEN => __('Accès refusé par Portainer (403) pour cette clé.', 'dockerinventory'),
+            PortainerException::NOT_FOUND => __("Adresse introuvable (404) : vérifier l'adresse.", 'dockerinventory'),
+            PortainerException::NOT_SWARM => __("Cet environnement n'est pas un cluster Swarm.", 'dockerinventory'),
+            PortainerException::PRIVATE_NETWORK => __('Réseau privé refusé par GLPI (voir README).', 'dockerinventory'),
+            PortainerException::UNEXPECTED => __("Réponse inattendue : est-ce bien Portainer ?", 'dockerinventory'),
+            PortainerException::UNREACHABLE => __('Portainer injoignable (réseau, certificat...).', 'dockerinventory'),
         ];
     }
 
     private static function urlErrorLabel(string $error): string
     {
         return match ($error) {
-            UrlPolicy::ERROR_HTTPS_REQUIRED => __('HTTPS obligatoire (sauf « Autoriser HTTP »).', 'containers'),
-            UrlPolicy::ERROR_CREDENTIALS => __("L'adresse ne doit pas contenir d'identifiants.", 'containers'),
-            default => __('Adresse invalide (exemple : https://portainer.exemple.test:9443).', 'containers'),
+            UrlPolicy::ERROR_HTTPS_REQUIRED => __('HTTPS obligatoire (sauf « Autoriser HTTP »).', 'dockerinventory'),
+            UrlPolicy::ERROR_CREDENTIALS => __("L'adresse ne doit pas contenir d'identifiants.", 'dockerinventory'),
+            default => sprintf(
+                __('Adresse invalide (exemple : %s).', 'dockerinventory'),
+                'https://portainer.exemple.test:9443'
+            ),
         };
     }
 
@@ -287,7 +290,7 @@ class Connection extends ConnectionBase
      */
     public static function cronInfo(string $name): array
     {
-        return ['description' => __('Import des stacks et services Docker Swarm depuis Portainer', 'containers')];
+        return ['description' => __('Import des stacks et services Docker Swarm depuis Portainer', 'dockerinventory')];
     }
 
     /**
@@ -306,7 +309,7 @@ class Connection extends ConnectionBase
             $report = (new Importer())->import($connection);
             $task->addVolume($report['services']);
             $task->log(sprintf(
-                __('%1$s : %2$s (%3$d services, %4$d retirés, %5$d nœuds)', 'containers'),
+                __('%1$s : %2$s (%3$d services, %4$d retirés, %5$d nœuds)', 'dockerinventory'),
                 $connection->fields['name'],
                 self::statusLabel($report['status']),
                 $report['services'],

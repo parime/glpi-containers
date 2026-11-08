@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -15,14 +15,14 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Containers\Install\Installer;
+use GlpiPlugin\Dockerinventory\Install\Installer;
 
-function plugin_containers_install(): bool
+function plugin_dockerinventory_install(): bool
 {
-    return (new Installer())->install(new Migration(PLUGIN_CONTAINERS_VERSION));
+    return (new Installer())->install(new Migration(PLUGIN_DOCKERINVENTORY_VERSION));
 }
 
-function plugin_containers_uninstall(): bool
+function plugin_dockerinventory_uninstall(): bool
 {
     return (new Installer())->uninstall();
 }

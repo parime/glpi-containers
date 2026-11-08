@@ -1,8 +1,8 @@
 {#
  # -------------------------------------------------------------------------
- # Containers plugin for GLPI
+ # Docker Inventory plugin for GLPI
  # Copyright (C) 2026 Vincent GUILLOTTE
- # https://github.com/parime/glpi-containers
+ # https://github.com/parime/glpi-docker-inventory
  # -------------------------------------------------------------------------
  # LICENSE
  #
@@ -16,10 +16,10 @@
 {# Pastille « Actif » / « Retiré » d'un service. #}
 {% if retired %}
     <span class="badge bg-secondary text-white">
-        <i class="ti ti-archive me-1" aria-hidden="true"></i>{{ __('Retiré', 'containers') }}
+        <i class="ti ti-archive me-1" aria-hidden="true"></i>{{ __('Retiré', 'dockerinventory') }}
     </span>
 {% else %}
     <span class="badge bg-success text-white">
-        <i class="ti ti-circle-check me-1" aria-hidden="true"></i>{{ __('Actif', 'containers') }}
+        <i class="ti ti-circle-check me-1" aria-hidden="true"></i>{{ __('Actif', 'dockerinventory') }}
     </span>
 {% endif %}

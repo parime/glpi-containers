@@ -1,8 +1,8 @@
 {#
  # -------------------------------------------------------------------------
- # Containers plugin for GLPI
+ # Docker Inventory plugin for GLPI
  # Copyright (C) 2026 Vincent GUILLOTTE
- # https://github.com/parime/glpi-containers
+ # https://github.com/parime/glpi-docker-inventory
  # -------------------------------------------------------------------------
  # LICENSE
  #
@@ -17,8 +17,8 @@
 {% if nodes is empty %}
     <div class="alert alert-info">
         <i class="ti ti-info-circle me-2" aria-hidden="true"></i>
-        {{ __("Cet ordinateur n'est rattaché à aucun nœud Docker Swarm.", 'containers') }}
-        {{ __("Le rattachement se fait à l'import Portainer, par nom d'hôte.", 'containers') }}
+        {{ __("Cet ordinateur n'est rattaché à aucun nœud Docker Swarm.", 'dockerinventory') }}
+        {{ __("Le rattachement se fait à l'import Portainer, par nom d'hôte.", 'dockerinventory') }}
     </div>
 {% endif %}
 {% for node in nodes %}
@@ -34,26 +34,26 @@
                 <span class="badge bg-warning text-white">{{ node.availability }}</span>
             {% endif %}
             {% if node.is_retired %}
-                <span class="badge bg-secondary text-white">{{ __('Retiré', 'containers') }}</span>
+                <span class="badge bg-secondary text-white">{{ __('Retiré', 'dockerinventory') }}</span>
             {% endif %}
         </div>
         <div class="card-body">
             <dl class="row mb-0">
-                <dt class="col-sm-3">{{ __('Version de Docker', 'containers') }}</dt>
+                <dt class="col-sm-3">{{ __('Version de Docker', 'dockerinventory') }}</dt>
                 <dd class="col-sm-9">{{ node.engine_version ?: '-' }}</dd>
-                <dt class="col-sm-3">{{ __('Adresse', 'containers') }}</dt>
+                <dt class="col-sm-3">{{ __('Adresse', 'dockerinventory') }}</dt>
                 <dd class="col-sm-9">{{ node.address ?: '-' }}</dd>
-                <dt class="col-sm-3">{{ __('Vu la dernière fois', 'containers') }}</dt>
+                <dt class="col-sm-3">{{ __('Vu la dernière fois', 'dockerinventory') }}</dt>
                 <dd class="col-sm-9">{{ node.last_seen|formatted_datetime }}</dd>
             </dl>
         </div>
         {% if node.services is empty %}
             <div class="card-body pt-0 text-muted">
-                {{ __('Aucune tâche de service en cours sur ce nœud.', 'containers') }}
+                {{ __('Aucune tâche de service en cours sur ce nœud.', 'dockerinventory') }}
             </div>
         {% else %}
             <div class="table-responsive">
-                {{ include('@containers/_service_rows.html.twig', {services: node.services, show_tasks: true}) }}
+                {{ include('@dockerinventory/_service_rows.html.twig', {services: node.services, show_tasks: true}) }}
             </div>
         {% endif %}
     </div>

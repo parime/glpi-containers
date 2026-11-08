@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -17,13 +17,13 @@
 
 declare(strict_types=1);
 
-namespace GlpiPlugin\Containers\Install;
+namespace GlpiPlugin\Dockerinventory\Install;
 
 use CronTask;
 use DBConnection;
 use DisplayPreference;
-use GlpiPlugin\Containers\Connection;
-use GlpiPlugin\Containers\Service;
+use GlpiPlugin\Dockerinventory\Connection;
+use GlpiPlugin\Dockerinventory\Service;
 use Migration;
 use ProfileRight;
 
@@ -37,11 +37,11 @@ use ProfileRight;
 final class Installer
 {
     public const TABLES = [
-        'glpi_plugin_containers_connections',
-        'glpi_plugin_containers_stacks',
-        'glpi_plugin_containers_services',
-        'glpi_plugin_containers_nodes',
-        'glpi_plugin_containers_services_nodes',
+        'glpi_plugin_dockerinventory_connections',
+        'glpi_plugin_dockerinventory_stacks',
+        'glpi_plugin_dockerinventory_services',
+        'glpi_plugin_dockerinventory_nodes',
+        'glpi_plugin_dockerinventory_services_nodes',
     ];
 
     public const CRON_NAME = 'portainerimport';
@@ -74,7 +74,7 @@ final class Installer
     {
         global $DB;
 
-        CronTask::unregister('containers');
+        CronTask::unregister('dockerinventory');
         ProfileRight::deleteProfileRights([Service::RIGHTNAME]);
         $this->deleteCoreRowsOfPluginItemtypes();
 
@@ -95,7 +95,7 @@ final class Installer
         $options = "ENGINE=InnoDB DEFAULT CHARSET={$charset} COLLATE={$collation} ROW_FORMAT=DYNAMIC";
 
         $definitions = [
-            'glpi_plugin_containers_connections' => "
+            'glpi_plugin_dockerinventory_connections' => "
                 `id` int {$sign} NOT NULL AUTO_INCREMENT,
                 `name` varchar(255) NOT NULL DEFAULT '',
                 `entities_id` int {$sign} NOT NULL DEFAULT '0',
@@ -117,9 +117,9 @@ final class Installer
                 KEY `is_recursive` (`is_recursive`),
                 KEY `is_active` (`is_active`),
                 KEY `applianceenvironments_id` (`applianceenvironments_id`)",
-            'glpi_plugin_containers_stacks' => "
+            'glpi_plugin_dockerinventory_stacks' => "
                 `id` int {$sign} NOT NULL AUTO_INCREMENT,
-                `plugin_containers_connections_id` int {$sign} NOT NULL DEFAULT '0',
+                `plugin_dockerinventory_connections_id` int {$sign} NOT NULL DEFAULT '0',
                 `endpoint_uid` int NOT NULL DEFAULT '0',
                 `stack_uid` int NOT NULL DEFAULT '0',
                 `name` varchar(255) NOT NULL DEFAULT '',
@@ -129,19 +129,19 @@ final class Installer
                 `date_mod` timestamp NULL DEFAULT NULL,
                 `date_creation` timestamp NULL DEFAULT NULL,
                 PRIMARY KEY (`id`),
-                UNIQUE KEY `unicity` (`plugin_containers_connections_id`, `stack_uid`),
+                UNIQUE KEY `unicity` (`plugin_dockerinventory_connections_id`, `stack_uid`),
                 KEY `appliances_id` (`appliances_id`)",
-            'glpi_plugin_containers_services' => "
+            'glpi_plugin_dockerinventory_services' => "
                 `id` int {$sign} NOT NULL AUTO_INCREMENT,
                 `name` varchar(255) NOT NULL DEFAULT '',
                 `entities_id` int {$sign} NOT NULL DEFAULT '0',
                 `is_recursive` tinyint NOT NULL DEFAULT '0',
-                `plugin_containers_connections_id` int {$sign} NOT NULL DEFAULT '0',
+                `plugin_dockerinventory_connections_id` int {$sign} NOT NULL DEFAULT '0',
                 `endpoint_uid` int NOT NULL DEFAULT '0',
                 `endpoint_name` varchar(255) NOT NULL DEFAULT '',
                 `service_uid` varchar(64) NOT NULL DEFAULT '',
                 `stack_name` varchar(255) NOT NULL DEFAULT '',
-                `plugin_containers_stacks_id` int {$sign} NOT NULL DEFAULT '0',
+                `plugin_dockerinventory_stacks_id` int {$sign} NOT NULL DEFAULT '0',
                 `appliances_id` int {$sign} NOT NULL DEFAULT '0',
                 `image` varchar(255) NOT NULL DEFAULT '',
                 `tag` varchar(255) NOT NULL DEFAULT '',
@@ -158,16 +158,16 @@ final class Installer
                 `date_mod` timestamp NULL DEFAULT NULL,
                 `date_creation` timestamp NULL DEFAULT NULL,
                 PRIMARY KEY (`id`),
-                UNIQUE KEY `unicity` (`plugin_containers_connections_id`, `service_uid`),
+                UNIQUE KEY `unicity` (`plugin_dockerinventory_connections_id`, `service_uid`),
                 KEY `name` (`name`),
                 KEY `entities_id` (`entities_id`),
                 KEY `is_recursive` (`is_recursive`),
-                KEY `plugin_containers_stacks_id` (`plugin_containers_stacks_id`),
+                KEY `plugin_dockerinventory_stacks_id` (`plugin_dockerinventory_stacks_id`),
                 KEY `appliances_id` (`appliances_id`),
                 KEY `is_retired` (`is_retired`)",
-            'glpi_plugin_containers_nodes' => "
+            'glpi_plugin_dockerinventory_nodes' => "
                 `id` int {$sign} NOT NULL AUTO_INCREMENT,
-                `plugin_containers_connections_id` int {$sign} NOT NULL DEFAULT '0',
+                `plugin_dockerinventory_connections_id` int {$sign} NOT NULL DEFAULT '0',
                 `endpoint_uid` int NOT NULL DEFAULT '0',
                 `node_uid` varchar(64) NOT NULL DEFAULT '',
                 `hostname` varchar(255) NOT NULL DEFAULT '',
@@ -182,16 +182,16 @@ final class Installer
                 `date_mod` timestamp NULL DEFAULT NULL,
                 `date_creation` timestamp NULL DEFAULT NULL,
                 PRIMARY KEY (`id`),
-                UNIQUE KEY `unicity` (`plugin_containers_connections_id`, `node_uid`),
+                UNIQUE KEY `unicity` (`plugin_dockerinventory_connections_id`, `node_uid`),
                 KEY `computers_id` (`computers_id`)",
-            'glpi_plugin_containers_services_nodes' => "
+            'glpi_plugin_dockerinventory_services_nodes' => "
                 `id` int {$sign} NOT NULL AUTO_INCREMENT,
-                `plugin_containers_services_id` int {$sign} NOT NULL DEFAULT '0',
-                `plugin_containers_nodes_id` int {$sign} NOT NULL DEFAULT '0',
+                `plugin_dockerinventory_services_id` int {$sign} NOT NULL DEFAULT '0',
+                `plugin_dockerinventory_nodes_id` int {$sign} NOT NULL DEFAULT '0',
                 `running_tasks` int NOT NULL DEFAULT '0',
                 PRIMARY KEY (`id`),
-                UNIQUE KEY `unicity` (`plugin_containers_services_id`, `plugin_containers_nodes_id`),
-                KEY `plugin_containers_nodes_id` (`plugin_containers_nodes_id`)",
+                UNIQUE KEY `unicity` (`plugin_dockerinventory_services_id`, `plugin_dockerinventory_nodes_id`),
+                KEY `plugin_dockerinventory_nodes_id` (`plugin_dockerinventory_nodes_id`)",
         ];
 
         foreach ($definitions as $table => $columns) {
@@ -239,7 +239,7 @@ final class Installer
     {
         global $DB;
 
-        $like = addcslashes('GlpiPlugin\\Containers\\', '\\') . '%';
+        $like = addcslashes('GlpiPlugin\\Dockerinventory\\', '\\') . '%';
         $columns = $DB->request([
             'SELECT' => ['TABLE_NAME', 'COLUMN_NAME'],
             'FROM'   => 'information_schema.COLUMNS',

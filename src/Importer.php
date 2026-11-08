@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -17,13 +17,13 @@
 
 declare(strict_types=1);
 
-namespace GlpiPlugin\Containers;
+namespace GlpiPlugin\Dockerinventory;
 
 use Appliance;
 use DbUtils;
-use GlpiPlugin\Containers\Portainer\PortainerClient;
-use GlpiPlugin\Containers\Portainer\PortainerException;
-use GlpiPlugin\Containers\Portainer\PortainerMapper;
+use GlpiPlugin\Dockerinventory\Portainer\PortainerClient;
+use GlpiPlugin\Dockerinventory\Portainer\PortainerException;
+use GlpiPlugin\Dockerinventory\Portainer\PortainerMapper;
 
 /**
  * Import en lecture seule d'un serveur Portainer.
@@ -159,7 +159,7 @@ final class Importer
 
         $connectionId = (int) $connection->getID();
         $report['retired'] = $this->retire(Service::getTable(), $connectionId, $seen['services'], $read, $listed);
-        $this->retire('glpi_plugin_containers_stacks', $connectionId, $seen['stacks'], $read, $listed);
+        $this->retire('glpi_plugin_dockerinventory_stacks', $connectionId, $seen['stacks'], $read, $listed);
         $this->retire(Node::getTable(), $connectionId, $seen['nodes'], $read, $listed);
 
         if ($report['errors'] !== []) {
@@ -184,8 +184,11 @@ final class Importer
     ): array {
         global $DB;
 
-        $table = 'glpi_plugin_containers_stacks';
-        $where = ['plugin_containers_connections_id' => (int) $connection->getID(), 'stack_uid' => (int) $stack['Id']];
+        $table = 'glpi_plugin_dockerinventory_stacks';
+        $where = [
+            'plugin_dockerinventory_connections_id' => (int) $connection->getID(),
+            'stack_uid'                             => (int) $stack['Id'],
+        ];
         $existing = $DB->request(['FROM' => $table, 'WHERE' => $where, 'LIMIT' => 1])->current();
         $name = (string) $stack['Name'];
         $applianceId = $this->ensureAppliance(
@@ -251,7 +254,7 @@ final class Importer
             'is_recursive'             => (int) $connection->fields['is_recursive'],
             'applianceenvironments_id' => (int) $connection->fields['applianceenvironments_id'],
             'comment'                  => sprintf(
-                __('Créée par le plugin Containers pour la stack Portainer « %1$s » (%2$s).', 'containers'),
+                __('Créée par le plugin Inventaire Docker pour la stack Portainer « %1$s » (%2$s).', 'dockerinventory'),
                 $stackName,
                 $endpointName
             ),
@@ -274,7 +277,10 @@ final class Importer
         global $DB;
 
         $table = Node::getTable();
-        $where = ['plugin_containers_connections_id' => (int) $connection->getID(), 'node_uid' => $node['node_uid']];
+        $where = [
+            'plugin_dockerinventory_connections_id' => (int) $connection->getID(),
+            'node_uid'                              => $node['node_uid'],
+        ];
         $computerId = $this->matchComputer($connection, $node['hostname']);
         if ($computerId > 0) {
             $report['linked_nodes']++;
@@ -345,7 +351,7 @@ final class Importer
 
         $table = Service::getTable();
         $where = [
-            'plugin_containers_connections_id' => (int) $connection->getID(),
+            'plugin_dockerinventory_connections_id' => (int) $connection->getID(),
             'service_uid'                      => $service['service_uid'],
         ];
         $values = [
@@ -355,7 +361,7 @@ final class Importer
             'endpoint_uid'      => $endpointId,
             'endpoint_name'    => $endpointName,
             'stack_name'       => $service['stack_name'],
-            'plugin_containers_stacks_id'        => $stackRow['id'],
+            'plugin_dockerinventory_stacks_id'        => $stackRow['id'],
             'appliances_id'    => $stackRow['appliances_id'],
             'image'            => $service['image'],
             'tag'              => $service['tag'],
@@ -392,13 +398,13 @@ final class Importer
     {
         global $DB;
 
-        $table = 'glpi_plugin_containers_services_nodes';
-        $DB->delete($table, ['plugin_containers_services_id' => $serviceId]);
+        $table = 'glpi_plugin_dockerinventory_services_nodes';
+        $DB->delete($table, ['plugin_dockerinventory_services_id' => $serviceId]);
         foreach ($placement as $nodeUid => $count) {
             if (isset($nodeRows[$nodeUid])) {
                 $DB->insert($table, [
-                    'plugin_containers_services_id'   => $serviceId,
-                    'plugin_containers_nodes_id'      => $nodeRows[$nodeUid],
+                    'plugin_dockerinventory_services_id'   => $serviceId,
+                    'plugin_dockerinventory_nodes_id'      => $nodeRows[$nodeUid],
                     'running_tasks' => $count,
                 ]);
             }
@@ -424,7 +430,7 @@ final class Importer
         }
         $scope[] = $listed === [] ? ['endpoint_uid' => ['>', -1]] : ['NOT' => ['endpoint_uid' => $listed]];
         $where = [
-            'plugin_containers_connections_id' => $connectionId,
+            'plugin_dockerinventory_connections_id' => $connectionId,
             'is_retired'     => 0,
             'OR'             => $scope,
         ];
@@ -440,7 +446,10 @@ final class Importer
         }
         $values = ['is_retired' => 1, 'date_mod' => $this->now];
         if ($table === Service::getTable()) {
+            // Plus aucune tâche connue : ni réplicas en cours, ni nœud.
             $values['date_retired'] = $this->now;
+            $values['running_replicas'] = 0;
+            $DB->delete('glpi_plugin_dockerinventory_services_nodes', ['plugin_dockerinventory_services_id' => $ids]);
         }
         $DB->update($table, $values, ['id' => $ids]);
 

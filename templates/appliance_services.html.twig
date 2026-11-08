@@ -1,8 +1,8 @@
 {#
  # -------------------------------------------------------------------------
- # Containers plugin for GLPI
+ # Docker Inventory plugin for GLPI
  # Copyright (C) 2026 Vincent GUILLOTTE
- # https://github.com/parime/glpi-containers
+ # https://github.com/parime/glpi-docker-inventory
  # -------------------------------------------------------------------------
  # LICENSE
  #
@@ -18,23 +18,23 @@
     <div class="card-header">
         <h3 class="card-title">
             <i class="ti ti-brand-docker me-2" aria-hidden="true"></i>
-            {{ __('Services Docker Swarm de cette stack', 'containers') }}
+            {{ __('Services Docker Swarm de cette stack', 'dockerinventory') }}
         </h3>
     </div>
     {% if services is empty %}
         <div class="card-body">
             <p class="text-muted mb-0">
-                {{ __('Aucun service importé pour cette application.', 'containers') }}
-                {{ __("Elle n'est peut-être liée à aucune stack Portainer.", 'containers') }}
+                {{ __('Aucun service importé pour cette application.', 'dockerinventory') }}
+                {{ __("Elle n'est peut-être liée à aucune stack Portainer.", 'dockerinventory') }}
             </p>
         </div>
     {% else %}
         <div class="table-responsive">
-            {{ include('@containers/_service_rows.html.twig', {services: services}) }}
+            {{ include('@dockerinventory/_service_rows.html.twig', {services: services}) }}
         </div>
         <div class="card-footer text-muted small">
-            {{ __('Données importées de Portainer en lecture seule.', 'containers') }}
-            {{ __('Un service disparu est marqué « Retiré », jamais supprimé.', 'containers') }}
+            {{ __('Données importées de Portainer en lecture seule.', 'dockerinventory') }}
+            {{ __('Un service disparu est marqué « Retiré », jamais supprimé.', 'dockerinventory') }}
         </div>
     {% endif %}
 </div>

@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -15,8 +15,8 @@
  * -------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Containers\Connection;
-use GlpiPlugin\Containers\Importer;
+use GlpiPlugin\Dockerinventory\Connection;
+use GlpiPlugin\Dockerinventory\Importer;
 
 Session::checkRight(Connection::RIGHTNAME, UPDATE);
 
@@ -45,7 +45,7 @@ if (isset($_POST['add'])) {
     $report = (new Importer())->import($connection);
     Session::addMessageAfterRedirect(
         htmlescape(sprintf(
-            __('Import terminé (%1$s) : %2$d stacks, %3$d services, %4$d retirés, %5$d nœuds.', 'containers'),
+            __('Import terminé (%1$s) : %2$d stacks, %3$d services, %4$d retirés, %5$d nœuds.', 'dockerinventory'),
             Connection::statusLabel($report['status']),
             $report['stacks'],
             $report['services'],

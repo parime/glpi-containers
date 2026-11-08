@@ -1,8 +1,8 @@
 {#
  # -------------------------------------------------------------------------
- # Containers plugin for GLPI
+ # Docker Inventory plugin for GLPI
  # Copyright (C) 2026 Vincent GUILLOTTE
- # https://github.com/parime/glpi-containers
+ # https://github.com/parime/glpi-docker-inventory
  # -------------------------------------------------------------------------
  # LICENSE
  #
@@ -19,10 +19,10 @@
 
 {% block form_fields %}
     {% set status_html %}
-        {{ include('@containers/_status_badge.html.twig', {retired: service.is_retired}) }}
+        {{ include('@dockerinventory/_status_badge.html.twig', {retired: service.is_retired}) }}
         {% if service.is_retired and service.date_retired %}
             <span class="ms-2 text-muted">
-                {{ __('depuis le', 'containers') }} {{ service.date_retired|formatted_datetime }}
+                {{ __('depuis le', 'dockerinventory') }} {{ service.date_retired|formatted_datetime }}
             </span>
         {% endif %}
     {% endset %}
@@ -31,30 +31,30 @@
             <a href="{{ appliance.url }}"><i class="ti ti-apps me-1"></i>{{ appliance.name }}</a>
         {% elseif service.stack_name %}
             {{ service.stack_name }}
-            <span class="text-muted">({{ __('stack hors Portainer', 'containers') }})</span>
+            <span class="text-muted">({{ __('stack hors Portainer', 'dockerinventory') }})</span>
         {% else %}
-            <span class="text-muted">{{ __('Aucune stack', 'containers') }}</span>
+            <span class="text-muted">{{ __('Aucune stack', 'dockerinventory') }}</span>
         {% endif %}
     {% endset %}
     {% set replicas_html %}
         {% set replicas_class = service.replicas_ok ? 'bg-success' : 'bg-warning' %}
         <span class="badge {{ replicas_class }} text-white">{{ service.replicas }}</span>
-        <span class="ms-2 text-muted">{{ __('en cours / voulus', 'containers') }}</span>
+        <span class="ms-2 text-muted">{{ __('en cours / voulus', 'dockerinventory') }}</span>
     {% endset %}
     {% set lists = {
-        (__('Ports publiés', 'containers')): service.ports,
-        (__('Réseaux', 'containers')): service.networks,
-        (__('Secrets (noms)', 'containers')): service.secrets,
+        (__('Ports publiés', 'dockerinventory')): service.ports,
+        (__('Réseaux', 'dockerinventory')): service.networks,
+        (__('Secrets (noms)', 'dockerinventory')): service.secrets,
     } %}
 
     {{ fields.readOnlyField('name', service.name, __('Name')) }}
-    {{ fields.field('status', status_html, __('Statut', 'containers')) }}
-    {{ fields.field('appliance', appliance_html, __('Application (stack)', 'containers')) }}
-    {{ fields.readOnlyField('endpoint', service.endpoint, __('Environnement Portainer', 'containers')) }}
-    {{ fields.readOnlyField('image', service.image, __('Image', 'containers')) }}
-    {{ fields.readOnlyField('tag', service.tag, __('Tag (version déployée)', 'containers')) }}
-    {{ fields.readOnlyField('digest', service.digest ?: '-', __('Empreinte (digest)', 'containers')) }}
-    {{ fields.field('replicas', replicas_html, __('Réplicas', 'containers')) }}
+    {{ fields.field('status', status_html, __('Statut', 'dockerinventory')) }}
+    {{ fields.field('appliance', appliance_html, __('Application (stack)', 'dockerinventory')) }}
+    {{ fields.readOnlyField('endpoint', service.endpoint, __('Environnement Portainer', 'dockerinventory')) }}
+    {{ fields.readOnlyField('image', service.image, __('Image', 'dockerinventory')) }}
+    {{ fields.readOnlyField('tag', service.tag, __('Tag (version déployée)', 'dockerinventory')) }}
+    {{ fields.readOnlyField('digest', service.digest ?: '-', __('Empreinte (digest)', 'dockerinventory')) }}
+    {{ fields.field('replicas', replicas_html, __('Réplicas', 'dockerinventory')) }}
     {% for label, values in lists %}
         {% set list_html %}
             {% for value in values %}
@@ -68,20 +68,20 @@
     {{ fields.readOnlyField(
         'last_seen',
         service.last_seen|formatted_datetime,
-        __('Vu la dernière fois', 'containers')
+        __('Vu la dernière fois', 'dockerinventory')
     ) }}
 
-    {{ fields.smallTitle(__('Nœuds', 'containers'), 'ti ti-server') }}
+    {{ fields.smallTitle(__('Nœuds', 'dockerinventory'), 'ti ti-server') }}
     <div class="col-12 mb-3">
         {% if nodes is empty %}
-            <p class="text-muted">{{ __('Aucune tâche en cours connue pour ce service.', 'containers') }}</p>
+            <p class="text-muted">{{ __('Aucune tâche en cours connue pour ce service.', 'dockerinventory') }}</p>
         {% else %}
             <table class="table table-sm table-hover">
                 <thead>
                     <tr>
-                        <th>{{ __("Nom d'hôte", 'containers') }}</th>
-                        <th>{{ __('Ordinateur', 'containers') }}</th>
-                        <th>{{ __('Tâches en cours', 'containers') }}</th>
+                        <th>{{ __("Nom d'hôte", 'dockerinventory') }}</th>
+                        <th>{{ __('Ordinateur', 'dockerinventory') }}</th>
+                        <th>{{ __('Tâches en cours', 'dockerinventory') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -94,7 +94,7 @@
                                         <i class="ti ti-device-desktop me-1"></i>{{ node.computer.name }}
                                     </a>
                                 {% else %}
-                                    <span class="text-muted">{{ __('Non rattaché', 'containers') }}</span>
+                                    <span class="text-muted">{{ __('Non rattaché', 'dockerinventory') }}</span>
                                 {% endif %}
                             </td>
                             <td>{{ node.running_tasks }}</td>

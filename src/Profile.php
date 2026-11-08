@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace GlpiPlugin\Containers;
+namespace GlpiPlugin\Dockerinventory;
 
 use CommonGLPI;
 use Glpi\Application\View\TemplateRenderer;
@@ -32,7 +32,7 @@ class Profile extends CommonGLPI
 {
     public static function getTypeName($nb = 0)
     {
-        return __('Conteneurs', 'containers');
+        return __('Conteneurs', 'dockerinventory');
     }
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
@@ -48,7 +48,7 @@ class Profile extends CommonGLPI
         if (!self::canManage($item)) {
             return false;
         }
-        TemplateRenderer::getInstance()->display('@containers/profile_rights.html.twig', [
+        TemplateRenderer::getInstance()->display('@dockerinventory/profile_rights.html.twig', [
             'item'   => $item,
             'title'  => self::getTypeName(),
             'rights' => [

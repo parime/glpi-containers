@@ -1,5 +1,5 @@
 {
-    "name": "parime/glpi-containers",
+    "name": "parime/glpi-docker-inventory",
     "description": "GLPI plugin: Docker Swarm stacks and services imported from Portainer, read-only",
     "type": "glpi-plugin",
     "license": "GPL-3.0-or-later",
@@ -9,9 +9,9 @@
         "docker",
         "swarm",
         "portainer",
-        "containers"
+        "inventory"
     ],
-    "homepage": "https://github.com/parime/glpi-containers",
+    "homepage": "https://github.com/parime/glpi-docker-inventory",
     "authors": [
         {
             "name": "Vincent GUILLOTTE",
@@ -31,12 +31,12 @@
     },
     "autoload": {
         "psr-4": {
-            "GlpiPlugin\\Containers\\": "src/"
+            "GlpiPlugin\\Dockerinventory\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "GlpiPlugin\\Containers\\Tests\\": "tests/"
+            "GlpiPlugin\\Dockerinventory\\Tests\\": "tests/"
         }
     },
     "config": {

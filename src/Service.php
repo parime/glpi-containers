@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -17,13 +17,13 @@
 
 declare(strict_types=1);
 
-namespace GlpiPlugin\Containers;
+namespace GlpiPlugin\Dockerinventory;
 
 use Appliance;
 use CommonGLPI;
 use DbUtils;
 use Glpi\Application\View\TemplateRenderer;
-use GlpiPlugin\Containers\Compat\Base\ServiceBase;
+use GlpiPlugin\Dockerinventory\Compat\Base\ServiceBase;
 use Session;
 
 /**
@@ -32,11 +32,13 @@ use Session;
  */
 class Service extends ServiceBase
 {
-    public const RIGHTNAME = 'plugin_containers_service';
+    public const RIGHTNAME = 'plugin_dockerinventory_service';
 
     public static function getTypeName($nb = 0)
     {
-        return $nb > 1 ? __('Services de conteneurs', 'containers') : __('Service de conteneur', 'containers');
+        return $nb > 1
+            ? __('Services de conteneurs', 'dockerinventory')
+            : __('Service de conteneur', 'dockerinventory');
     }
 
     public static function getIcon()
@@ -87,19 +89,19 @@ class Service extends ServiceBase
         $table = static::getTable();
         $own = [
             2  => ['id', __('ID'), 'number'],
-            3  => ['image', __('Image', 'containers'), 'string'],
-            4  => ['tag', __('Tag', 'containers'), 'string'],
-            5  => ['digest', __('Empreinte (digest)', 'containers'), 'string'],
-            6  => ['replicas', __('Réplicas voulus', 'containers'), 'number'],
-            7  => ['running_replicas', __('Réplicas en cours', 'containers'), 'number'],
-            9  => ['stack_name', __('Stack', 'containers'), 'string'],
-            10 => ['is_retired', __('Retiré', 'containers'), 'bool'],
-            11 => ['last_seen', __('Vu la dernière fois', 'containers'), 'datetime'],
-            12 => ['endpoint_name', __('Environnement Portainer', 'containers'), 'string'],
-            14 => ['ports', __('Ports publiés', 'containers'), 'text'],
-            15 => ['networks', __('Réseaux', 'containers'), 'text'],
-            16 => ['secrets', __('Secrets (noms)', 'containers'), 'text'],
-            17 => ['date_retired', __('Retiré le', 'containers'), 'datetime'],
+            3  => ['image', __('Image', 'dockerinventory'), 'string'],
+            4  => ['tag', __('Tag', 'dockerinventory'), 'string'],
+            5  => ['digest', __('Empreinte (digest)', 'dockerinventory'), 'string'],
+            6  => ['replicas', __('Réplicas voulus', 'dockerinventory'), 'number'],
+            7  => ['running_replicas', __('Réplicas en cours', 'dockerinventory'), 'number'],
+            9  => ['stack_name', __('Stack', 'dockerinventory'), 'string'],
+            10 => ['is_retired', __('Retiré', 'dockerinventory'), 'bool'],
+            11 => ['last_seen', __('Vu la dernière fois', 'dockerinventory'), 'datetime'],
+            12 => ['endpoint_name', __('Environnement Portainer', 'dockerinventory'), 'string'],
+            14 => ['ports', __('Ports publiés', 'dockerinventory'), 'text'],
+            15 => ['networks', __('Réseaux', 'dockerinventory'), 'text'],
+            16 => ['secrets', __('Secrets (noms)', 'dockerinventory'), 'text'],
+            17 => ['date_retired', __('Retiré le', 'dockerinventory'), 'datetime'],
         ];
         $options = parent::rawSearchOptions();
         foreach ($own as $id => [$field, $name, $datatype]) {
@@ -125,7 +127,7 @@ class Service extends ServiceBase
             'id'            => 13,
             'table'         => Connection::getTable(),
             'field'         => 'name',
-            'linkfield'     => 'plugin_containers_connections_id',
+            'linkfield'     => 'plugin_dockerinventory_connections_id',
             'name'          => Connection::getTypeName(1),
             'datatype'      => 'itemlink',
             'massiveaction' => false,
@@ -145,7 +147,7 @@ class Service extends ServiceBase
     public function showForm($ID, array $options = [])
     {
         $this->initForm($ID, $options);
-        TemplateRenderer::getInstance()->display('@containers/service_form.html.twig', [
+        TemplateRenderer::getInstance()->display('@dockerinventory/service_form.html.twig', [
             'item'      => $this,
             'params'    => ['canedit' => false] + $options,
             'service'   => self::present($this->fields),
@@ -166,7 +168,7 @@ class Service extends ServiceBase
             $count = countElementsInTable(static::getTable(), self::criteriaForAppliance((int) $item->getID()));
         }
 
-        return self::createTabEntry(__('Services', 'containers'), $count, static::class, self::getIcon());
+        return self::createTabEntry(__('Services', 'dockerinventory'), $count, static::class, self::getIcon());
     }
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
@@ -186,7 +188,7 @@ class Service extends ServiceBase
         foreach ($iterator as $row) {
             $services[] = self::present($row);
         }
-        TemplateRenderer::getInstance()->display('@containers/appliance_services.html.twig', [
+        TemplateRenderer::getInstance()->display('@dockerinventory/appliance_services.html.twig', [
             'services' => $services,
         ]);
 
@@ -224,7 +226,7 @@ class Service extends ServiceBase
             'digest'       => $digest,
             'digest_short' => strlen($digest) > 19 ? substr($digest, 0, 19) . '...' : $digest,
             'mode'         => (string) ($row['mode'] ?? ''),
-            'replicas'     => $replicas === null ? sprintf(__('%d (global)', 'containers'), $running)
+            'replicas'     => $replicas === null ? sprintf(__('%d (global)', 'dockerinventory'), $running)
                 : sprintf('%d / %d', $running, (int) $replicas),
             'replicas_ok'  => $replicas === null ? $running > 0 : $running >= (int) $replicas,
             'ports'        => self::split((string) ($row['ports'] ?? '')),
@@ -270,11 +272,11 @@ class Service extends ServiceBase
         $nodes = [];
         $iterator = $DB->request([
             'SELECT'     => ['n.*', 'sn.running_tasks'],
-            'FROM'       => 'glpi_plugin_containers_services_nodes AS sn',
+            'FROM'       => 'glpi_plugin_dockerinventory_services_nodes AS sn',
             'INNER JOIN' => [
-                Node::getTable() . ' AS n' => ['ON' => ['sn' => 'plugin_containers_nodes_id', 'n' => 'id']],
+                Node::getTable() . ' AS n' => ['ON' => ['sn' => 'plugin_dockerinventory_nodes_id', 'n' => 'id']],
             ],
-            'WHERE'      => ['sn.plugin_containers_services_id' => (int) $this->getID()],
+            'WHERE'      => ['sn.plugin_dockerinventory_services_id' => (int) $this->getID()],
             'ORDER'      => 'n.hostname',
         ]);
         foreach ($iterator as $row) {

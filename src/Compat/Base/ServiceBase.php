@@ -2,9 +2,9 @@
 
 /**
  * -------------------------------------------------------------------------
- * Containers plugin for GLPI
+ * Docker Inventory plugin for GLPI
  * Copyright (C) 2026 Vincent GUILLOTTE
- * https://github.com/parime/glpi-containers
+ * https://github.com/parime/glpi-docker-inventory
  * -------------------------------------------------------------------------
  * LICENSE
  *
@@ -15,14 +15,14 @@
  * -------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Containers\Compat\Base;
+namespace GlpiPlugin\Dockerinventory\Compat\Base;
 
 use CommonDBTM;
-use GlpiPlugin\Containers\Compat\GlpiVersion;
-use GlpiPlugin\Containers\Service;
+use GlpiPlugin\Dockerinventory\Compat\GlpiVersion;
+use GlpiPlugin\Dockerinventory\Service;
 
 /*
- * Parent de \GlpiPlugin\Containers\Service : redéclare $rightname sans type en GLPI 11, typé en
+ * Parent de \GlpiPlugin\Dockerinventory\Service : redéclare $rightname sans type en GLPI 11, typé en
  * GLPI 12 (voir GlpiVersion). La valeur vient de la constante de la classe enfant.
  */
 if (GlpiVersion::isAtLeast12()) {

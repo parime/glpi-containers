@@ -7,6 +7,8 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions
 
 ## [0.2.0] - 2026-11-08
 
+- Publiée dans le catalogue de la marketplace GLPI (`dockerinventory.xml`).
+
 ### Added
 
 - Lot 2 : versions des images depuis What's Up Docker (WUD), en lecture seule.

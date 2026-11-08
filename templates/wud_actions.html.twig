@@ -1,0 +1,129 @@
+{#
+ # -------------------------------------------------------------------------
+ # Docker Inventory plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-docker-inventory
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Sous le formulaire d'une connexion WUD enregistrée : test, lecture immédiate, dernier compte rendu. #}
+{% set status_colors = {0: 'secondary', 1: 'success', 2: 'warning', 3: 'danger'} %}
+{% set status = item.fields['last_import_status']|default(0) %}
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="ti ti-tags me-2" aria-hidden="true"></i>
+            {{ __('Versions depuis What’s Up Docker', 'dockerinventory') }}
+        </h3>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">
+            {{ __(
+                'La lecture de WUD ne modifie rien dans WUD (aucun déclencheur) et tourne toutes les heures.',
+                'dockerinventory'
+            ) }}
+            {{ __('Le bouton « Lire WUD maintenant » la lance tout de suite.', 'dockerinventory') }}
+        </p>
+        <div class="alert alert-info">
+            <i class="ti ti-info-circle me-2" aria-hidden="true"></i>
+            {{ __('Les conteneurs vus par WUD sont rattachés aux services importés de Portainer.', 'dockerinventory') }}
+            {{ __(
+                'Lancez d’abord l’import Portainer, sinon ils seront tous listés « sans service ».',
+                'dockerinventory'
+            ) }}
+        </div>
+
+        <div class="mb-3">
+            <span class="me-2">{{ __('Dernière lecture', 'dockerinventory') }} :</span>
+            <span class="badge bg-{{ status_colors[status] ?? 'secondary' }} text-white">{{ status_label }}</span>
+            {% if item.fields['last_import_date'] %}
+                <span class="ms-2 text-muted">{{ item.fields['last_import_date']|formatted_datetime }}</span>
+            {% endif %}
+            {% if report and report.wud_version|default('') %}
+                <span class="badge bg-teal-lt ms-2">WUD {{ report.wud_version }}</span>
+            {% endif %}
+        </div>
+
+        {% if report and status != 3 %}
+            <ul class="list-inline mb-3">
+                <li class="list-inline-item">
+                    <i class="ti ti-box" aria-hidden="true"></i>
+                    {{ __('Conteneurs suivis', 'dockerinventory') }} :
+                    <strong>{{ report.containers|default(0) }}</strong>
+                </li>
+                <li class="list-inline-item">
+                    <i class="ti ti-brand-docker" aria-hidden="true"></i>
+                    {{ __('Services rattachés', 'dockerinventory') }} :
+                    <strong>{{ report.services|default(0) }}</strong>
+                </li>
+                <li class="list-inline-item">
+                    <i class="ti ti-unlink" aria-hidden="true"></i>
+                    {{ __('Conteneurs sans service', 'dockerinventory') }} :
+                    <strong>{{ report.unmatched|default(0) }}</strong>
+                </li>
+                <li class="list-inline-item">
+                    <i class="ti ti-arrows-split" aria-hidden="true"></i>
+                    {{ __('Réplicas désynchronisés', 'dockerinventory') }} :
+                    <strong>{{ report.out_of_sync|default(0) }}</strong>
+                </li>
+            </ul>
+            {% if report.gaps is defined %}
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% for code, gap in gaps %}
+                        {% if report.gaps[code]|default(0) > 0 %}
+                            <span>
+                                {{ include('@dockerinventory/_version_badge.html.twig', {gap: gap}) }}
+                                <strong class="ms-1">{{ report.gaps[code] }}</strong>
+                            </span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+        {% if report and report.errors is not empty %}
+            <div class="alert alert-warning">
+                <ul class="mb-0">
+                    {% for error in report.errors %}
+                        <li>{{ error_labels[error.code] ?? error.code }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="post" action="{{ item.getFormURL() }}" class="d-flex flex-wrap gap-2">
+            <input type="hidden" name="id" value="{{ item.getID() }}">
+            <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" name="test" value="1" class="btn btn-outline-secondary">
+                <i class="ti ti-plug-connected me-1" aria-hidden="true"></i>
+                {{ __('Tester la connexion', 'dockerinventory') }}
+            </button>
+            <button type="submit" name="import" value="1" class="btn btn-primary">
+                <i class="ti ti-download me-1" aria-hidden="true"></i>
+                {{ __('Lire WUD maintenant', 'dockerinventory') }}
+            </button>
+            <a href="{{ versions_url }}" class="btn btn-outline-primary">
+                <i class="ti ti-tags me-1" aria-hidden="true"></i>
+                {{ __('Voir les versions des images', 'dockerinventory') }}
+            </a>
+        </form>
+
+        <details class="mt-3 text-muted">
+            <summary>{{ __('WUD sur un réseau privé (GLPI 12)', 'dockerinventory') }}</summary>
+            <p class="mt-2 mb-1">
+                {{ __('GLPI 12 refuse par défaut les appels vers un réseau privé.', 'dockerinventory') }}
+                {{ __('Pour WUD seulement, ajouter dans config/local_define.php :', 'dockerinventory') }}
+            </p>
+            <pre class="mb-0"><code>define('GLPI_SERVERSIDE_URL_ALLOWED_PRIVATE_NETWORKS_CONTEXTS', [
+    '{{ context_class }}',
+]);</code></pre>
+        </details>
+    </div>
+</div>

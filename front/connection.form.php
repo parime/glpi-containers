@@ -16,7 +16,6 @@
  */
 
 use GlpiPlugin\Dockerinventory\Connection;
-use GlpiPlugin\Dockerinventory\Importer;
 
 Session::checkRight(Connection::RIGHTNAME, UPDATE);
 
@@ -26,7 +25,9 @@ $id = (int) ($_REQUEST['id'] ?? 0);
 if (isset($_POST['add'])) {
     $connection->check(-1, CREATE, $_POST);
     $newId = $connection->add($_POST);
-    Html::redirect($newId ? Connection::getFormURLWithID((int) $newId) : Connection::getFormURL());
+    Html::redirect($newId
+        ? Connection::getFormURLWithID((int) $newId)
+        : Connection::getFormURL() . '?type=' . rawurlencode((string) ($_POST['type'] ?? '')));
 } elseif (isset($_POST['update'])) {
     $connection->check($id, UPDATE);
     $connection->update($_POST);
@@ -42,16 +43,9 @@ if (isset($_POST['add'])) {
     Html::back();
 } elseif (isset($_POST['import'])) {
     $connection->check($id, UPDATE);
-    $report = (new Importer())->import($connection);
+    $report = $connection->runImport();
     Session::addMessageAfterRedirect(
-        htmlescape(sprintf(
-            __('Import terminé (%1$s) : %2$d stacks, %3$d services, %4$d retirés, %5$d nœuds.', 'dockerinventory'),
-            Connection::statusLabel($report['status']),
-            $report['stacks'],
-            $report['services'],
-            $report['retired'],
-            $report['nodes']
-        )),
+        htmlescape($connection->importMessage($report)),
         false,
         $report['status'] === Connection::STATUS_ERROR ? ERROR : INFO
     );
@@ -60,5 +54,6 @@ if (isset($_POST['add'])) {
 
 $connection->check($id > 0 ? $id : -1, $id > 0 ? READ : CREATE);
 Html::header(Connection::getTypeName(2), '', 'config', Connection::class);
-$connection->display(['id' => $id]);
+// Nouvelle connexion : type choisi sur la première page (Portainer ou WUD).
+$connection->display(['id' => $id, 'type' => (string) ($_GET['type'] ?? '')]);
 Html::footer();

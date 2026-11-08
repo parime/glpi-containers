@@ -17,17 +17,21 @@
 
 /**
  * Jeu de données des contrôles de sécurité communs (parime/glpi-plugin-security), lancé avant la
- * désinstallation pour que le contrôle des restes porte sur de vraies données : une connexion,
- * un import complet depuis le jeu fictif du faux Portainer, une recherche enregistrée et des
- * préférences d'affichage personnelles sur les services. Données fictives uniquement.
+ * désinstallation pour que le contrôle des restes porte sur de vraies données : une connexion
+ * Portainer et une connexion WUD, un import complet depuis les jeux fictifs des faux Portainer et
+ * WUD (versions des images), des recherches enregistrées et des préférences d'affichage
+ * personnelles sur les services et les versions. Données fictives uniquement.
  *
  * Usage (dossier de GLPI, utilisateur www-data) : php plugins/dockerinventory/tests/security/setup.php
  */
 
 use GlpiPlugin\Dockerinventory\Connection;
+use GlpiPlugin\Dockerinventory\ImageVersion;
 use GlpiPlugin\Dockerinventory\Importer;
 use GlpiPlugin\Dockerinventory\Portainer\PortainerClient;
 use GlpiPlugin\Dockerinventory\Service;
+use GlpiPlugin\Dockerinventory\Wud\WudClient;
+use GlpiPlugin\Dockerinventory\Wud\WudImporter;
 
 require '/var/www/glpi/vendor/autoload.php';
 $kernel = new \Glpi\Kernel\Kernel();
@@ -83,4 +87,44 @@ $DB->insert(DisplayPreference::getTable(), [
     'users_id' => $userId,
 ] + ($DB->fieldExists(DisplayPreference::getTable(), 'interface') ? ['interface' => 'central'] : []));
 
-echo sprintf("connexion %d, %d services importés\n", $id, $report['services']);
+$wudFixture = json_decode((string) file_get_contents(dirname(__DIR__) . '/mock-wud/fixture.json'), true);
+$wud = new Connection();
+$wudId = (int) $wud->add([
+    'name'        => 'WUD fictif (sécurité)',
+    'type'        => Connection::TYPE_WUD,
+    'entities_id' => 0,
+    'url'         => 'https://wud.exemple.test:3000',
+    'username'    => 'lecteur',
+    'api_key'     => 'wud_mot_de_passe_securite',
+]);
+$wud->getFromDB($wudId);
+$wudReport = (new WudImporter(static fn (Connection $c): WudClient => new WudClient(
+    'https://wud.exemple.test:3000',
+    'lecteur',
+    'wud_mot_de_passe_securite',
+    static fn (string $url): string => (string) json_encode(
+        str_ends_with($url, '/api/app') ? $wudFixture['app'] : $wudFixture['containers']
+    )
+)))->import($wud);
+(new SavedSearch())->add([
+    'name'        => 'Versions majeures (sécurité)',
+    'type'        => SavedSearch::SEARCH,
+    'itemtype'    => ImageVersion::class,
+    'users_id'    => $userId,
+    'entities_id' => 0,
+    'query'       => 'criteria[0][field]=8&criteria[0][searchtype]=equals&criteria[0][value]=major',
+]);
+$DB->insert(DisplayPreference::getTable(), [
+    'itemtype' => ImageVersion::class,
+    'num'      => 13,
+    'rank'     => 1,
+    'users_id' => $userId,
+] + ($DB->fieldExists(DisplayPreference::getTable(), 'interface') ? ['interface' => 'central'] : []));
+
+echo sprintf(
+    "connexion %d, %d services importés ; connexion WUD %d, %d versions de services\n",
+    $id,
+    $report['services'],
+    $wudId,
+    $wudReport['services']
+);

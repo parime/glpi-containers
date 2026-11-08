@@ -3,7 +3,7 @@
 Conception d'origine : [glpi-iso27001-management#179](https://github.com/parime/glpi-iso27001-management/issues/179).
 Chaque lot fini et testé part en version, sans attendre le suivant.
 
-## Lot 1 : Portainer (en cours)
+## Lot 1 : Portainer (publié en 0.1.0)
 
 - [#1](https://github.com/parime/glpi-docker-inventory/issues/1) Import Portainer : stacks en Applications,
   services, nœuds rattachés aux ordinateurs, services retirés.
@@ -12,17 +12,18 @@ Chaque lot fini et testé part en version, sans attendre le suivant.
 
 Objectif : pour chaque service, version déployée, dernière version disponible et écart.
 
-| Issue | Sujet |
-| --- | --- |
-| [#2](https://github.com/parime/glpi-docker-inventory/issues/2) | Connexion WUD et lecture de `/api/containers` |
-| [#3](https://github.com/parime/glpi-docker-inventory/issues/3) | Rattachement des conteneurs WUD aux services Swarm |
-| [#4](https://github.com/parime/glpi-docker-inventory/issues/4) | Comparaison des versions (correctif, mineure, majeure, `latest` non suivable) |
-| [#5](https://github.com/parime/glpi-docker-inventory/issues/5) | Repli sans WUD : Docker Hub et API v2 de Harbor |
-| [#6](https://github.com/parime/glpi-docker-inventory/issues/6) | Tableau des versions : onglet du service et vue d'ensemble |
-| [#7](https://github.com/parime/glpi-docker-inventory/issues/7) | Tickets de mise à jour selon des seuils |
-| [#8](https://github.com/parime/glpi-docker-inventory/issues/8) | Faux WUD et jeu de données fictif |
+| Issue | Sujet | État |
+| --- | --- | --- |
+| [#2](https://github.com/parime/glpi-docker-inventory/issues/2) | Connexion WUD et lecture de `/api/containers` | Fait, à valider sur une vraie instance WUD 8.x |
+| [#3](https://github.com/parime/glpi-docker-inventory/issues/3) | Rattachement des conteneurs WUD aux services Swarm | Fait |
+| [#4](https://github.com/parime/glpi-docker-inventory/issues/4) | Comparaison des versions (correctif, mineure, majeure, `latest` non suivable) | Fait |
+| [#5](https://github.com/parime/glpi-docker-inventory/issues/5) | Repli sans WUD : Docker Hub et API v2 de Harbor | À faire |
+| [#6](https://github.com/parime/glpi-docker-inventory/issues/6) | Tableau des versions : onglet du service et vue d'ensemble | Fait |
+| [#7](https://github.com/parime/glpi-docker-inventory/issues/7) | Tickets de mise à jour selon des seuils | À faire |
+| [#8](https://github.com/parime/glpi-docker-inventory/issues/8) | Faux WUD et jeu de données fictif | Fait |
 
-Ordre conseillé : #8 et #2 (on peut tester), puis #3 et #4, puis #6, enfin #5 et #7.
+Ordre conseillé : #8 et #2 (on peut tester), puis #3 et #4, puis #6, enfin #5 et #7. Le cœur du lot
+(#2, #3, #4, #6, #8) part en version dès qu'il est fusionné ; #5 et #7 suivent.
 
 ## Lot 3 : Harbor
 

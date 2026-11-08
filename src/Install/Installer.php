@@ -23,6 +23,7 @@ use CronTask;
 use DBConnection;
 use DisplayPreference;
 use GlpiPlugin\Dockerinventory\Connection;
+use GlpiPlugin\Dockerinventory\ImageVersion;
 use GlpiPlugin\Dockerinventory\Service;
 use Migration;
 use ProfileRight;
@@ -42,28 +43,47 @@ final class Installer
         'glpi_plugin_dockerinventory_services',
         'glpi_plugin_dockerinventory_nodes',
         'glpi_plugin_dockerinventory_services_nodes',
+        'glpi_plugin_dockerinventory_imageversions',
     ];
 
     public const CRON_NAME = 'portainerimport';
+    public const CRON_WUD = 'wudimport';
 
     /** Colonnes affichées par défaut dans la liste des services (options de recherche de Service). */
     private const DEFAULT_COLUMNS = [8, 3, 4, 6, 7, 10, 11];
 
+    /** Colonnes affichées par défaut dans la recherche des versions (options de ImageVersion). */
+    private const VERSION_COLUMNS = [1, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    /** Colonnes affichées par défaut dans la liste des connexions : type, adresse, active, dernier import. */
+    private const CONNECTION_COLUMNS = [7, 3, 4, 5];
+
     public function install(Migration $migration): bool
     {
         $this->createTables();
+        $this->migrate($migration);
 
         $firstInstall = countElementsInTable('glpi_profilerights', ['name' => Service::RIGHTNAME]) === 0;
-        ProfileRight::addProfileRights([Service::RIGHTNAME]);
         if ($firstInstall) {
+            // Une seule fois : addProfileRights() insère sans vérifier, et la mise à jour d'une
+            // version à l'autre repasse par install() (doublon refusé par la clé unique).
+            ProfileRight::addProfileRights([Service::RIGHTNAME]);
             $this->grantReadToAdministrators();
-            $this->installDisplayPreferences();
+            $this->installDisplayPreferences(Service::class, self::DEFAULT_COLUMNS);
+        }
+        $defaults = [ImageVersion::class => self::VERSION_COLUMNS, Connection::class => self::CONNECTION_COLUMNS];
+        foreach ($defaults as $itemtype => $columns) {
+            if (countElementsInTable(DisplayPreference::getTable(), ['itemtype' => $itemtype]) === 0) {
+                $this->installDisplayPreferences($itemtype, $columns);
+            }
         }
 
-        CronTask::register(Connection::class, self::CRON_NAME, HOUR_TIMESTAMP, [
-            'state'         => CronTask::STATE_WAITING,
-            'logs_lifetime' => 30,
-        ]);
+        foreach ([self::CRON_NAME, self::CRON_WUD] as $cron) {
+            CronTask::register(Connection::class, $cron, HOUR_TIMESTAMP, [
+                'state'         => CronTask::STATE_WAITING,
+                'logs_lifetime' => 30,
+            ]);
+        }
 
         $migration->executeMigration();
 
@@ -101,7 +121,9 @@ final class Installer
                 `entities_id` int {$sign} NOT NULL DEFAULT '0',
                 `is_recursive` tinyint NOT NULL DEFAULT '0',
                 `is_active` tinyint NOT NULL DEFAULT '1',
+                `type` varchar(32) NOT NULL DEFAULT 'portainer',
                 `url` varchar(255) NOT NULL DEFAULT '',
+                `username` varchar(255) NOT NULL DEFAULT '',
                 `api_key` text,
                 `allow_http` tinyint NOT NULL DEFAULT '0',
                 `applianceenvironments_id` int {$sign} NOT NULL DEFAULT '0',
@@ -116,6 +138,7 @@ final class Installer
                 KEY `entities_id` (`entities_id`),
                 KEY `is_recursive` (`is_recursive`),
                 KEY `is_active` (`is_active`),
+                KEY `type` (`type`),
                 KEY `applianceenvironments_id` (`applianceenvironments_id`)",
             'glpi_plugin_dockerinventory_stacks' => "
                 `id` int {$sign} NOT NULL AUTO_INCREMENT,
@@ -192,6 +215,41 @@ final class Installer
                 PRIMARY KEY (`id`),
                 UNIQUE KEY `unicity` (`plugin_dockerinventory_services_id`, `plugin_dockerinventory_nodes_id`),
                 KEY `plugin_dockerinventory_nodes_id` (`plugin_dockerinventory_nodes_id`)",
+            // Une ligne par service suivi (container_uid vide) ou par conteneur sans service
+            // (plugin_dockerinventory_services_id = 0), pour chaque connexion WUD.
+            'glpi_plugin_dockerinventory_imageversions' => "
+                `id` int {$sign} NOT NULL AUTO_INCREMENT,
+                `entities_id` int {$sign} NOT NULL DEFAULT '0',
+                `is_recursive` tinyint NOT NULL DEFAULT '0',
+                `plugin_dockerinventory_connections_id` int {$sign} NOT NULL DEFAULT '0',
+                `plugin_dockerinventory_services_id` int {$sign} NOT NULL DEFAULT '0',
+                `container_uid` varchar(128) NOT NULL DEFAULT '',
+                `containers` text,
+                `container_count` int NOT NULL DEFAULT '0',
+                `image` varchar(255) NOT NULL DEFAULT '',
+                `registry_name` varchar(255) NOT NULL DEFAULT '',
+                `registry_url` varchar(255) NOT NULL DEFAULT '',
+                `deployed_tag` varchar(255) NOT NULL DEFAULT '',
+                `deployed_digest` varchar(255) NOT NULL DEFAULT '',
+                `latest_tag` varchar(255) NOT NULL DEFAULT '',
+                `latest_digest` varchar(255) NOT NULL DEFAULT '',
+                `gap` varchar(16) NOT NULL DEFAULT '',
+                `update_available` tinyint NOT NULL DEFAULT '0',
+                `is_out_of_sync` tinyint NOT NULL DEFAULT '0',
+                `deployed_versions` text,
+                `match_method` varchar(32) NOT NULL DEFAULT '',
+                `source` varchar(16) NOT NULL DEFAULT 'wud',
+                `error` varchar(255) NOT NULL DEFAULT '',
+                `date_checked` timestamp NULL DEFAULT NULL,
+                `date_mod` timestamp NULL DEFAULT NULL,
+                `date_creation` timestamp NULL DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `unicity` (`plugin_dockerinventory_connections_id`, `plugin_dockerinventory_services_id`,
+                    `container_uid`),
+                KEY `entities_id` (`entities_id`),
+                KEY `is_recursive` (`is_recursive`),
+                KEY `plugin_dockerinventory_services_id` (`plugin_dockerinventory_services_id`),
+                KEY `gap` (`gap`)",
         ];
 
         foreach ($definitions as $table => $columns) {
@@ -199,6 +257,18 @@ final class Installer
                 $DB->doQuery("CREATE TABLE `{$table}` ({$columns}) {$options}");
             }
         }
+    }
+
+    /**
+     * Mise à jour d'une installation existante (0.1.0 : connexions Portainer seulement).
+     */
+    private function migrate(Migration $migration): void
+    {
+        $table = Connection::getTable();
+        $migration->addField($table, 'type', "varchar(32) NOT NULL DEFAULT 'portainer'", ['after' => 'is_active']);
+        $migration->addField($table, 'username', "varchar(255) NOT NULL DEFAULT ''", ['after' => 'url']);
+        $migration->addKey($table, 'type');
+        $migration->migrationOneTable($table);
     }
 
     /**
@@ -216,14 +286,18 @@ final class Installer
         }
     }
 
-    private function installDisplayPreferences(): void
+    /**
+     * @param class-string<\CommonDBTM> $itemtype
+     * @param list<int> $columns
+     */
+    private function installDisplayPreferences(string $itemtype, array $columns): void
     {
         global $DB;
 
         $hasInterface = $DB->fieldExists(DisplayPreference::getTable(), 'interface');
-        foreach (self::DEFAULT_COLUMNS as $rank => $num) {
+        foreach ($columns as $rank => $num) {
             $DB->insert(DisplayPreference::getTable(), [
-                'itemtype' => Service::class,
+                'itemtype' => $itemtype,
                 'num'      => $num,
                 'rank'     => $rank + 1,
                 'users_id' => 0,

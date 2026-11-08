@@ -5,7 +5,7 @@ noms `GlpiPlugin\Dockerinventory`.
 
 ## Arborescence
 
-Les éléments marqués *(lot 2)* ou *(lot 3)* sont prévus et n'existent pas encore.
+Les éléments marqués *(prévu)* n'existent pas encore.
 
 ```text
 dockerinventory/
@@ -13,20 +13,24 @@ dockerinventory/
 ├── hook.php                   installation, mise à jour, désinstallation
 ├── composer.json
 ├── front/                     pages (une par écran)
-│   ├── connection.php         liste des connexions Portainer (droit Configuration en modification)
-│   ├── connection.form.php    formulaire, « Tester la connexion », « Importer maintenant »
+│   ├── connection.php         liste des connexions Portainer et WUD (droit Configuration en modification)
+│   ├── connection.form.php    choix du type, formulaire, « Tester la connexion », « Importer maintenant »
 │   ├── service.php            liste des services importés (recherche GLPI)
 │   ├── service.form.php       fiche d'un service, en lecture seule
-│   └── version.php            tableau des versions par service              (lot 2)
+│   ├── version.php            « Versions des images » : compteurs, filtres, badges (Twig)
+│   └── imageversion.php       recherche GLPI sur les versions (vues enregistrées, exports)
 ├── src/
 │   ├── Compat/
 │   │   ├── GlpiVersion.php    GLPI 11 ou 12
 │   │   ├── Http.php           GET par le client HTTP de GLPI, sans redirection
 │   │   └── Base/              classes parentes : propriétés typées (GLPI 12) ou non (GLPI 11)
 │   ├── Install/Installer.php  tables, droit, tâche automatique, préférences d'affichage ; désinstallation
-│   ├── Connection.php         connexion Portainer : URL, clé chiffrée (GLPIKey), environnement des
-│   │                          applications créées, dernier compte rendu ; tâche automatique horaire
-│   ├── Importer.php           import : stacks, services, nœuds, tâches en cours, retraits
+│   ├── Connection.php         connexion Portainer ou WUD (type figé à la création) : URL, clé ou mot de
+│   │                          passe chiffré (GLPIKey), utilisateur WUD, environnement des applications
+│   │                          créées, dernier compte rendu ; tâches automatiques horaires
+│   ├── Importer.php           import Portainer : stacks, services, nœuds, tâches en cours, retraits
+│   ├── ImageVersion.php       version d'image d'un service (ou d'un conteneur sans service) ; onglet
+│   │                          « Versions » des services et des applications, page et recherche
 │   ├── Service.php            service Swarm (lecture seule) ; onglet « Services » des applications
 │   ├── Node.php               nœud Swarm ; onglet « Services du nœud » des ordinateurs
 │   ├── Profile.php            onglet « Inventaire Docker » des profils (droit plugin_dockerinventory_service)
@@ -37,20 +41,20 @@ dockerinventory/
 │   │   ├── PortainerException.php  codes d'erreur stables, jamais le texte d'origine ni la clé
 │   │   ├── PortainerMapper.php     réponse Docker → valeurs enregistrées (fonctions pures)
 │   │   └── UrlPolicy.php           HTTPS obligatoire sauf autorisation, ni identifiants ni requête
-│   ├── Wud/                                                                  (lot 2)
-│   │   ├── WudClient.php      lecture de /api/containers, authentification basique
+│   ├── Wud/
+│   │   ├── WudClient.php      lecture seule de /api/app et /api/containers, authentification basique
 │   │   ├── WudContext.php     contexte réseau (réseaux privés autorisés sous GLPI 12)
-│   │   ├── WudException.php
-│   │   └── WudMapper.php      conteneur WUD → service (empreinte, image, tag)
-│   ├── Registry/              repli sans WUD : Docker Hub, API v2 de Harbor   (lot 2)
-│   │   ├── RegistryClient.php
-│   │   └── TagLister.php
-│   ├── Version/                                                              (lot 2)
-│   │   ├── VersionComparator.php  écart correctif, mineure, majeure ; `latest` non suivable
-│   │   └── ImageVersion.php       version déployée et dernière version d'un service
-│   ├── Ticket/                                                               (lot 2)
-│   │   └── UpdateTicket.php   un ticket par service au-delà des seuils, suivi si la situation change
-│   └── Harbor/                projets, dépôts, artefacts, analyses           (lot 3)
+│   │   ├── WudException.php   codes d'erreur stables, jamais le texte d'origine ni le mot de passe
+│   │   ├── WudMapper.php      conteneur WUD → valeurs lues (lecture défensive), clés d'image
+│   │   └── WudImporter.php    lecture d'une connexion WUD → table des versions
+│   ├── Version/
+│   │   ├── VersionComparator.php  écart : majeure, mineure, correctif, préversion, empreinte seule,
+│   │   │                          non suivable (`latest`...), non vérifié ; calcul de WUD repris
+│   │   └── VersionLinker.php      conteneurs → services (empreinte, nom, image et tag), une ligne
+│   │                              par service, réplicas désynchronisés
+│   ├── Registry/              repli sans WUD : Docker Hub, API v2 de Harbor    (prévu, #5)
+│   ├── Ticket/                tickets de mise à jour selon des seuils           (prévu, #7)
+│   └── Harbor/                projets, dépôts, artefacts, analyses           (prévu, lot 3)
 ├── templates/                 Twig uniquement (aucun HTML dans le PHP)
 ├── locales/                   fr_FR, en_GB, de_DE, es_ES, it_IT, pl_PL, pt_BR (+ variantes régionales)
 └── tests/
@@ -58,19 +62,19 @@ dockerinventory/
     ├── Integration/           import complet contre la vraie base GLPI (transport en mémoire)
     ├── security/setup.php     jeu de données des contrôles de sécurité communs
     ├── mock-portainer/        faux Portainer (Python) et jeu de données fictif
-    └── mock-wud/              faux WUD et jeu de données fictif               (lot 2)
+    └── mock-wud/              faux WUD (Python, format WUD 8.x) et jeu de données fictif
 ```
 
 ## Tables
 
 | Table | Contenu |
 | --- | --- |
-| `glpi_plugin_dockerinventory_connections` | Connexion Portainer : URL, clé chiffrée, HTTP autorisé ou non, entité, environnement des applications créées, dernier import et son compte rendu |
+| `glpi_plugin_dockerinventory_connections` | Connexion Portainer ou WUD (`type`) : URL, clé ou mot de passe chiffré, utilisateur (WUD), HTTP autorisé ou non, entité, environnement des applications créées (Portainer), dernier import et son compte rendu |
 | `glpi_plugin_dockerinventory_stacks` | Stack Swarm de Portainer ↔ Application GLPI, état « retiré » |
 | `glpi_plugin_dockerinventory_services` | Service Swarm : stack, Application, image, tag, empreinte, réplicas voulus et en cours, ports, réseaux, noms des secrets, état « retiré » |
 | `glpi_plugin_dockerinventory_nodes` | Nœud Swarm : nom d'hôte, rôle, état, version de Docker, ordinateur GLPI rattaché |
 | `glpi_plugin_dockerinventory_services_nodes` | Tâches en cours d'un service sur chaque nœud (recalculé à chaque import) |
-| `glpi_plugin_dockerinventory_imageversions` *(lot 2)* | Service, tag et empreinte déployés, dernière version, type d'écart, source (wud ou registre), date de vérification |
+| `glpi_plugin_dockerinventory_imageversions` | Une ligne par service suivi (ou par conteneur sans service, `plugin_dockerinventory_services_id` = 0) et par connexion WUD : conteneurs, image et registre, tag et empreinte déployés, dernière version, écart, réplicas désynchronisés, méthode de rattachement (ou raison de l'absence), source, date de vérification. Recalculée à chaque lecture de WUD |
 
 ## Portainer (lot 1)
 
@@ -97,14 +101,28 @@ dockerinventory/
 
 ## WUD (lot 2)
 
-- Lecture seule de l'API de WUD (`GET /api/containers`) ; les déclencheurs de WUD ne sont jamais
-  appelés.
-- Pour chaque conteneur suivi : image, tag et empreinte locaux, dernière version trouvée par WUD,
-  type d'écart. Le plugin ne recalcule pas ce que WUD a déjà calculé.
-- Rattachement au service : par l'empreinte de l'image, puis par le nom du service Swarm porté par
-  le conteneur, puis par image et tag. Un conteneur sans correspondance est listé à part.
-- Sans WUD : le plugin interroge lui-même Docker Hub ou l'API v2 de Harbor pour la liste des tags.
-- Le tag `latest` (ou tout tag non versionné) est signalé comme non suivable de façon fiable.
+- Lecture seule de l'API de WUD : `GET /api/app` (version, affichée au test et sur la connexion) et
+  `GET /api/containers` ; les déclencheurs de WUD ne sont jamais appelés. Authentification basique
+  facultative, mot de passe chiffré dans la colonne `api_key` (champ sécurisé), jamais réaffiché.
+- Champs lus par conteneur (documentation publique de WUD 8.x, **à valider sur une vraie instance**,
+  #2) : `id`, `name`, `watcher`, `image.{registry.{name, url}, name, tag.{value, semver},
+  digest.{watch, value, repo}}`, `result.{tag, digest}`, `updateAvailable`, `updateKind.{kind,
+  semverDiff, localValue, remoteValue}`, `labels`, `error.message`. Champ absent toléré, champ
+  inconnu ignoré.
+- Écart : celui de WUD (`updateKind`) est repris tel quel ; le plugin ne le calcule que si WUD ne le
+  donne pas. Tag mobile (`latest`, `stable`...) ou non versionné : « non suivable », quelle que soit
+  l'empreinte. Pas encore de résultat (ou erreur de registre) : « non vérifié ».
+- Rattachement au service (services actifs de l'entité de la connexion WUD et de ses sous-entités) :
+  par l'empreinte de l'image (celle que Swarm épingle), puis par le nom du service Swarm
+  (`com.docker.swarm.service.name`, ou nom de tâche `service.emplacement.tâche`), puis par image et
+  tag. À chaque étape, plusieurs services possibles sont départagés par les critères suivants ;
+  s'il en reste plusieurs, le conteneur est listé « plusieurs services possibles » plutôt que
+  rattaché au mauvais. Conteneurs Compose : « hors Swarm ».
+- Une ligne par service : le conteneur qui correspond au service (même empreinte, sinon même tag)
+  donne les valeurs ; des conteneurs dans des versions différentes sont signalés « réplicas
+  désynchronisés » avec le détail.
+- WUD injoignable ou en erreur : rien n'est modifié dans la table des versions.
+- Sans WUD : le plugin interrogera lui-même Docker Hub ou l'API v2 de Harbor (prévu, #5).
 
 ## Règles communes
 

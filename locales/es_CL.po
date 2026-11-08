@@ -23,7 +23,7 @@ msgstr "Servicio"
 msgid "Image et tag"
 msgstr "Imagen y etiqueta"
 
-#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:98
+#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php
 msgid "Empreinte (digest)"
 msgstr "Digest"
 
@@ -35,7 +35,7 @@ msgstr "Réplicas"
 msgid "Tâches sur ce nœud"
 msgstr "Tareas en este nodo"
 
-#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:105
+#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php
 msgid "Ports publiés"
 msgstr "Puertos publicados"
 
@@ -43,257 +43,73 @@ msgstr "Puertos publicados"
 msgid "Statut"
 msgstr "Estado"
 
-#: templates/_service_rows.html.twig templates/computer_nodes.html.twig templates/service_form.html.twig src/Service.php:103
+#: templates/_service_rows.html.twig templates/computer_nodes.html.twig templates/service_form.html.twig src/Service.php
 msgid "Vu la dernière fois"
 msgstr "Visto por última vez"
 
-#: templates/_service_rows.html.twig templates/_version_rows.html.twig src/ImageVersion.php:227 src/Service.php:101
+#: templates/_service_rows.html.twig templates/_version_rows.html.twig src/ImageVersion.php src/Service.php
 msgid "Stack"
 msgstr "Stack"
 
-#: templates/computer_nodes.html.twig
-msgid "Cet ordinateur n'est rattaché à aucun nœud Docker Swarm."
-msgstr "Este equipo no está vinculado a ningún nodo Docker Swarm."
-
-#: templates/computer_nodes.html.twig
-msgid "Le rattachement se fait à l'import Portainer, par nom d'hôte."
-msgstr "La vinculación se hace en la importación de Portainer, por nombre de host."
-
-#: templates/computer_nodes.html.twig templates/_status_badge.html.twig templates/_version_rows.html.twig src/Service.php:102
+#: templates/_status_badge.html.twig templates/_version_rows.html.twig templates/computer_nodes.html.twig src/Service.php
 msgid "Retiré"
 msgstr "Retirado"
-
-#: templates/computer_nodes.html.twig
-msgid "Version de Docker"
-msgstr "Versión de Docker"
-
-#: templates/computer_nodes.html.twig src/Connection.php:126
-msgid "Adresse"
-msgstr "Dirección"
-
-#: templates/computer_nodes.html.twig
-msgid "Aucune tâche de service en cours sur ce nœud."
-msgstr "No hay ninguna tarea de servicio en ejecución en este nodo."
-
-#: templates/versions.html.twig src/ImageVersion.php:59
-msgid "Versions des images"
-msgstr "Versiones de las imágenes"
-
-#: templates/versions.html.twig
-msgid "Recherche avancée et export"
-msgstr "Búsqueda avanzada y exportación"
-
-#: templates/versions.html.twig
-msgid "Pour chaque service : version déployée, dernière version disponible et écart."
-msgstr "Para cada servicio: versión desplegada, última versión disponible y diferencia."
-
-#: templates/versions.html.twig
-msgid "Les données viennent de What’s Up Docker, lu sans rien y modifier."
-msgstr "Los datos proceden de What’s Up Docker, leído sin modificar nada en él."
-
-#: templates/versions.html.twig templates/version_tab.html.twig
-msgid "Aucune connexion What’s Up Docker n’est déclarée : la version disponible est inconnue."
-msgstr "No hay ninguna conexión What’s Up Docker declarada: la versión disponible es desconocida."
-
-#: templates/versions.html.twig templates/version_tab.html.twig
-msgid "Ajouter une connexion WUD"
-msgstr "Añadir una conexión WUD"
-
-#: templates/versions.html.twig
-msgid "Tous"
-msgstr "Todos"
-
-#: templates/versions.html.twig
-msgid "À mettre à jour"
-msgstr "Por actualizar"
-
-#: templates/versions.html.twig templates/_version_rows.html.twig src/ImageVersion.php:259
-msgid "Écart"
-msgstr "Diferencia"
-
-#: templates/versions.html.twig
-msgid "Environnement"
-msgstr "Entorno"
-
-#: templates/versions.html.twig
-msgid "Sans environnement"
-msgstr "Sin entorno"
-
-#: templates/versions.html.twig
-msgid "Filtrer"
-msgstr "Filtrar"
-
-#: templates/versions.html.twig
-msgid "Réinitialiser"
-msgstr "Restablecer"
-
-#: templates/versions.html.twig templates/connection_actions.html.twig src/Service.php:175
-msgid "Services"
-msgstr "Servicios"
-
-#: templates/versions.html.twig
-msgid "Aucun service ne correspond à ces filtres."
-msgstr "Ningún servicio coincide con estos filtros."
-
-#: templates/versions.html.twig
-msgid "Conteneurs sans service Swarm"
-msgstr "Contenedores sin servicio Swarm"
-
-#: templates/versions.html.twig
-msgid "Conteneurs suivis par WUD qui ne correspondent à aucun service importé de Portainer."
-msgstr "Contenedores vigilados por WUD que no corresponden a ningún servicio importado de Portainer."
-
-#: templates/versions.html.twig
-msgid "Ils ne sont pas ignorés : leur version est suivie ici."
-msgstr "No se ignoran: su versión se sigue aquí."
-
-#: templates/versions.html.twig
-msgid "« Non suivable » : tag mobile (latest...) ou sans numéro de version."
-msgstr "«No rastreable»: etiqueta móvil (latest...) o sin número de versión."
-
-#: templates/versions.html.twig templates/version_tab.html.twig
-msgid "Préférer un tag versionné (1.2.3) pour savoir ce qui tourne vraiment."
-msgstr "Preferir una etiqueta con versión (1.2.3) para saber qué se ejecuta realmente."
 
 #: templates/_status_badge.html.twig
 msgid "Actif"
 msgstr "Activo"
 
-#: templates/connection_type_choice.html.twig
-msgid "Quelle source voulez-vous connecter ?"
-msgstr "¿Qué origen desea conectar?"
+#: templates/_version_rows.html.twig templates/version_tab.html.twig
+msgid "Page du registre"
+msgstr "Página del registro"
 
-#: templates/connection_type_choice.html.twig
-msgid "Le plugin lit ces outils sans jamais rien y modifier."
-msgstr "El plugin lee estas herramientas sin modificar nunca nada en ellas."
+#: templates/_version_rows.html.twig
+msgid "Conteneur WUD"
+msgstr "Contenedor WUD"
 
-#: templates/connection_type_choice.html.twig
-msgid "Commencez par Portainer : WUD complète les services que Portainer a importés."
-msgstr "Empiece por Portainer: WUD completa los servicios que Portainer ha importado."
+#: templates/_version_rows.html.twig
+msgid "Pourquoi sans service"
+msgstr "Por qué sin servicio"
 
-#: templates/connection_type_choice.html.twig
-msgid "Stacks, services Docker Swarm et nœuds : ce qui tourne, et où."
-msgstr "Stacks, servicios Docker Swarm y nodos: qué se ejecuta, y dónde."
+#: templates/_version_rows.html.twig
+msgid "Application et environnement"
+msgstr "Aplicación y entorno"
 
-#: templates/connection_type_choice.html.twig
-msgid "Version déployée et dernière version disponible de chaque image."
-msgstr "Versión desplegada y última versión disponible de cada imagen."
-
-#: templates/service_form.html.twig
-msgid "depuis le"
-msgstr "desde el"
-
-#: templates/service_form.html.twig
-msgid "stack hors Portainer"
-msgstr "stack fuera de Portainer"
-
-#: templates/service_form.html.twig
-msgid "Aucune stack"
-msgstr "Ningún stack"
-
-#: templates/service_form.html.twig
-msgid "en cours / voulus"
-msgstr "en ejecución / deseadas"
-
-#: templates/service_form.html.twig src/Service.php:106
-msgid "Réseaux"
-msgstr "Redes"
-
-#: templates/service_form.html.twig src/Service.php:107
-msgid "Secrets (noms)"
-msgstr "Secretos (nombres)"
-
-#: templates/service_form.html.twig
-msgid "Application (stack)"
-msgstr "Aplicación (stack)"
-
-#: templates/service_form.html.twig src/Service.php:104
-msgid "Environnement Portainer"
-msgstr "Entorno de Portainer"
-
-#: templates/service_form.html.twig templates/_version_rows.html.twig templates/version_tab.html.twig src/ImageVersion.php:262 src/Service.php:96
+#: templates/_version_rows.html.twig templates/service_form.html.twig templates/version_tab.html.twig src/ImageVersion.php src/Service.php
 msgid "Image"
 msgstr "Imagen"
 
-#: templates/service_form.html.twig
-msgid "Tag (version déployée)"
-msgstr "Etiqueta (versión desplegada)"
+#: templates/_version_rows.html.twig src/ImageVersion.php
+msgid "Version déployée"
+msgstr "Versión desplegada"
 
-#: templates/service_form.html.twig templates/connection_actions.html.twig
-msgid "Nœuds"
-msgstr "Nodos"
+#: templates/_version_rows.html.twig src/ImageVersion.php
+msgid "Dernière version"
+msgstr "Última versión"
 
-#: templates/service_form.html.twig
-msgid "Aucune tâche en cours connue pour ce service."
-msgstr "No se conoce ninguna tarea en ejecución para este servicio."
+#: templates/_version_rows.html.twig templates/versions.html.twig src/ImageVersion.php
+msgid "Écart"
+msgstr "Diferencia"
 
-#: templates/service_form.html.twig
-msgid "Nom d'hôte"
-msgstr "Nombre de host"
+#: templates/_version_rows.html.twig templates/version_tab.html.twig src/ImageVersion.php
+msgid "Vérifié le"
+msgstr "Comprobado el"
 
-#: templates/service_form.html.twig
-msgid "Ordinateur"
-msgstr "Equipo"
+#: templates/_version_rows.html.twig templates/version_tab.html.twig src/ImageVersion.php
+msgid "Registre"
+msgstr "Registro"
 
-#: templates/service_form.html.twig
-msgid "Tâches en cours"
-msgstr "Tareas en ejecución"
+#: templates/_version_rows.html.twig templates/version_tab.html.twig templates/wud_actions.html.twig src/ImageVersion.php
+msgid "Réplicas désynchronisés"
+msgstr "Réplicas desincronizadas"
 
-#: templates/service_form.html.twig
-msgid "Non rattaché"
-msgstr "No vinculado"
+#: templates/_version_rows.html.twig
+msgid "Nouvelle empreinte disponible"
+msgstr "Nuevo digest disponible"
 
-#: templates/connection_actions.html.twig
-msgid "Import depuis Portainer"
-msgstr "Importación desde Portainer"
-
-#: templates/connection_actions.html.twig
-msgid "L'import lit Portainer sans rien y modifier et tourne toutes les heures."
-msgstr "La importación lee Portainer sin modificar nada y se ejecuta cada hora."
-
-#: templates/connection_actions.html.twig
-msgid "Le bouton « Importer maintenant » le lance tout de suite."
-msgstr "El botón «Importar ahora» la lanza de inmediato."
-
-#: templates/connection_actions.html.twig src/Connection.php:149
-msgid "Dernier import"
-msgstr "Última importación"
-
-#: templates/connection_actions.html.twig
-msgid "Stacks"
-msgstr "Stacks"
-
-#: templates/connection_actions.html.twig
-msgid "Retirés à cet import"
-msgstr "Retirados en esta importación"
-
-#: templates/connection_actions.html.twig
-msgid "rattachés à un ordinateur"
-msgstr "vinculados a un equipo"
-
-#: templates/connection_actions.html.twig
-msgid "Applications créées"
-msgstr "Aplicaciones creadas"
-
-#: templates/connection_actions.html.twig templates/wud_actions.html.twig
-msgid "Tester la connexion"
-msgstr "Probar la conexión"
-
-#: templates/connection_actions.html.twig
-msgid "Importer maintenant"
-msgstr "Importar ahora"
-
-#: templates/connection_actions.html.twig
-msgid "Portainer sur un réseau privé (GLPI 12)"
-msgstr "Portainer en una red privada (GLPI 12)"
-
-#: templates/connection_actions.html.twig templates/wud_actions.html.twig
-msgid "GLPI 12 refuse par défaut les appels vers un réseau privé."
-msgstr "Por defecto, GLPI 12 rechaza las llamadas a una red privada."
-
-#: templates/connection_actions.html.twig
-msgid "Pour Portainer seulement, ajouter dans config/local_define.php :"
-msgstr "Para permitirlas solo para Portainer, añadir en config/local_define.php:"
+#: templates/_version_rows.html.twig templates/version_tab.html.twig
+msgid "Erreur WUD"
+msgstr "Error de WUD"
 
 #: templates/appliance_services.html.twig
 msgid "Services Docker Swarm de cette stack"
@@ -315,53 +131,93 @@ msgstr "Datos importados de Portainer en solo lectura."
 msgid "Un service disparu est marqué « Retiré », jamais supprimé."
 msgstr "Un servicio desaparecido se marca como «Retirado», nunca se elimina."
 
-#: templates/_version_rows.html.twig templates/version_tab.html.twig
-msgid "Page du registre"
-msgstr "Página del registro"
+#: templates/computer_nodes.html.twig
+msgid "Cet ordinateur n'est rattaché à aucun nœud Docker Swarm."
+msgstr "Este equipo no está vinculado a ningún nodo Docker Swarm."
 
-#: templates/_version_rows.html.twig
-msgid "Conteneur WUD"
-msgstr "Contenedor WUD"
+#: templates/computer_nodes.html.twig
+msgid "Le rattachement se fait à l'import Portainer, par nom d'hôte."
+msgstr "La vinculación se hace en la importación de Portainer, por nombre de host."
 
-#: templates/_version_rows.html.twig
-msgid "Pourquoi sans service"
-msgstr "Por qué sin servicio"
+#: templates/computer_nodes.html.twig
+msgid "Version de Docker"
+msgstr "Versión de Docker"
 
-#: templates/_version_rows.html.twig
-msgid "Application et environnement"
-msgstr "Aplicación y entorno"
+#: templates/computer_nodes.html.twig src/Connection.php
+msgid "Adresse"
+msgstr "Dirección"
 
-#: templates/_version_rows.html.twig src/ImageVersion.php:257
-msgid "Version déployée"
-msgstr "Versión desplegada"
+#: templates/computer_nodes.html.twig
+msgid "Aucune tâche de service en cours sur ce nœud."
+msgstr "No hay ninguna tarea de servicio en ejecución en este nodo."
 
-#: templates/_version_rows.html.twig src/ImageVersion.php:258
-msgid "Dernière version"
-msgstr "Última versión"
+#: templates/connection_actions.html.twig
+msgid "Import depuis Portainer"
+msgstr "Importación desde Portainer"
 
-#: templates/_version_rows.html.twig templates/version_tab.html.twig src/ImageVersion.php:261
-msgid "Vérifié le"
-msgstr "Comprobado el"
+#: templates/connection_actions.html.twig
+msgid "L'import lit Portainer sans rien y modifier et tourne toutes les heures."
+msgstr "La importación lee Portainer sin modificar nada y se ejecuta cada hora."
 
-#: templates/_version_rows.html.twig templates/version_tab.html.twig src/ImageVersion.php:268
-msgid "Registre"
-msgstr "Registro"
+#: templates/connection_actions.html.twig
+msgid "Le bouton « Importer maintenant » le lance tout de suite."
+msgstr "El botón «Importar ahora» la lanza de inmediato."
 
-#: templates/_version_rows.html.twig templates/wud_actions.html.twig templates/version_tab.html.twig src/ImageVersion.php:263
-msgid "Réplicas désynchronisés"
-msgstr "Réplicas desincronizadas"
+#: templates/connection_actions.html.twig src/Connection.php
+msgid "Dernier import"
+msgstr "Última importación"
 
-#: templates/_version_rows.html.twig
-msgid "Nouvelle empreinte disponible"
-msgstr "Nuevo digest disponible"
+#: templates/connection_actions.html.twig
+msgid "Stacks"
+msgstr "Stacks"
 
-#: templates/_version_rows.html.twig templates/version_tab.html.twig
-msgid "Erreur WUD"
-msgstr "Error de WUD"
+#: templates/connection_actions.html.twig templates/versions.html.twig src/Service.php
+msgid "Services"
+msgstr "Servicios"
+
+#: templates/connection_actions.html.twig
+msgid "Retirés à cet import"
+msgstr "Retirados en esta importación"
+
+#: templates/connection_actions.html.twig templates/service_form.html.twig
+msgid "Nœuds"
+msgstr "Nodos"
+
+#: templates/connection_actions.html.twig
+msgid "rattachés à un ordinateur"
+msgstr "vinculados a un equipo"
+
+#: templates/connection_actions.html.twig
+msgid "Applications créées"
+msgstr "Aplicaciones creadas"
+
+#: templates/connection_actions.html.twig templates/harbor_actions.html.twig templates/wud_actions.html.twig
+msgid "Tester la connexion"
+msgstr "Probar la conexión"
+
+#: templates/connection_actions.html.twig
+msgid "Importer maintenant"
+msgstr "Importar ahora"
+
+#: templates/connection_actions.html.twig
+msgid "Portainer sur un réseau privé (GLPI 12)"
+msgstr "Portainer en una red privada (GLPI 12)"
+
+#: templates/connection_actions.html.twig templates/harbor_actions.html.twig templates/wud_actions.html.twig
+msgid "GLPI 12 refuse par défaut les appels vers un réseau privé."
+msgstr "Por defecto, GLPI 12 rechaza las llamadas a una red privada."
+
+#: templates/connection_actions.html.twig
+msgid "Pour Portainer seulement, ajouter dans config/local_define.php :"
+msgstr "Para permitirlas solo para Portainer, añadir en config/local_define.php:"
 
 #: templates/connection_form.html.twig
 msgid "Un mot de passe est enregistré (chiffré) : laisser vide pour le conserver."
 msgstr "Hay una contraseña guardada (cifrada): dejar vacío para conservarla."
+
+#: templates/connection_form.html.twig
+msgid "Facultatif pour les projets publics."
+msgstr "Opcional para los proyectos públicos."
 
 #: templates/connection_form.html.twig
 msgid "Facultatif : seulement si WUD demande une authentification."
@@ -379,9 +235,13 @@ msgstr "Token de acceso de un usuario de Portainer dedicado, con derechos de sol
 msgid "Appliqué seulement aux applications créées par l'import, jamais aux applications existantes."
 msgstr "Se aplica solo a las aplicaciones creadas por la importación, nunca a las existentes."
 
-#: templates/connection_form.html.twig src/Connection.php:133
+#: templates/connection_form.html.twig src/Connection.php
 msgid "Type"
 msgstr "Tipo"
+
+#: templates/connection_form.html.twig
+msgid "Nom libre, par exemple « Harbor production »."
+msgstr "Nombre libre, por ejemplo «Harbor producción»."
 
 #: templates/connection_form.html.twig
 msgid "Nom libre, par exemple « WUD production »."
@@ -394,6 +254,50 @@ msgstr "Nombre libre, por ejemplo «Portainer producción»."
 #: templates/connection_form.html.twig
 msgid "Une connexion inactive n'est pas importée par la tâche automatique."
 msgstr "Una conexión inactiva no es importada por la acción automática."
+
+#: templates/connection_form.html.twig
+msgid "Adresse de Harbor"
+msgstr "Dirección de Harbor"
+
+#: templates/connection_form.html.twig
+msgid "Adresse du registre Harbor, sans /v2 ni /api à la fin."
+msgstr "Dirección del registro Harbor, sin /v2 ni /api al final."
+
+#: templates/connection_form.html.twig
+msgid "Hôte dans les images"
+msgstr "Host en las imágenes"
+
+#: templates/connection_form.html.twig
+msgid "Seulement s’il diffère de l’adresse : début des images (registry.exemple.test:5000/...)."
+msgstr "Solo si difiere de la dirección: inicio de las imágenes (registry.exemple.test:5000/...)."
+
+#: templates/connection_form.html.twig
+msgid "Compte robot"
+msgstr "Cuenta robot"
+
+#: templates/connection_form.html.twig
+msgid "Compte robot Harbor avec le seul droit de lecture (pull) ; vide pour les projets publics."
+msgstr "Cuenta robot de Harbor solo con el derecho de lectura (pull); vacío para los proyectos públicos."
+
+#: templates/connection_form.html.twig
+msgid "Mot de passe"
+msgstr "Contraseña"
+
+#: templates/connection_form.html.twig
+msgid "Effacer le mot de passe"
+msgstr "Borrar la contraseña"
+
+#: templates/connection_form.html.twig
+msgid "Oui : le mot de passe enregistré est supprimé (projets publics seulement)."
+msgstr "Sí: se elimina la contraseña guardada (solo proyectos públicos)."
+
+#: templates/connection_form.html.twig
+msgid "Autoriser HTTP"
+msgstr "Permitir HTTP"
+
+#: templates/connection_form.html.twig
+msgid "Déconseillé : le mot de passe circule alors en clair."
+msgstr "Desaconsejado: la contraseña circula entonces sin cifrar."
 
 #: templates/connection_form.html.twig
 msgid "Adresse de WUD"
@@ -412,24 +316,8 @@ msgid "Laisser vide si WUD n'a pas d'authentification."
 msgstr "Dejar vacío si WUD no tiene autenticación."
 
 #: templates/connection_form.html.twig
-msgid "Mot de passe"
-msgstr "Contraseña"
-
-#: templates/connection_form.html.twig
-msgid "Effacer le mot de passe"
-msgstr "Borrar la contraseña"
-
-#: templates/connection_form.html.twig
 msgid "Oui : le mot de passe enregistré est supprimé (WUD sans mot de passe)."
 msgstr "Sí: se elimina la contraseña guardada (WUD sin contraseña)."
-
-#: templates/connection_form.html.twig
-msgid "Autoriser HTTP"
-msgstr "Permitir HTTP"
-
-#: templates/connection_form.html.twig
-msgid "Déconseillé : le mot de passe circule alors en clair."
-msgstr "Desaconsejado: la contraseña circula entonces sin cifrar."
 
 #: templates/connection_form.html.twig
 msgid "Adresse de Portainer"
@@ -447,9 +335,289 @@ msgstr "Clave de API"
 msgid "Déconseillé : la clé d'API circule alors en clair."
 msgstr "Desaconsejado: la clave de API circula entonces en claro."
 
-#: templates/connection_form.html.twig src/Connection.php:157
+#: templates/connection_form.html.twig src/Connection.php
 msgid "Environnement des applications créées"
 msgstr "Entorno de las aplicaciones creadas"
+
+#: templates/connection_type_choice.html.twig
+msgid "Quelle source voulez-vous connecter ?"
+msgstr "¿Qué origen desea conectar?"
+
+#: templates/connection_type_choice.html.twig
+msgid "Le plugin lit ces outils sans jamais rien y modifier."
+msgstr "El plugin lee estas herramientas sin modificar nunca nada en ellas."
+
+#: templates/connection_type_choice.html.twig
+msgid "Commencez par Portainer : WUD complète les services que Portainer a importés."
+msgstr "Empiece por Portainer: WUD completa los servicios que Portainer ha importado."
+
+#: templates/connection_type_choice.html.twig
+msgid "Sans WUD, Docker Hub est lu directement ; Harbor sert aux images de vos projets."
+msgstr "Sin WUD, Docker Hub se lee directamente; Harbor sirve para las imágenes de sus proyectos."
+
+#: templates/connection_type_choice.html.twig
+msgid "Stacks, services Docker Swarm et nœuds : ce qui tourne, et où."
+msgstr "Stacks, servicios Docker Swarm y nodos: qué se ejecuta, y dónde."
+
+#: templates/connection_type_choice.html.twig
+msgid "Version déployée et dernière version disponible de chaque image."
+msgstr "Versión desplegada y última versión disponible de cada imagen."
+
+#: templates/connection_type_choice.html.twig
+msgid "Registre privé : dernières versions de vos images, sans WUD."
+msgstr "Registro privado: últimas versiones de sus imágenes, sin WUD."
+
+#: templates/harbor_actions.html.twig
+msgid "Versions depuis le registre Harbor"
+msgstr "Versiones desde el registro Harbor"
+
+#: templates/harbor_actions.html.twig
+msgid "Pour les services qu’aucune connexion WUD ne suit, le plugin lit la liste des tags de leur image."
+msgstr "Para los servicios que ninguna conexión WUD sigue, el plugin lee la lista de tags de su imagen."
+
+#: templates/harbor_actions.html.twig
+msgid "Seule cette liste est lue : rien n’est modifié dans Harbor."
+msgstr "Solo se lee esta lista: no se modifica nada en Harbor."
+
+#: templates/harbor_actions.html.twig
+msgid "La vérification tourne toutes les heures ; le bouton la lance tout de suite."
+msgstr "La verificación se ejecuta cada hora; el botón la lanza de inmediato."
+
+#: templates/harbor_actions.html.twig
+msgid "Images concernées : celles qui commencent par"
+msgstr "Imágenes afectadas: las que empiezan por"
+
+#: templates/harbor_actions.html.twig
+msgid "dans l’entité de cette connexion et ses sous-entités."
+msgstr "en la entidad de esta conexión y sus subentidades."
+
+#: templates/harbor_actions.html.twig
+msgid "Dernière vérification"
+msgstr "Última verificación"
+
+#: templates/harbor_actions.html.twig
+msgid "Services de ce registre"
+msgstr "Servicios de este registro"
+
+#: templates/harbor_actions.html.twig
+msgid "Requêtes"
+msgstr "Solicitudes"
+
+#: templates/harbor_actions.html.twig templates/versions.html.twig
+msgid "Vérifier les registres maintenant"
+msgstr "Verificar los registros ahora"
+
+#: templates/harbor_actions.html.twig templates/wud_actions.html.twig
+msgid "Voir les versions des images"
+msgstr "Ver las versiones de las imágenes"
+
+#: templates/harbor_actions.html.twig
+msgid "Harbor sur un réseau privé (GLPI 12)"
+msgstr "Harbor en una red privada (GLPI 12)"
+
+#: templates/harbor_actions.html.twig
+msgid "Pour les registres seulement, ajouter dans config/local_define.php :"
+msgstr "Solo para los registros, añadir en config/local_define.php:"
+
+#: templates/service_form.html.twig
+msgid "depuis le"
+msgstr "desde el"
+
+#: templates/service_form.html.twig
+msgid "stack hors Portainer"
+msgstr "stack fuera de Portainer"
+
+#: templates/service_form.html.twig
+msgid "Aucune stack"
+msgstr "Ningún stack"
+
+#: templates/service_form.html.twig
+msgid "en cours / voulus"
+msgstr "en ejecución / deseadas"
+
+#: templates/service_form.html.twig src/Service.php
+msgid "Réseaux"
+msgstr "Redes"
+
+#: templates/service_form.html.twig src/Service.php
+msgid "Secrets (noms)"
+msgstr "Secretos (nombres)"
+
+#: templates/service_form.html.twig
+msgid "Application (stack)"
+msgstr "Aplicación (stack)"
+
+#: templates/service_form.html.twig src/Service.php
+msgid "Environnement Portainer"
+msgstr "Entorno de Portainer"
+
+#: templates/service_form.html.twig
+msgid "Tag (version déployée)"
+msgstr "Etiqueta (versión desplegada)"
+
+#: templates/service_form.html.twig
+msgid "Aucune tâche en cours connue pour ce service."
+msgstr "No se conoce ninguna tarea en ejecución para este servicio."
+
+#: templates/service_form.html.twig
+msgid "Nom d'hôte"
+msgstr "Nombre de host"
+
+#: templates/service_form.html.twig
+msgid "Ordinateur"
+msgstr "Equipo"
+
+#: templates/service_form.html.twig
+msgid "Tâches en cours"
+msgstr "Tareas en ejecución"
+
+#: templates/service_form.html.twig
+msgid "Non rattaché"
+msgstr "No vinculado"
+
+#: templates/version_tab.html.twig templates/versions.html.twig
+msgid "Aucune version connue pour le moment."
+msgstr "Todavía no hay ninguna versión conocida."
+
+#: templates/version_tab.html.twig templates/versions.html.twig
+msgid "Ajoutez une connexion WUD, ou lancez la vérification des registres (toutes les heures)."
+msgstr "Añada una conexión WUD o lance la verificación de los registros (cada hora)."
+
+#: templates/version_tab.html.twig templates/versions.html.twig src/Connection.php
+msgid "Connexions Docker"
+msgstr "Conexiones Docker"
+
+#: templates/version_tab.html.twig
+msgid "Aucune version connue pour ce service (ni WUD, ni registre)."
+msgstr "Ninguna versión conocida para este servicio (ni WUD ni registro)."
+
+#: templates/version_tab.html.twig
+msgid "Les registres sont vérifiés toutes les heures pour les services sans WUD."
+msgstr "Los registros se verifican cada hora para los servicios sin WUD."
+
+#: templates/version_tab.html.twig
+msgid "Aucune version connue pour les services de cette application."
+msgstr "Ninguna versión conocida para los servicios de esta aplicación."
+
+#: templates/version_tab.html.twig
+msgid "Version de l’image"
+msgstr "Versión de la imagen"
+
+#: templates/version_tab.html.twig
+msgid "Conteneurs dans des versions différentes (mise à jour en cours ou bloquée) :"
+msgstr "Contenedores en versiones diferentes (actualización en curso o bloqueada):"
+
+#: templates/version_tab.html.twig
+msgid "Ce tag ne désigne pas une version précise."
+msgstr "Esta etiqueta no designa una versión precisa."
+
+#: templates/version_tab.html.twig templates/versions.html.twig
+msgid "Préférer un tag versionné (1.2.3) pour savoir ce qui tourne vraiment."
+msgstr "Preferir una etiqueta con versión (1.2.3) para saber qué se ejecuta realmente."
+
+#: templates/version_tab.html.twig
+msgid "Une nouvelle empreinte est disponible pour ce tag."
+msgstr "Hay un nuevo digest disponible para este tag."
+
+#: templates/version_tab.html.twig src/ImageVersion.php
+msgid "Empreinte déployée"
+msgstr "Digest desplegado"
+
+#: templates/version_tab.html.twig src/ImageVersion.php
+msgid "Dernière empreinte"
+msgstr "Último digest"
+
+#: templates/version_tab.html.twig src/ImageVersion.php
+msgid "Conteneurs WUD"
+msgstr "Contenedores WUD"
+
+#: templates/version_tab.html.twig src/ImageVersion.php
+msgid "Rattachement"
+msgstr "Vinculación"
+
+#: templates/version_tab.html.twig src/ImageVersion.php
+msgid "Source"
+msgstr "Origen"
+
+#: templates/version_tab.html.twig
+msgid "Pourquoi non vérifié"
+msgstr "Por qué no verificado"
+
+#: templates/version_tab.html.twig
+msgid "Versions des images de cette application"
+msgstr "Versiones de las imágenes de esta aplicación"
+
+#: templates/version_tab.html.twig
+msgid "Versions lues dans What’s Up Docker ou dans le registre de l’image, sans rien y modifier."
+msgstr "Versiones leídas en What’s Up Docker o en el registro de la imagen, sin modificar nada."
+
+#: templates/version_tab.html.twig
+msgid "Voir toutes les versions des images"
+msgstr "Ver todas las versiones de las imágenes"
+
+#: templates/versions.html.twig src/ImageVersion.php
+msgid "Versions des images"
+msgstr "Versiones de las imágenes"
+
+#: templates/versions.html.twig
+msgid "Docker Hub au plus une fois par jour et par image."
+msgstr "Docker Hub como máximo una vez al día por imagen."
+
+#: templates/versions.html.twig
+msgid "Recherche avancée et export"
+msgstr "Búsqueda avanzada y exportación"
+
+#: templates/versions.html.twig
+msgid "Pour chaque service : version déployée, dernière version disponible et écart."
+msgstr "Para cada servicio: versión desplegada, última versión disponible y diferencia."
+
+#: templates/versions.html.twig
+msgid "Source : What’s Up Docker, sinon le registre de l’image (Docker Hub, Harbor), sans rien y modifier."
+msgstr "Fuente: What’s Up Docker, si no el registro de la imagen (Docker Hub, Harbor), sin modificar nada."
+
+#: templates/versions.html.twig
+msgid "Tous"
+msgstr "Todos"
+
+#: templates/versions.html.twig
+msgid "À mettre à jour"
+msgstr "Por actualizar"
+
+#: templates/versions.html.twig
+msgid "Environnement"
+msgstr "Entorno"
+
+#: templates/versions.html.twig
+msgid "Sans environnement"
+msgstr "Sin entorno"
+
+#: templates/versions.html.twig
+msgid "Filtrer"
+msgstr "Filtrar"
+
+#: templates/versions.html.twig
+msgid "Réinitialiser"
+msgstr "Restablecer"
+
+#: templates/versions.html.twig
+msgid "Aucun service ne correspond à ces filtres."
+msgstr "Ningún servicio coincide con estos filtros."
+
+#: templates/versions.html.twig
+msgid "Conteneurs sans service Swarm"
+msgstr "Contenedores sin servicio Swarm"
+
+#: templates/versions.html.twig
+msgid "Conteneurs suivis par WUD qui ne correspondent à aucun service importé de Portainer."
+msgstr "Contenedores vigilados por WUD que no corresponden a ningún servicio importado de Portainer."
+
+#: templates/versions.html.twig
+msgid "Ils ne sont pas ignorés : leur version est suivie ici."
+msgstr "No se ignoran: su versión se sigue aquí."
+
+#: templates/versions.html.twig
+msgid "« Non suivable » : tag mobile (latest...) ou sans numéro de version."
+msgstr "«No rastreable»: etiqueta móvil (latest...) o sin número de versión."
 
 #: templates/wud_actions.html.twig
 msgid "Versions depuis What’s Up Docker"
@@ -492,10 +660,6 @@ msgid "Lire WUD maintenant"
 msgstr "Leer WUD ahora"
 
 #: templates/wud_actions.html.twig
-msgid "Voir les versions des images"
-msgstr "Ver las versiones de las imágenes"
-
-#: templates/wud_actions.html.twig
 msgid "WUD sur un réseau privé (GLPI 12)"
 msgstr "WUD en una red privada (GLPI 12)"
 
@@ -503,344 +667,345 @@ msgstr "WUD en una red privada (GLPI 12)"
 msgid "Pour WUD seulement, ajouter dans config/local_define.php :"
 msgstr "Solo para WUD, añadir en config/local_define.php:"
 
-#: templates/version_tab.html.twig
-msgid "Aucun conteneur suivi par WUD n’a été rattaché à ce service."
-msgstr "Ningún contenedor vigilado por WUD se ha vinculado a este servicio."
-
-#: templates/version_tab.html.twig
-msgid "Vérifier que WUD surveille ce service, puis relire WUD."
-msgstr "Compruebe que WUD vigila este servicio y vuelva a leer WUD."
-
-#: templates/version_tab.html.twig
-msgid "Aucun service de cette application n’est suivi par WUD."
-msgstr "Ningún servicio de esta aplicación está vigilado por WUD."
-
-#: templates/version_tab.html.twig
-msgid "Version de l’image"
-msgstr "Versión de la imagen"
-
-#: templates/version_tab.html.twig
-msgid "Conteneurs dans des versions différentes (mise à jour en cours ou bloquée) :"
-msgstr "Contenedores en versiones diferentes (actualización en curso o bloqueada):"
-
-#: templates/version_tab.html.twig
-msgid "Ce tag ne désigne pas une version précise."
-msgstr "Esta etiqueta no designa una versión precisa."
-
-#: templates/version_tab.html.twig
-msgid "WUD signale une nouvelle empreinte pour ce tag."
-msgstr "WUD indica un nuevo digest para esta etiqueta."
-
-#: templates/version_tab.html.twig src/ImageVersion.php:265
-msgid "Empreinte déployée"
-msgstr "Digest desplegado"
-
-#: templates/version_tab.html.twig src/ImageVersion.php:266
-msgid "Dernière empreinte"
-msgstr "Último digest"
-
-#: templates/version_tab.html.twig src/ImageVersion.php:264
-msgid "Conteneurs WUD"
-msgstr "Contenedores WUD"
-
-#: templates/version_tab.html.twig src/ImageVersion.php:267
-msgid "Rattachement"
-msgstr "Vinculación"
-
-#: templates/version_tab.html.twig src/ImageVersion.php:260
-msgid "Source"
-msgstr "Origen"
-
-#: templates/version_tab.html.twig
-msgid "Versions des images de cette application"
-msgstr "Versiones de las imágenes de esta aplicación"
-
-#: templates/version_tab.html.twig
-msgid "Versions lues dans What’s Up Docker, sans rien y modifier."
-msgstr "Versiones leídas en What’s Up Docker, sin modificar nada en él."
-
-#: templates/version_tab.html.twig
-msgid "Voir toutes les versions des images"
-msgstr "Ver todas las versiones de las imágenes"
-
-#: src/Connection.php:62
-msgid "Connexions Docker"
-msgstr "Conexiones Docker"
-
-#: src/Connection.php:62
+#: src/Connection.php
 msgid "Connexion Docker"
 msgstr "Conexión Docker"
 
-#: src/Connection.php:256
+#: src/Connection.php
 msgid "La clé d'API Portainer est obligatoire."
 msgstr "La clave de API de Portainer es obligatoria."
 
-#: src/Connection.php:365
+#: src/Connection.php
+msgid "Hôte du registre invalide (exemple : registry.exemple.test:5000)."
+msgstr "Host del registro no válido (ejemplo: registry.exemple.test:5000)."
+
+#: src/Connection.php
 #, php-format
 msgid "Échec : %s"
 msgstr "Error: %s"
 
-#: src/Connection.php:370
+#: src/Connection.php
 #, php-format
 msgid "Lecture de WUD terminée (%1$s) : %2$d conteneurs, %3$d services suivis, %4$d sans service."
 msgstr "Lectura de WUD terminada (%1$s): %2$d contenedores, %3$d servicios seguidos, %4$d sin servicio."
 
-#: src/Connection.php:381
+#: src/Connection.php
 #, php-format
 msgid "Import terminé (%1$s) : %2$d stacks, %3$d services, %4$d retirés, %5$d nœuds."
 msgstr "Importación terminada (%1$s): %2$d stacks, %3$d servicios, %4$d retirados, %5$d nodos."
 
-#: src/Connection.php:408
+#: src/Connection.php
+#, php-format
+msgid "Registres vérifiés (%1$s) : %2$d services, %3$d versions trouvées, %4$d non vérifiées, %5$d requêtes."
+msgstr "Registros verificados (%1$s): %2$d servicios, %3$d versiones encontradas, %4$d sin verificar, %5$d solicitudes."
+
+#: src/Connection.php
+msgid "Connexion réussie : le registre Harbor accepte ce compte."
+msgstr "Conexión correcta: el registro Harbor acepta esta cuenta."
+
+#: src/Connection.php
+msgid "Connexion réussie : registre joignable sans compte (projets publics seulement)."
+msgstr "Conexión correcta: registro accesible sin cuenta (solo proyectos públicos)."
+
+#: src/Connection.php
 #, php-format
 msgid "Connexion réussie : WUD %1$s, %2$d conteneur(s) suivi(s)."
 msgstr "Conexión correcta: WUD %1$s, %2$d contenedor(es) vigilado(s)."
 
-#: src/Connection.php:434
+#: src/Connection.php
 #, php-format
 msgid "Connexion réussie : %d environnement(s) Portainer visible(s) avec cette clé."
 msgstr "Conexión correcta: %d entorno(s) de Portainer visible(s) con esta clave."
 
-#: src/Connection.php:443
+#: src/Connection.php
 msgid "Réussi"
 msgstr "Correcto"
 
-#: src/Connection.php:444
+#: src/Connection.php
 msgid "Partiel"
 msgstr "Parcial"
 
-#: src/Connection.php:445
+#: src/Connection.php
 msgid "Échec"
 msgstr "Fallido"
 
-#: src/Connection.php:446
+#: src/Connection.php
 msgid "Jamais lancé"
 msgstr "Nunca ejecutado"
 
-#: src/Connection.php:456
+#: src/Connection.php
 msgid "Clé d'API refusée par Portainer (401)."
 msgstr "Clave de API rechazada por Portainer (401)."
 
-#: src/Connection.php:457
+#: src/Connection.php
 msgid "Accès refusé par Portainer (403) pour cette clé."
 msgstr "Acceso denegado por Portainer (403) para esta clave."
 
-#: src/Connection.php:458 src/Connection.php:465
+#: src/Connection.php
 msgid "Adresse introuvable (404) : vérifier l'adresse."
 msgstr "Dirección no encontrada (404): comprobar la dirección."
 
-#: src/Connection.php:459
+#: src/Connection.php
 msgid "Cet environnement n'est pas un cluster Swarm."
 msgstr "Este entorno no es un clúster Swarm."
 
-#: src/Connection.php:460 src/Connection.php:467
+#: src/Connection.php
 msgid "Réseau privé refusé par GLPI (voir README)."
 msgstr "Red privada rechazada por GLPI (ver el README)."
 
-#: src/Connection.php:461
+#: src/Connection.php
 msgid "Réponse inattendue : est-ce bien Portainer ?"
 msgstr "Respuesta inesperada: ¿es realmente Portainer?"
 
-#: src/Connection.php:462
+#: src/Connection.php
 msgid "Portainer injoignable (réseau, certificat...)."
 msgstr "Portainer inaccesible (red, certificado...)."
 
-#: src/Connection.php:463
+#: src/Connection.php
 msgid "Identifiants refusés par WUD (401)."
 msgstr "Credenciales rechazadas por WUD (401)."
 
-#: src/Connection.php:464
+#: src/Connection.php
 msgid "Accès refusé par WUD (403)."
 msgstr "Acceso denegado por WUD (403)."
 
-#: src/Connection.php:466
+#: src/Connection.php
 msgid "WUD a répondu par une erreur interne (5xx)."
 msgstr "WUD respondió con un error interno (5xx)."
 
-#: src/Connection.php:468
+#: src/Connection.php
 msgid "Réponse inattendue : est-ce bien What's Up Docker ?"
 msgstr "Respuesta inesperada: ¿es realmente What's Up Docker?"
 
-#: src/Connection.php:469
+#: src/Connection.php
 msgid "WUD injoignable (réseau, certificat, délai...)."
 msgstr "WUD inaccesible (red, certificado, tiempo de espera...)."
 
-#: src/Connection.php:476
+#: src/Connection.php
+msgid "Compte refusé par le registre (401)."
+msgstr "Cuenta rechazada por el registro (401)."
+
+#: src/Connection.php
+msgid "Accès refusé par le registre (403)."
+msgstr "Acceso denegado por el registro (403)."
+
+#: src/Connection.php
+msgid "Image introuvable dans le registre, ou privée."
+msgstr "Imagen no encontrada en el registro, o privada."
+
+#: src/Connection.php
+msgid "Limite de requêtes du registre atteinte (429) : nouvel essai plus tard."
+msgstr "Límite de solicitudes del registro alcanzado (429): nuevo intento más tarde."
+
+#: src/Connection.php
+msgid "Le registre a répondu par une erreur interne (5xx)."
+msgstr "El registro respondió con un error interno (5xx)."
+
+#: src/Connection.php
+msgid "Réponse inattendue du registre."
+msgstr "Respuesta inesperada del registro."
+
+#: src/Connection.php
+msgid "Registre injoignable (réseau, certificat, délai...)."
+msgstr "Registro inaccesible (red, certificado, tiempo de espera...)."
+
+#: src/Connection.php
+msgid "Registre non pris en charge : ni Docker Hub, ni un Harbor déclaré."
+msgstr "Registro no compatible: ni Docker Hub ni un Harbor declarado."
+
+#: src/Connection.php
+msgid "Registre privé : renseigner un compte robot sur la connexion Harbor."
+msgstr "Registro privado: indique una cuenta robot en la conexión Harbor."
+
+#: src/Connection.php
+msgid "Docker Hub non interrogé cette fois (limite ou réseau) : nouvel essai plus tard."
+msgstr "Docker Hub no consultado esta vez (límite o red): nuevo intento más tarde."
+
+#: src/Connection.php
 msgid "HTTPS obligatoire (sauf « Autoriser HTTP »)."
 msgstr "HTTPS obligatorio (salvo «Permitir HTTP»)."
 
-#: src/Connection.php:477
+#: src/Connection.php
 msgid "L'adresse ne doit pas contenir d'identifiants."
 msgstr "La dirección no debe contener credenciales."
 
-#: src/Connection.php:479
+#: src/Connection.php
 #, php-format
 msgid "Adresse invalide (exemple : %s)."
 msgstr "Dirección no válida (ejemplo: %s)."
 
-#: src/Connection.php:491
+#: src/Connection.php
+msgid "Dernières versions dans les registres (Docker Hub, Harbor) pour les services sans WUD"
+msgstr "Últimas versiones en los registros (Docker Hub, Harbor) para los servicios sin WUD"
+
+#: src/Connection.php
 msgid "Lecture des versions des images depuis What's Up Docker"
 msgstr "Lectura de las versiones de las imágenes desde What's Up Docker"
 
-#: src/Connection.php:494
+#: src/Connection.php
 msgid "Import des stacks et services Docker Swarm depuis Portainer"
 msgstr "Importación de stacks y servicios Docker Swarm desde Portainer"
 
-#: src/Connection.php:514
+#: src/Connection.php
 #, php-format
 msgid "%1$s : %2$s (%3$d conteneurs, %4$d services suivis, %5$d sans service)"
 msgstr "%1$s: %2$s (%3$d contenedores, %4$d servicios seguidos, %5$d sin servicio)"
 
-#: src/Connection.php:544
+#: src/Connection.php
 #, php-format
 msgid "%1$s : %2$s (%3$d services, %4$d retirés, %5$d nœuds)"
 msgstr "%1$s: %2$s (%3$d servicios, %4$d retirados, %5$d nodos)"
 
-#: src/ImageVersion.php:59
+#: src/ImageVersion.php
 msgid "Version d'image"
 msgstr "Versión de imagen"
 
-#: src/ImageVersion.php:123
+#: src/ImageVersion.php
 msgid "Version majeure"
 msgstr "Versión mayor"
 
-#: src/ImageVersion.php:126
+#: src/ImageVersion.php
 msgid "Nouvelle version majeure : changements possiblement incompatibles."
 msgstr "Nueva versión mayor: cambios posiblemente incompatibles."
 
-#: src/ImageVersion.php:129
+#: src/ImageVersion.php
 msgid "Version mineure"
 msgstr "Versión menor"
 
-#: src/ImageVersion.php:133
+#: src/ImageVersion.php
 msgid "Nouvelle version mineure : nouvelles fonctions, en principe compatibles."
 msgstr "Nueva versión menor: nuevas funciones, en principio compatibles."
 
-#: src/ImageVersion.php:138
+#: src/ImageVersion.php
 msgid "Correctif"
 msgstr "Parche"
 
-#: src/ImageVersion.php:141
+#: src/ImageVersion.php
 msgid "Correctif disponible (souvent des corrections de sécurité)."
 msgstr "Parche disponible (a menudo correcciones de seguridad)."
 
-#: src/ImageVersion.php:144
+#: src/ImageVersion.php
 msgid "Préversion"
 msgstr "Versión preliminar"
 
-#: src/ImageVersion.php:147
+#: src/ImageVersion.php
 msgid "Seule une préversion (ou une variante) plus récente existe."
 msgstr "Solo existe una versión preliminar (o variante) más reciente."
 
-#: src/ImageVersion.php:150
+#: src/ImageVersion.php
 msgid "Empreinte seule"
 msgstr "Solo digest"
 
-#: src/ImageVersion.php:153
+#: src/ImageVersion.php
 msgid "Même tag, image reconstruite : seule son empreinte a changé."
 msgstr "Misma etiqueta, imagen reconstruida: solo ha cambiado su digest."
 
-#: src/ImageVersion.php:156
+#: src/ImageVersion.php
 msgid "Non suivable"
 msgstr "No rastreable"
 
-#: src/ImageVersion.php:160
+#: src/ImageVersion.php
 msgid "Tag mobile (latest...) ou sans numéro de version : seule l’empreinte dit si l’image a changé."
 msgstr "Etiqueta móvil (latest...) o sin número de versión: solo el digest indica si la imagen ha cambiado."
 
-#: src/ImageVersion.php:165
+#: src/ImageVersion.php
 msgid "Non vérifié"
 msgstr "No comprobado"
 
-#: src/ImageVersion.php:168
-msgid "WUD n’a pas encore trouvé de version pour cette image."
-msgstr "WUD aún no ha encontrado una versión para esta imagen."
+#: src/ImageVersion.php
+msgid "Aucune version trouvée pour cette image (WUD ou registre), ou registre non pris en charge."
+msgstr "No se encontró ninguna versión para esta imagen (WUD o registro), o registro no compatible."
 
-#: src/ImageVersion.php:171
+#: src/ImageVersion.php
 msgid "À jour"
 msgstr "Actualizado"
 
-#: src/ImageVersion.php:174
+#: src/ImageVersion.php
 msgid "Aucune version plus récente connue."
 msgstr "No se conoce ninguna versión más reciente."
 
-#: src/ImageVersion.php:193
+#: src/ImageVersion.php
 msgid "Par empreinte de l’image"
 msgstr "Por digest de la imagen"
 
-#: src/ImageVersion.php:194
+#: src/ImageVersion.php
 msgid "Par nom du service Swarm"
 msgstr "Por nombre del servicio Swarm"
 
-#: src/ImageVersion.php:195
+#: src/ImageVersion.php
 msgid "Par image et tag"
 msgstr "Por imagen y etiqueta"
 
-#: src/ImageVersion.php:196
+#: src/ImageVersion.php
 msgid "Plusieurs services possibles"
 msgstr "Varios servicios posibles"
 
-#: src/ImageVersion.php:197
+#: src/ImageVersion.php
 msgid "Conteneur hors Swarm"
 msgstr "Contenedor fuera de Swarm"
 
-#: src/ImageVersion.php:198
+#: src/ImageVersion.php
 msgid "Aucun service importé correspondant"
 msgstr "Ningún servicio importado correspondiente"
 
-#: src/ImageVersion.php:269
+#: src/ImageVersion.php
+msgid "Registre de l'image"
+msgstr "Registro de la imagen"
+
+#: src/ImageVersion.php
 msgid "Mise à jour disponible"
 msgstr "Actualización disponible"
 
-#: src/ImageVersion.php:349
+#: src/ImageVersion.php
 msgid "Versions"
 msgstr "Versiones"
 
-#: src/Importer.php:259
+#: src/Importer.php
 #, php-format
 msgid "Créée par le plugin Inventaire Docker pour la stack Portainer « %1$s » (%2$s)."
 msgstr "Creada por el plugin Inventario Docker para el stack de Portainer «%1$s» (%2$s)."
 
-#: src/Node.php:37
+#: src/Node.php
 msgid "Nœuds Swarm"
 msgstr "Nodos Swarm"
 
-#: src/Node.php:37
+#: src/Node.php
 msgid "Nœud Swarm"
 msgstr "Nodo Swarm"
 
-#: src/Node.php:50
+#: src/Node.php
 msgid "Services du nœud"
 msgstr "Servicios del nodo"
 
-#: src/Profile.php:35
+#: src/Profile.php
 msgid "Inventaire Docker"
 msgstr "Inventario Docker"
 
-#: src/Service.php:40
+#: src/Service.php
 msgid "Services de conteneurs"
 msgstr "Servicios de contenedores"
 
-#: src/Service.php:41
+#: src/Service.php
 msgid "Service de conteneur"
 msgstr "Servicio de contenedor"
 
-#: src/Service.php:97
+#: src/Service.php
 msgid "Tag"
 msgstr "Etiqueta"
 
-#: src/Service.php:99
+#: src/Service.php
 msgid "Réplicas voulus"
 msgstr "Réplicas deseadas"
 
-#: src/Service.php:100
+#: src/Service.php
 msgid "Réplicas en cours"
 msgstr "Réplicas en ejecución"
 
-#: src/Service.php:108
+#: src/Service.php
 msgid "Retiré le"
 msgstr "Retirado el"
 
-#: src/Service.php:233
+#: src/Service.php
 #, php-format
 msgid "%d (global)"
 msgstr "%d (global)"

@@ -5,9 +5,40 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions
 
 ## [Unreleased]
 
+### Added
+
+- Lot 2 : versions des images depuis What's Up Docker (WUD), en lecture seule.
+  - Connexions de type WUD ([#2](https://github.com/parime/glpi-docker-inventory/issues/2)) : à la
+    création, choix du type (Portainer ou WUD) ; adresse, utilisateur et mot de passe facultatifs
+    (chiffré avec la clé de GLPI, jamais réaffiché), HTTPS obligatoire sauf autorisation, contexte
+    réseau `WudContext` pour GLPI 12, « Tester la connexion » (version de WUD, conteneurs suivis),
+    « Lire WUD maintenant » et tâche automatique horaire `wudimport`. Seuls `GET /api/app` et
+    `GET /api/containers` sont appelés. Correspondance à valider sur une vraie instance WUD 8.x.
+  - Rattachement des conteneurs WUD aux services Swarm
+    ([#3](https://github.com/parime/glpi-docker-inventory/issues/3)) : empreinte de l'image, puis nom
+    du service Swarm, puis image et tag ; une ligne par service, réplicas désynchronisés signalés,
+    conteneurs sans service (hors Swarm, ambigus) listés à part.
+  - Comparaison des versions ([#4](https://github.com/parime/glpi-docker-inventory/issues/4)) :
+    table `glpi_plugin_dockerinventory_imageversions` ; écart de WUD repris tel quel (version
+    majeure, mineure, correctif, préversion, empreinte seule) ; `latest` ou tag non versionné « non
+    suivable ».
+  - Tableau des versions ([#6](https://github.com/parime/glpi-docker-inventory/issues/6)) : onglet
+    « Versions » des services et des applications, page *Parc > Versions des images* (compteurs
+    cliquables, filtres par écart et par environnement, badges colorés avec icônes, lien vers la
+    page de l'image sur Docker Hub), recherche GLPI sur les colonnes (vues enregistrées, exports).
+  - Faux WUD et jeu de données fictif ([#8](https://github.com/parime/glpi-docker-inventory/issues/8))
+    dans `tests/mock-wud` ; deux services ajoutés au faux Portainer.
+  - Colonnes par défaut de la liste des connexions : type, adresse, état, dernier import.
+
 ### Changed
 
 - README : installation depuis l'archive de la dernière version publiée.
+- « Connexions Portainer » devient « Connexions Docker » (Portainer et WUD).
+
+### Fixed
+
+- Mise à jour du plugin : l'installation ne réinsère plus le droit du plugin s'il existe déjà
+  (doublon refusé par la base, qui faisait échouer la mise à jour).
 
 ## [0.1.0] - 2026-11-08
 

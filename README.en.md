@@ -12,8 +12,9 @@ It answers "what is running, in which version, is it up to date, is it vulnerabl
 cannot do on its own: its "Virtualization" tab lists isolated containers, with no stack, service,
 replicas or version.
 
-> **Status**: version 0.1.0 released with lot 1 (Portainer). WUD and Harbor follow. See
-> [ROADMAP.md](ROADMAP.md).
+> **Status**: version 0.1.0 released with batch 1 (Portainer). The core of batch 2 (What's Up Docker:
+> image versions) is ready for the next release; registries without WUD, tickets and Harbor follow.
+> See [ROADMAP.md](ROADMAP.md).
 
 ## Principles
 
@@ -31,7 +32,7 @@ replicas or version.
 | Source | Import | In GLPI |
 | --- | --- | --- |
 | Portainer | Stacks, services (image, tag, digest, replicas, published ports, networks, secret names), nodes | Stack = native Appliance (impact analysis); Service form; nodes linked to inventoried computers |
-| WUD | Watched containers: local tag and digest, latest version, kind of gap | Deployed version, latest version, gap (patch, minor, major) per service |
+| WUD | Watched containers: local tag and digest, latest version, kind of gap | Deployed version, latest version, gap (patch, minor, major, digest only, not trackable) per service; containers without a service listed separately |
 | Registries (without WUD) | Docker Hub and Harbor v2 API | Same version table, computed by the plugin |
 | Harbor | Projects, repositories, artifacts, vulnerability scan overview | Vulnerabilities per image, images outside the managed registry flagged |
 
@@ -60,8 +61,9 @@ Then **Setup > Plugins**, install and enable "Docker Inventory".
 
 1. **In Portainer**, create a dedicated user with minimal rights (read-only on the environments to
    inventory) and an access token for it (*My account > Access tokens*).
-2. **In GLPI**, *Setup > Portainer connections* (or the plugin name in *Setup > Plugins*): add a
-   connection with the Portainer address (`https://portainer.exemple.test:9443`) and the key. Pick
+2. **In GLPI**, *Setup > Docker connections* (or the plugin name in *Setup > Plugins*): "Add",
+   choose **Portainer**, then enter the Portainer address (`https://portainer.exemple.test:9443`)
+   and the key. Pick
    the environment (Production, Staging...) given to the appliances the import will create. "Test
    the connection", then "Import now".
 3. The import then runs **every hour** (*Setup > Automatic actions*, `portainerimport`).
@@ -78,12 +80,52 @@ appliance, a computer or an environment is never modified or created. The read r
 is granted in *Administration > Profiles*, "Docker Inventory" tab; connections require the *Setup*
 update right.
 
-**Portainer on a private network (GLPI 12).** By default GLPI 12 refuses calls to a private
-address. To allow them for Portainer only, add to `config/local_define.php`:
+## Usage (batch 2: What's Up Docker)
+
+[What's Up Docker](https://github.com/getwud/wud) (WUD) watches container images and knows the
+latest published version of each one. The plugin reads that result **without changing anything in
+WUD** (no trigger, no update) and links it to the services imported from Portainer.
+
+1. **Import Portainer first**: containers seen by WUD are linked to the imported Swarm services (by
+   image digest, then by Swarm service name, then by image and tag).
+2. **In GLPI**, *Setup > Docker connections*: "Add", choose **What's Up Docker**, enter the WUD
+   address (`https://wud.exemple.test:3000`) and, if WUD requires authentication, the user and
+   password (encrypted with the GLPI key, never shown again). "Test the connection" shows the WUD
+   version and the number of watched containers, then "Read WUD now".
+3. The read then runs **every hour** (*Setup > Automatic actions*, `wudimport`).
+
+What you get:
+
+- *Assets > Image versions*: for each service, deployed version, latest version and gap (coloured
+  badges: major, minor, patch, digest only, not trackable, up to date), filters by gap and by
+  appliance environment, containers without a service listed separately; "Advanced search and
+  export" opens the GLPI search on the same columns;
+- on each **service** and each **appliance**, the "Versions" tab.
+
+Reading rules:
+
+- the gap computed by WUD is taken as is; the plugin only computes it when WUD does not give it;
+- a moving tag (`latest`, `stable`...) or one without a version number is "not trackable": only the
+  digest tells whether the image changed;
+- several containers of one service give a single row; replicas in different versions (update in
+  progress or stuck) are flagged;
+- a container without a matching service (outside Swarm, or several possible services) is not
+  ignored: it is listed separately with the reason.
+
+> The mapping of the WUD API (`/api/containers`, `/api/app`) follows the public WUD 8.x
+> documentation and a fake WUD (`tests/mock-wud`); it still has to be validated against a real WUD
+> 8.x instance ([#2](https://github.com/parime/glpi-docker-inventory/issues/2)).
+
+The read right on services (*Administration > Profiles*, "Docker Inventory" tab) also gives access
+to the versions.
+
+**Portainer or WUD on a private network (GLPI 12).** By default GLPI 12 refuses calls to a private
+address. To allow them for Portainer and WUD only, add to `config/local_define.php`:
 
 ```php
 define('GLPI_SERVERSIDE_URL_ALLOWED_PRIVATE_NETWORKS_CONTEXTS', [
     \GlpiPlugin\Dockerinventory\Portainer\PortainerContext::class,
+    \GlpiPlugin\Dockerinventory\Wud\WudContext::class,
 ]);
 ```
 

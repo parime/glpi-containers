@@ -16,6 +16,8 @@
 {# Tableau des versions (ImageVersion::present()). `containers_mode` : conteneurs sans service
    (colonne du conteneur et de la raison au lieu du service et de l'application). #}
 {% set containers_mode = containers_mode|default(false) %}
+{% set hide_appliance = hide_appliance|default(false) %}
+{% set registry_title = __('Page du registre', 'dockerinventory') %}
 <table class="table table-hover table-sm card-table align-middle">
     <thead>
         <tr>
@@ -24,7 +26,9 @@
                 <th>{{ __('Pourquoi sans service', 'dockerinventory') }}</th>
             {% else %}
                 <th>{{ __('Service', 'dockerinventory') }}</th>
-                <th>{{ __('Application et environnement', 'dockerinventory') }}</th>
+                {% if not hide_appliance %}
+                    <th>{{ __('Application et environnement', 'dockerinventory') }}</th>
+                {% endif %}
             {% endif %}
             <th>{{ __('Image', 'dockerinventory') }}</th>
             <th>{{ __('Version déployée', 'dockerinventory') }}</th>
@@ -60,6 +64,7 @@
                             {{ __('Stack', 'dockerinventory') }} : {{ row.stack_name }}</div>
                         {% endif %}
                     </td>
+                    {% if not hide_appliance %}
                     <td>
                         {% if row.appliance %}
                             {% if row.appliance.url %}
@@ -76,19 +81,20 @@
                             <div><span class="badge bg-azure-lt">{{ row.environment }}</span></div>
                         {% endif %}
                     </td>
+                    {% endif %}
                 {% endif %}
                 <td>
-                    <div class="text-break">{{ row.image ?: '-' }}</div>
-                    <div class="small text-muted">
-                        {% if row.registry_link %}
-                            <a href="{{ row.registry_link }}" target="_blank" rel="noopener noreferrer">
-                                <i class="ti ti-external-link me-1" aria-hidden="true"></i>
-                                {{ __('Page du registre', 'dockerinventory') }}
-                            </a>
-                        {% elseif row.registry_name %}
+                    <span class="text-break">{{ row.image ?: '-' }}</span>
+                    {% if row.registry_link %}
+                        <a href="{{ row.registry_link }}" target="_blank" rel="noopener noreferrer"
+                           title="{{ registry_title }}" aria-label="{{ registry_title }}" data-bs-toggle="tooltip">
+                            <i class="ti ti-external-link" aria-hidden="true"></i>
+                        </a>
+                    {% elseif row.registry_name %}
+                        <div class="small text-muted">
                             {{ __('Registre', 'dockerinventory') }} : {{ row.registry_name }}
-                        {% endif %}
-                    </div>
+                        </div>
+                    {% endif %}
                 </td>
                 <td>
                     <span class="badge bg-blue-lt">{{ row.deployed_tag ?: '-' }}</span>

@@ -358,6 +358,12 @@ class Connection extends ConnectionBase
      */
     public function importMessage(array $report): string
     {
+        $errors = is_array($report['errors'] ?? null) ? $report['errors'] : [];
+        if ((int) $report['status'] === self::STATUS_ERROR && $errors !== []) {
+            $code = (string) ($errors[0]['code'] ?? '');
+
+            return sprintf(__('Échec : %s', 'dockerinventory'), self::errorLabels()[$code] ?? $code);
+        }
         if ($this->isWud()) {
             return sprintf(
                 __(

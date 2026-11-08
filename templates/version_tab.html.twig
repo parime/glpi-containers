@@ -37,7 +37,7 @@
         <div class="card mb-3">
             <div class="card-header d-flex flex-wrap align-items-center gap-2">
                 <h3 class="card-title mb-0">
-                    <i class="ti ti-versions me-2" aria-hidden="true"></i>
+                    <i class="ti ti-tags me-2" aria-hidden="true"></i>
                     {{ __('Version de l’image', 'dockerinventory') }}
                 </h3>
                 {{ include('@dockerinventory/_version_badge.html.twig', {gap: row.gap}) }}
@@ -58,11 +58,13 @@
                 {% if row.is_out_of_sync %}
                     <div class="alert alert-warning">
                         <i class="ti ti-arrows-split me-2" aria-hidden="true"></i>
-                        {{ __(
-                            'Conteneurs dans des versions différentes (mise à jour en cours ou bloquée) :',
-                            'dockerinventory'
-                        ) }}
-                        <strong>{{ row.deployed_versions }}</strong>
+                        <div>
+                            {{ __(
+                                'Conteneurs dans des versions différentes (mise à jour en cours ou bloquée) :',
+                                'dockerinventory'
+                            ) }}
+                            <strong>{{ row.deployed_versions }}</strong>
+                        </div>
                     </div>
                 {% endif %}
                 {% if row.gap_code == 'untrackable' %}
@@ -122,12 +124,12 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
-                <i class="ti ti-versions me-2" aria-hidden="true"></i>
+                <i class="ti ti-tags me-2" aria-hidden="true"></i>
                 {{ __('Versions des images de cette application', 'dockerinventory') }}
             </h3>
         </div>
         <div class="table-responsive">
-            {{ include('@dockerinventory/_version_rows.html.twig', {rows: rows}) }}
+            {{ include('@dockerinventory/_version_rows.html.twig', {rows: rows, hide_appliance: true}) }}
         </div>
     </div>
 {% endif %}

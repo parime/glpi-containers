@@ -20,7 +20,7 @@
 <div class="card mt-3">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="ti ti-versions me-2" aria-hidden="true"></i>
+            <i class="ti ti-tags me-2" aria-hidden="true"></i>
             {{ __('Versions depuis What’s Up Docker', 'dockerinventory') }}
         </h3>
     </div>
@@ -52,28 +52,22 @@
             {% endif %}
         </div>
 
-        {% if report %}
+        {% if report and status != 3 %}
             <ul class="list-inline mb-3">
                 <li class="list-inline-item">
                     <i class="ti ti-box" aria-hidden="true"></i>
-                    {{ __(
-                        'Conteneurs suivis',
-                        'dockerinventory'
-                    ) }} : <strong>{{ report.containers|default(0) }}</strong>
+                    {{ __('Conteneurs suivis', 'dockerinventory') }} :
+                    <strong>{{ report.containers|default(0) }}</strong>
                 </li>
                 <li class="list-inline-item">
                     <i class="ti ti-brand-docker" aria-hidden="true"></i>
-                    {{ __(
-                        'Services rattachés',
-                        'dockerinventory'
-                    ) }} : <strong>{{ report.services|default(0) }}</strong>
+                    {{ __('Services rattachés', 'dockerinventory') }} :
+                    <strong>{{ report.services|default(0) }}</strong>
                 </li>
                 <li class="list-inline-item">
                     <i class="ti ti-unlink" aria-hidden="true"></i>
-                    {{ __(
-                        'Conteneurs sans service',
-                        'dockerinventory'
-                    ) }} : <strong>{{ report.unmatched|default(0) }}</strong>
+                    {{ __('Conteneurs sans service', 'dockerinventory') }} :
+                    <strong>{{ report.unmatched|default(0) }}</strong>
                 </li>
                 <li class="list-inline-item">
                     <i class="ti ti-arrows-split" aria-hidden="true"></i>
@@ -93,15 +87,15 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            {% if report.errors is not empty %}
-                <div class="alert alert-warning">
-                    <ul class="mb-0">
-                        {% for error in report.errors %}
-                            <li>{{ error_labels[error.code] ?? error.code }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
+        {% endif %}
+        {% if report and report.errors is not empty %}
+            <div class="alert alert-warning">
+                <ul class="mb-0">
+                    {% for error in report.errors %}
+                        <li>{{ error_labels[error.code] ?? error.code }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
         {% endif %}
 
         <form method="post" action="{{ item.getFormURL() }}" class="d-flex flex-wrap gap-2">
@@ -116,7 +110,7 @@
                 {{ __('Lire WUD maintenant', 'dockerinventory') }}
             </button>
             <a href="{{ versions_url }}" class="btn btn-outline-primary">
-                <i class="ti ti-versions me-1" aria-hidden="true"></i>
+                <i class="ti ti-tags me-1" aria-hidden="true"></i>
                 {{ __('Voir les versions des images', 'dockerinventory') }}
             </a>
         </form>

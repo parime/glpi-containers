@@ -61,7 +61,7 @@ class ImageVersion extends CommonDBTM
 
     public static function getIcon()
     {
-        return 'ti ti-versions';
+        return 'ti ti-tags';
     }
 
     public static function canView(): bool

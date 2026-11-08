@@ -53,7 +53,10 @@ final class Installer
     private const DEFAULT_COLUMNS = [8, 3, 4, 6, 7, 10, 11];
 
     /** Colonnes affichées par défaut dans la recherche des versions (options de ImageVersion). */
-    private const VERSION_COLUMNS = [3, 4, 5, 6, 7, 8, 9, 10];
+    private const VERSION_COLUMNS = [1, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    /** Colonnes affichées par défaut dans la liste des connexions : type, adresse, active, dernier import. */
+    private const CONNECTION_COLUMNS = [7, 3, 4, 5];
 
     public function install(Migration $migration): bool
     {
@@ -68,8 +71,11 @@ final class Installer
             $this->grantReadToAdministrators();
             $this->installDisplayPreferences(Service::class, self::DEFAULT_COLUMNS);
         }
-        if (countElementsInTable(DisplayPreference::getTable(), ['itemtype' => ImageVersion::class]) === 0) {
-            $this->installDisplayPreferences(ImageVersion::class, self::VERSION_COLUMNS);
+        $defaults = [ImageVersion::class => self::VERSION_COLUMNS, Connection::class => self::CONNECTION_COLUMNS];
+        foreach ($defaults as $itemtype => $columns) {
+            if (countElementsInTable(DisplayPreference::getTable(), ['itemtype' => $itemtype]) === 0) {
+                $this->installDisplayPreferences($itemtype, $columns);
+            }
         }
 
         foreach ([self::CRON_NAME, self::CRON_WUD] as $cron) {

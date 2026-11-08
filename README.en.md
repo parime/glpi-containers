@@ -12,9 +12,9 @@ It answers "what is running, in which version, is it up to date, is it vulnerabl
 cannot do on its own: its "Virtualization" tab lists isolated containers, with no stack, service,
 replicas or version.
 
-> **Status**: version 0.1.0 released with batch 1 (Portainer). The core of batch 2 (What's Up Docker:
-> image versions) is ready for the next release; registries without WUD, tickets and Harbor follow.
-> See [ROADMAP.md](ROADMAP.md).
+> **Status**: version 0.2.0 released (batch 1: Portainer; core of batch 2: What's Up Docker). The
+> registry fallback without WUD (Docker Hub, Harbor) is ready for the next release; tickets and
+> Harbor (batch 3) follow. See [ROADMAP.md](ROADMAP.md).
 
 ## Principles
 
@@ -119,13 +119,46 @@ Reading rules:
 The read right on services (*Administration > Profiles*, "Docker Inventory" tab) also gives access
 to the versions.
 
-**Portainer or WUD on a private network (GLPI 12).** By default GLPI 12 refuses calls to a private
-address. To allow them for Portainer and WUD only, add to `config/local_define.php`:
+## Usage (batch 2: registries, without WUD)
+
+For services that **no WUD connection covers**, the plugin itself reads the tag list of their image
+in the registry, **read-only** (GET requests on the tag list), and fills the same version table
+(source "Image registry").
+
+- **Docker Hub** (images `postgres`, `grafana/grafana`, `docker.io/...`): anonymous, at most one
+  read per image per day (cache), and no more calls during the check as soon as Docker Hub refuses
+  (rate limit) or does not answer. Only the names of the public images in use are sent to Docker
+  Hub.
+- **Harbor** (registry API v2, `/v2/<project>/<repository>/tags/list`): *Setup > Docker
+  connections*, "Add", choose **Harbor**, enter the address (`https://harbor.exemple.test`), a
+  **read-only robot account** (*pull* right on the useful projects; password encrypted with the
+  GLPI key, never shown again) and, if it differs from the address, the host as written in the
+  images (`registry.exemple.test:5000`). The connection covers the services of its entity and its
+  sub-entities; "Test the connection", then "Check the registries now".
+- **Unknown registry** (neither Docker Hub nor a declared Harbor) or **private without
+  credentials**: version "not checked", with the reason, no blocking error.
+
+Same comparison as with WUD: SemVer versions (`1.2`, `v1.2.3`, `2024.10.1`), same number of
+components as the deployed tag (`16` follows `17`, not `16.4`), same variant (`-alpine`),
+pre-releases (`-rc1`, `-beta2`) ignored unless a pre-release is deployed, `latest` "not trackable".
+
+The check runs **every hour** (*Setup > Automatic actions*, `registrycheck`); "Check the registries
+now" is available on the *Assets > Image versions* page and on each Harbor connection. For a Docker
+Hub mirror, define `PLUGIN_DOCKERINVENTORY_DOCKER_HUB_URL` in `config/local_define.php`. To never
+query Docker Hub, disable the `registrycheck` automatic action.
+
+> The Harbor call follows the registry API v2 specification (basic authentication of the robot
+> account) and a fake registry (`tests/mock-registry`); it still has to be validated against a
+> real Harbor 2.x.
+
+**Portainer, WUD or Harbor on a private network (GLPI 12).** By default GLPI 12 refuses calls to a
+private address. To allow them for these sources only, add to `config/local_define.php`:
 
 ```php
 define('GLPI_SERVERSIDE_URL_ALLOWED_PRIVATE_NETWORKS_CONTEXTS', [
     \GlpiPlugin\Dockerinventory\Portainer\PortainerContext::class,
     \GlpiPlugin\Dockerinventory\Wud\WudContext::class,
+    \GlpiPlugin\Dockerinventory\Registry\RegistryContext::class,
 ]);
 ```
 

@@ -5,6 +5,17 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions
 
 ## [Unreleased]
 
+### Added
+
+- Repli sans WUD par les registres ([#5](https://github.com/parime/glpi-docker-inventory/issues/5)) :
+  connexions de type Harbor (compte robot en lecture seule facultatif, mot de passe chiffré, hôte du
+  registre dans les images, « Tester la connexion »), lecture des tags de Docker Hub (anonyme, une
+  fois par jour et par image au plus) et de l'API v2 de Harbor pour les services qu'aucune connexion
+  WUD ne couvre ; même tableau des versions (source « Registre de l'image »), même comparaison
+  (préversions ignorées sauf si déployées) ; registre inconnu ou privé sans identifiants « non
+  vérifié » avec la raison ; tâche automatique horaire `registrycheck` et bouton « Vérifier les
+  registres maintenant » ; faux registre `tests/mock-registry`.
+
 ## [0.2.0] - 2026-11-08
 
 - Publiée dans le catalogue de la marketplace GLPI (`dockerinventory.xml`).

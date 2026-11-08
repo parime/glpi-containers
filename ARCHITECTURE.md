@@ -13,8 +13,9 @@ dockerinventory/
 ├── hook.php                   installation, mise à jour, désinstallation
 ├── composer.json
 ├── front/                     pages (une par écran)
-│   ├── connection.php         liste des connexions Portainer et WUD (droit Configuration en modification)
-│   ├── connection.form.php    choix du type, formulaire, « Tester la connexion », « Importer maintenant »
+│   ├── connection.php         liste des connexions Portainer, WUD et Harbor (droit Configuration en modification)
+│   ├── connection.form.php    choix du type, formulaire, « Tester la connexion », « Importer maintenant »,
+│   │                          « Vérifier les registres maintenant »
 │   ├── service.php            liste des services importés (recherche GLPI)
 │   ├── service.form.php       fiche d'un service, en lecture seule
 │   ├── version.php            « Versions des images » : compteurs, filtres, badges (Twig)
@@ -25,9 +26,10 @@ dockerinventory/
 │   │   ├── Http.php           GET par le client HTTP de GLPI, sans redirection
 │   │   └── Base/              classes parentes : propriétés typées (GLPI 12) ou non (GLPI 11)
 │   ├── Install/Installer.php  tables, droit, tâche automatique, préférences d'affichage ; désinstallation
-│   ├── Connection.php         connexion Portainer ou WUD (type figé à la création) : URL, clé ou mot de
-│   │                          passe chiffré (GLPIKey), utilisateur WUD, environnement des applications
-│   │                          créées, dernier compte rendu ; tâches automatiques horaires
+│   ├── Connection.php         connexion Portainer, WUD ou Harbor (type figé à la création) : URL, clé ou
+│   │                          mot de passe chiffré (GLPIKey), utilisateur WUD ou compte robot Harbor, hôte
+│   │                          du registre (Harbor), environnement des applications créées, dernier compte
+│   │                          rendu ; tâches automatiques horaires
 │   ├── Importer.php           import Portainer : stacks, services, nœuds, tâches en cours, retraits
 │   ├── ImageVersion.php       version d'image d'un service (ou d'un conteneur sans service) ; onglet
 │   │                          « Versions » des services et des applications, page et recherche
@@ -50,9 +52,18 @@ dockerinventory/
 │   ├── Version/
 │   │   ├── VersionComparator.php  écart : majeure, mineure, correctif, préversion, empreinte seule,
 │   │   │                          non suivable (`latest`...), non vérifié ; calcul de WUD repris
-│   │   └── VersionLinker.php      conteneurs → services (empreinte, nom, image et tag), une ligne
-│   │                              par service, réplicas désynchronisés
-│   ├── Registry/              repli sans WUD : Docker Hub, API v2 de Harbor    (prévu, #5)
+│   │   ├── VersionLinker.php      conteneurs → services (empreinte, nom, image et tag), une ligne
+│   │   │                          par service, réplicas désynchronisés
+│   │   └── TagSelector.php        dernière version parmi les tags d'un registre (même nombre de
+│   │                              composantes, même variante, préversions ignorées sauf déployées)
+│   ├── Registry/              repli sans WUD
+│   │   ├── RegistryClient.php      lecture seule : tags Docker Hub (anonyme, 3 pages au plus) et
+│   │   │                           /v2/<dépôt>/tags/list de Harbor (compte robot), transport injectable
+│   │   ├── RegistryContext.php     contexte réseau (réseaux privés autorisés sous GLPI 12)
+│   │   ├── RegistryException.php   codes stables, jamais le texte d'origine ni le mot de passe
+│   │   ├── RegistryResolver.php    registre d'une image : Docker Hub, Harbor déclaré (hôte, entité), inconnu
+│   │   └── RegistryImporter.php    services sans WUD → table des versions (source « registry »),
+│   │                               cache d'un jour pour Docker Hub
 │   ├── Ticket/                tickets de mise à jour selon des seuils           (prévu, #7)
 │   └── Harbor/                projets, dépôts, artefacts, analyses           (prévu, lot 3)
 ├── templates/                 Twig uniquement (aucun HTML dans le PHP)
@@ -62,19 +73,21 @@ dockerinventory/
     ├── Integration/           import complet contre la vraie base GLPI (transport en mémoire)
     ├── security/setup.php     jeu de données des contrôles de sécurité communs
     ├── mock-portainer/        faux Portainer (Python) et jeu de données fictif
-    └── mock-wud/              faux WUD (Python, format WUD 8.x) et jeu de données fictif
+    ├── mock-wud/              faux WUD (Python, format WUD 8.x) et jeu de données fictif
+    └── mock-registry/         faux registre (Python) : tags façon Docker Hub, /v2/.../tags/list façon Harbor
 ```
 
 ## Tables
 
 | Table | Contenu |
 | --- | --- |
-| `glpi_plugin_dockerinventory_connections` | Connexion Portainer ou WUD (`type`) : URL, clé ou mot de passe chiffré, utilisateur (WUD), HTTP autorisé ou non, entité, environnement des applications créées (Portainer), dernier import et son compte rendu |
+| `glpi_plugin_dockerinventory_connections` | Connexion Portainer, WUD ou Harbor (`type`) : URL, clé ou mot de passe chiffré, utilisateur (WUD) ou compte robot (Harbor), hôte du registre dans les images (Harbor), HTTP autorisé ou non, entité, environnement des applications créées (Portainer), dernier import et son compte rendu |
 | `glpi_plugin_dockerinventory_stacks` | Stack Swarm de Portainer ↔ Application GLPI, état « retiré » |
 | `glpi_plugin_dockerinventory_services` | Service Swarm : stack, Application, image, tag, empreinte, réplicas voulus et en cours, ports, réseaux, noms des secrets, état « retiré » |
 | `glpi_plugin_dockerinventory_nodes` | Nœud Swarm : nom d'hôte, rôle, état, version de Docker, ordinateur GLPI rattaché |
 | `glpi_plugin_dockerinventory_services_nodes` | Tâches en cours d'un service sur chaque nœud (recalculé à chaque import) |
-| `glpi_plugin_dockerinventory_imageversions` | Une ligne par service suivi (ou par conteneur sans service, `plugin_dockerinventory_services_id` = 0) et par connexion WUD : conteneurs, image et registre, tag et empreinte déployés, dernière version, écart, réplicas désynchronisés, méthode de rattachement (ou raison de l'absence), source, date de vérification. Recalculée à chaque lecture de WUD |
+| `glpi_plugin_dockerinventory_imageversions` | Une ligne par service suivi (ou par conteneur sans service, `plugin_dockerinventory_services_id` = 0) et par connexion WUD : conteneurs, image et registre, tag et empreinte déployés, dernière version, écart, réplicas désynchronisés, méthode de rattachement (ou raison de l'absence), source (`wud` ou `registry`), raison d'une version non vérifiée, date de vérification. Recalculée à chaque lecture de WUD ; repli sans WUD : une ligne par service, connexion Harbor ou 0 (Docker Hub, registre inconnu) |
+| `glpi_plugin_dockerinventory_registrytags` | Cache des tags de Docker Hub : dépôt, tags et empreintes (JSON), raison d'un échec durable (introuvable), date de lecture ; valable un jour |
 
 ## Portainer (lot 1)
 
@@ -122,11 +135,33 @@ dockerinventory/
   donne les valeurs ; des conteneurs dans des versions différentes sont signalés « réplicas
   désynchronisés » avec le détail.
 - WUD injoignable ou en erreur : rien n'est modifié dans la table des versions.
-- Sans WUD : le plugin interrogera lui-même Docker Hub ou l'API v2 de Harbor (prévu, #5).
+- Sans WUD : le plugin interroge lui-même le registre (ci-dessous).
+
+## Registres sans WUD (lot 2, #5)
+
+- Services concernés : actifs, avec une image, sans ligne WUD dans la table des versions. Dès
+  qu'une lecture de WUD rattache un service, sa ligne « registry » est supprimée.
+- Lecture seule : `GET /v2/repositories/<espace>/<dépôt>/tags` (Docker Hub, anonyme, 100 tags par
+  page, 3 pages au plus, les plus récents d'abord) ; `GET /v2/<projet>/<dépôt>/tags/list` et
+  `GET /v2/` (test) pour Harbor, authentification basique du compte robot (champ sécurisé, comme
+  les autres mots de passe). Aucune image n'est téléchargée.
+- Docker Hub : cache d'un jour par dépôt (table `registrytags`), y compris « introuvable ou privé » ;
+  un refus (429) ou une panne arrête les appels à Docker Hub pour la vérification en cours, sans
+  rien mettre en cache (nouvel essai à la suivante). Adresse changeable par la constante
+  `PLUGIN_DOCKERINVENTORY_DOCKER_HUB_URL` (miroir, tests).
+- Harbor : la connexion active dont l'hôte du registre (champ, sinon hôte de l'adresse) est celui de
+  l'image, et dont l'entité (ou une entité parente) est celle du service. Relu à chaque vérification.
+- Non vérifié (écart « non vérifié », raison enregistrée sous forme de code et traduite à
+  l'affichage) : registre inconnu, privé sans compte (401 sans identifiants), image introuvable,
+  limite ou panne. Seules les vraies erreurs d'appel rendent la vérification « partielle ».
+- Dernière version (`TagSelector`) : tags versionnés seulement, même nombre de composantes, même
+  variante, préversions ignorées sauf si une préversion est déployée (même canal), `v` facultatif.
+  Docker Hub donne l'empreinte de chaque tag : même tag reconstruit → « empreinte seule » ; tag
+  mobile → « non suivable », avec « nouvelle empreinte disponible » si elle a changé.
 
 ## Règles communes
 
-- Aucune action d'écriture vers Portainer, WUD, Harbor ou un registre.
+- Aucune action d'écriture vers Portainer, WUD, Harbor ou un registre (uniquement des GET).
 - Aucun changement automatique de statut, priorité, affectation ou droits dans GLPI.
 - Pas de SQL brut hors de l'installateur ; Twig pour tout l'affichage.
 - Appels HTTP par le client de GLPI ; sous GLPI 12, les adresses privées ne sont joignables que si
@@ -136,6 +171,7 @@ dockerinventory/
 
 - `vendor/bin/phpunit` (dans une instance GLPI où le plugin est installé) : tests unitaires
   (correspondances, adresses, client) et d'intégration (import complet, idempotence, retraits).
-- Faux serveurs Python dans `tests/mock-*` : jeux de données fictifs, aucune adresse ni nom réel.
+- Faux serveurs Python dans `tests/mock-*` : jeux de données fictifs, aucune adresse ni nom réel ;
+  les tests n'appellent jamais le vrai Docker Hub (transports en mémoire, adresse fictive).
 - Test dans une vraie instance GLPI 11 et 12 avant chaque version, en naviguant comme un
   utilisateur.

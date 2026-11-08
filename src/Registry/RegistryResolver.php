@@ -33,7 +33,8 @@ final class RegistryResolver
     public const KIND_UNKNOWN = 'unknown';
 
     /**
-     * @param list<HarborTarget> $harbors Connexions Harbor actives : hôte du registre, entités couvertes.
+     * @param list<HarborTarget> $harbors Connexions Harbor actives : hôte du registre, entités couvertes ;
+     *        la première qui convient est retenue (entité la plus proche du service en tête).
      * @return Resolved
      */
     public static function resolve(string $image, int $entityId, array $harbors): array

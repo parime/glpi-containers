@@ -152,7 +152,8 @@ final class RegistryImporter
     /**
      * Connexions Harbor actives, et leur cible de rattachement (hôte, entités couvertes).
      *
-     * @return array{0: array<int, Connection>, 1: list<array{id: int, host: string, entities: list<int>}>}
+     * @return array{0: array<int, Connection>, 1: list<array{id: int, host: string, entities: list<int>,
+     *     level: int}>}
      */
     private function harbors(): array
     {
@@ -177,8 +178,15 @@ final class RegistryImporter
                     (string) ($row['registry_host'] ?? '')
                 ),
                 'entities' => array_values(array_map('intval', $entities)),
+                'level'    => (int) ($DB->request([
+                    'SELECT' => ['level'],
+                    'FROM'   => 'glpi_entities',
+                    'WHERE'  => ['id' => (int) $row['entities_id']],
+                ])->current()['level'] ?? 0),
             ];
         }
+        // Plusieurs Harbor pour le même hôte : celui de l'entité la plus proche du service d'abord.
+        usort($targets, static fn (array $a, array $b): int => [$b['level'], $a['id']] <=> [$a['level'], $b['id']]);
 
         return [$connections, $targets];
     }

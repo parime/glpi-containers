@@ -56,6 +56,9 @@ final class RegistryImporterTest extends TestCase
 
     private int $harborId = 0;
 
+    /** @var list<int> Autres connexions Harbor actives de l'instance, suspendues pendant le test. */
+    private array $otherHarbors = [];
+
     protected function setUp(): void
     {
         global $DB;
@@ -84,6 +87,18 @@ final class RegistryImporterTest extends TestCase
         ]);
         $this->assertGreaterThan(0, $this->portainerId);
         $this->assertGreaterThan(0, $this->harborId);
+        // Instance de développement : ses propres connexions Harbor ne doivent pas répondre à la
+        // place de celle du test (rétablies dans tearDown()).
+        foreach (
+            $DB->request(['SELECT' => ['id'], 'FROM' => Connection::getTable(), 'WHERE' => [
+                'type' => Connection::TYPE_HARBOR, 'is_active' => 1, ['NOT' => ['id' => $this->harborId]],
+            ]]) as $row
+        ) {
+            $this->otherHarbors[] = (int) $row['id'];
+        }
+        if ($this->otherHarbors !== []) {
+            $DB->update(Connection::getTable(), ['is_active' => 0], ['id' => $this->otherHarbors]);
+        }
         // Cache de Docker Hub vidé : chaque test part d'une vérification complète.
         $DB->delete(RegistryImporter::CACHE_TABLE, ['registry' => RegistryClient::KIND_DOCKER_HUB]);
         $this->importPortainer();
@@ -114,6 +129,9 @@ final class RegistryImporterTest extends TestCase
             $DB->delete($table, ['plugin_dockerinventory_connections_id' => $this->portainerId]);
         }
         $DB->delete(RegistryImporter::CACHE_TABLE, ['registry' => RegistryClient::KIND_DOCKER_HUB]);
+        if ($this->otherHarbors !== []) {
+            $DB->update(Connection::getTable(), ['is_active' => 1], ['id' => $this->otherHarbors]);
+        }
         (new Connection())->delete(['id' => $this->harborId], true);
         (new Connection())->delete(['id' => $this->portainerId], true);
         (new \Entity())->delete(['id' => $this->entityId], true);

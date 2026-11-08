@@ -115,7 +115,7 @@
                     <dd class="col-sm-9">
                         {{ row.source }}
                         {% if row.connection_name %}({{ row.connection_name }}){% endif %}
-                        {% if row.source_code == 'registry' and row.registry_name %}
+                        {% if row.source_code == 'registry' and row.registry_name and not row.connection_name %}
                             <span class="text-muted">
                                 : {{ row.registry_name == 'hub' ? 'Docker Hub' : row.registry_name }}
                             </span>

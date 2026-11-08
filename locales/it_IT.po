@@ -696,8 +696,8 @@ msgstr "Importazione terminata (%1$s): %2$d stack, %3$d servizi, %4$d ritirati, 
 
 #: src/Connection.php
 #, php-format
-msgid "Registres vérifiés (%1$s) : %2$d services, %3$d versions trouvées, %4$d non vérifiées, %5$d requêtes."
-msgstr "Registri verificati (%1$s): %2$d servizi, %3$d versioni trovate, %4$d non verificate, %5$d richieste."
+msgid "Registres lus (%1$s) : %2$d versions trouvées, %3$d non suivables, %4$d non vérifiées, %5$d requêtes."
+msgstr "Registri letti (%1$s): %2$d versioni trovate, %3$d non tracciabili, %4$d non verificate, %5$d richieste."
 
 #: src/Connection.php
 msgid "Connexion réussie : le registre Harbor accepte ce compte."

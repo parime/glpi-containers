@@ -458,12 +458,12 @@ class Connection extends ConnectionBase
     {
         return sprintf(
             __(
-                'Registres vérifiés (%1$s) : %2$d services, %3$d versions trouvées, %4$d non vérifiées, %5$d requêtes.',
+                'Registres lus (%1$s) : %2$d versions trouvées, %3$d non suivables, %4$d non vérifiées, %5$d requêtes.',
                 'dockerinventory'
             ),
             self::statusLabel((int) $report['status']),
-            (int) ($report['services'] ?? 0),
-            (int) ($report['checked'] ?? 0) + (int) ($report['untrackable'] ?? 0),
+            (int) ($report['checked'] ?? 0),
+            (int) ($report['untrackable'] ?? 0),
             (int) ($report['not_checked'] ?? 0),
             (int) ($report['requests'] ?? 0)
         );

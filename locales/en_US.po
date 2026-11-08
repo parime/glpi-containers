@@ -696,8 +696,8 @@ msgstr "Import finished (%1$s): %2$d stacks, %3$d services, %4$d retired, %5$d n
 
 #: src/Connection.php
 #, php-format
-msgid "Registres vérifiés (%1$s) : %2$d services, %3$d versions trouvées, %4$d non vérifiées, %5$d requêtes."
-msgstr "Registries checked (%1$s): %2$d services, %3$d versions found, %4$d not checked, %5$d requests."
+msgid "Registres lus (%1$s) : %2$d versions trouvées, %3$d non suivables, %4$d non vérifiées, %5$d requêtes."
+msgstr "Registries read (%1$s): %2$d versions found, %3$d not trackable, %4$d not checked, %5$d requests."
 
 #: src/Connection.php
 msgid "Connexion réussie : le registre Harbor accepte ce compte."

@@ -1,0 +1,211 @@
+name: Release
+
+# Sur un tag de version (vX.Y.Z) : installe les dépendances de production, construit l'archive du
+# plugin, vérifie qu'elle s'installe réellement sur une instance GLPI neuve, puis publie la release
+# GitHub avec l'archive, sa somme SHA-256, une attestation de provenance, et ouvre une PR de mise à
+# jour du catalogue de la marketplace (dockerinventory.xml). Repris du workflow de Configuration
+# GLPI Auto.
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  # Permet à auto-tag.yml de déclencher explicitement cette release après avoir tagué : un push de
+  # tag effectué avec le GITHUB_TOKEN ne déclenche PAS les autres workflows. github.ref_name vaut
+  # alors le tag ciblé (gh workflow run --ref <tag>), comme pour un push classique.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GLPI_IMAGE: glpi/glpi:11.0.12
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+      # Attestation de provenance de l'archive (actions/attest-build-provenance) : jeton OIDC pour
+      # la signature Sigstore, et écriture de l'attestation dans le dépôt.
+      id-token: write
+      attestations: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7 (SHA pinned)
+
+      - name: Le tag correspond à PLUGIN_DOCKERINVENTORY_VERSION
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          CODE_VERSION="$(grep -oP "define\('PLUGIN_DOCKERINVENTORY_VERSION', '\K[^']+" setup.php)"
+          echo "Tag : $TAG_VERSION -- setup.php : $CODE_VERSION"
+          if [ "$TAG_VERSION" != "$CODE_VERSION" ]; then
+            echo "::error::Le tag $GITHUB_REF_NAME ne correspond pas à PLUGIN_DOCKERINVENTORY_VERSION ($CODE_VERSION)."
+            exit 1
+          fi
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2 (SHA pinned)
+        with:
+          php-version: "8.2"
+          coverage: none
+          tools: composer
+
+      - name: Dépendances de production
+        run: composer install --no-dev --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Construit l'archive
+        # git archive (pas un zip du checkout) : exactement le contenu versionné au tag, sans ce qui
+        # est marqué export-ignore dans .gitattributes (tests/, .github/, outillage). vendor/ n'est
+        # pas versionné : copié depuis l'installation de production ci-dessus. Préfixe
+        # dockerinventory/ : l'archive s'extrait directement dans plugins/ d'une instance GLPI.
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          ARCHIVE_NAME="glpi-docker-inventory-${VERSION}.zip"
+          echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> "$GITHUB_ENV"
+
+          mkdir -p /tmp/staging/dockerinventory
+          git archive "$GITHUB_REF_NAME" | tar -x -C /tmp/staging/dockerinventory
+          cp -r vendor /tmp/staging/dockerinventory/vendor
+
+          (cd /tmp/staging && zip -qr "$GITHUB_WORKSPACE/${ARCHIVE_NAME}" dockerinventory)
+
+      - name: Démarre MariaDB
+        run: |
+          docker network create di-release
+          docker run -d --name mariadb --network di-release \
+            -e MARIADB_ROOT_PASSWORD=glpi_password \
+            -e MARIADB_DATABASE=glpidb \
+            -e MARIADB_USER=glpi_user \
+            -e MARIADB_PASSWORD=glpi_password \
+            mariadb:11
+
+          echo "Attente de MariaDB..."
+          for i in $(seq 1 30); do
+            docker exec mariadb mariadb-admin ping -h 127.0.0.1 -u root -pglpi_password --silent && break
+            sleep 2
+          done
+
+      - name: Démarre GLPI (installation automatique de l'image officielle)
+        run: |
+          docker run -d --name glpi --network di-release \
+            -e TIMEZONE=Europe/Paris \
+            -e GLPI_DB_HOST=mariadb \
+            -e GLPI_DB_PORT=3306 \
+            -e GLPI_DB_NAME=glpidb \
+            -e GLPI_DB_USER=glpi_user \
+            -e GLPI_DB_PASSWORD=glpi_password \
+            "$GLPI_IMAGE"
+
+          echo "Attente de la fin de l'installation de GLPI..."
+          ready=0
+          for i in $(seq 1 60); do
+            docker exec glpi test -f /var/glpi/config/config_db.php && { ready=1; break; }
+            sleep 5
+          done
+          if [ "$ready" != "1" ]; then
+            echo "::error::L'installation automatique de GLPI ne s'est jamais terminée (config_db.php absent)."
+            docker logs glpi --tail 200
+            exit 1
+          fi
+
+      - name: Installe l'archive sur une vraie instance GLPI
+        run: |
+          mkdir -p /tmp/archive-extracted
+          unzip -q "$ARCHIVE_NAME" -d /tmp/archive-extracted
+          docker cp /tmp/archive-extracted/dockerinventory glpi:/var/www/glpi/plugins/dockerinventory
+          docker exec -u root glpi chown -R www-data:www-data /var/www/glpi/plugins/dockerinventory
+
+          ready=0
+          for i in $(seq 1 12); do
+            if docker exec glpi php bin/console database:update --force --no-interaction; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          if [ "$ready" != "1" ]; then
+            echo "::error::database:update a échoué après 12 essais."
+            exit 1
+          fi
+          c="docker exec -u www-data glpi php bin/console"
+          $c plugin:install dockerinventory --username=glpi --force --no-interaction
+          $c plugin:activate dockerinventory --no-interaction
+
+      - name: Journal GLPI (en cas d'échec)
+        if: failure()
+        run: docker logs glpi --tail 200
+
+      # Intégrité de l'archive publiée : somme SHA-256 jointe à la release, et attestation de
+      # provenance signée par GitHub (Sigstore) prouvant que l'archive a été construite par ce
+      # workflow, depuis ce dépôt et ce tag. Vérification : sha256sum -c, ou
+      # gh attestation verify <archive> --repo parime/glpi-docker-inventory
+      - name: Somme SHA-256 de l'archive
+        run: sha256sum "$ARCHIVE_NAME" > "$ARCHIVE_NAME.sha256"
+
+      - name: Attestation de provenance de l'archive
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2 (SHA pinned)
+        with:
+          subject-path: ${{ env.ARCHIVE_NAME }}
+
+      - name: Publie la release GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # gh release create échoue si une release existe déjà pour ce tag (créée à la main par
+          # exemple) : repli sur upload/edit pour rester idempotent.
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$ARCHIVE_NAME" "$ARCHIVE_NAME.sha256" --clobber
+            gh release edit "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+          else
+            gh release create "$GITHUB_REF_NAME" "$ARCHIVE_NAME" "$ARCHIVE_NAME.sha256" \
+              --title "$GITHUB_REF_NAME" \
+              --generate-notes
+          fi
+
+      - name: Ouvre une PR de mise à jour du catalogue de la marketplace
+        # Le catalogue (dockerinventory.xml) doit suivre chaque release : une PR prête à fusionner
+        # est ouverte à chaque publication plutôt que de compter sur une modification à la main.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          python3 .github/scripts/update_marketplace_xml.py \
+            dockerinventory.xml "$VERSION" "~11.0,~12.0" \
+            "https://github.com/parime/glpi-docker-inventory/releases/download/${GITHUB_REF_NAME}/${ARCHIVE_NAME}" \
+            "        " "            "
+
+          if git diff --quiet -- dockerinventory.xml; then
+            echo "Catalogue déjà à jour, rien à faire."
+            exit 0
+          fi
+
+          # La CI officielle GLPI exige une modification du CHANGELOG dans toute PR qui ne touche
+          # pas seulement locales/ ou .github/.
+          sed -i "s/^## \[${VERSION}\] .*/&\n\n- Publiée dans le catalogue de la marketplace GLPI (\`dockerinventory.xml\`)./" CHANGELOG.md
+
+          BRANCH="chore/marketplace-xml-${VERSION}"
+          # Commit créé via l'API GitHub, pas git : GitHub le signe (commits signés). Base : le
+          # commit tagué.
+          MESSAGE="chore: add version ${VERSION} to the marketplace catalogue"
+          REPO="${GITHUB_REPOSITORY}"
+          TREE_ITEMS='[]'
+          for FILE in dockerinventory.xml CHANGELOG.md; do
+            BLOB=$(jq -n --rawfile c <(base64 -w0 "$FILE") '{content: $c, encoding: "base64"}' \
+              | gh api "repos/${REPO}/git/blobs" --input - --jq .sha)
+            TREE_ITEMS=$(jq --arg p "$FILE" --arg s "$BLOB" '. + [{path: $p, mode: "100644", type: "blob", sha: $s}]' <<< "$TREE_ITEMS")
+          done
+          BASE_TREE=$(gh api "repos/${REPO}/git/commits/${GITHUB_SHA}" --jq .tree.sha)
+          TREE=$(jq -n --arg b "$BASE_TREE" --argjson t "$TREE_ITEMS" '{base_tree: $b, tree: $t}' \
+            | gh api "repos/${REPO}/git/trees" --input - --jq .sha)
+          COMMIT=$(jq -n --arg m "$MESSAGE" --arg t "$TREE" --arg p "${GITHUB_SHA}" '{message: $m, tree: $t, parents: [$p]}' \
+            | gh api "repos/${REPO}/git/commits" --input - --jq .sha)
+          gh api "repos/${REPO}/git/refs" -f ref="refs/heads/${BRANCH}" -f sha="$COMMIT" > /dev/null
+
+          gh pr create --title "$MESSAGE" \
+            --body "Mise à jour automatique après la release ${GITHUB_REF_NAME}. Ouverte par le bot : cliquer sur « Approve workflows to run » pour lancer les contrôles, puis fusionner." \
+            --base main --head "$BRANCH"
+
+          # Une PR ouverte avec le GITHUB_TOKEN ne lance pas ses workflows pull_request : les
+          # contrôles démarrent avec « Approve workflows to run » sur la PR.

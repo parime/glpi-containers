@@ -51,10 +51,40 @@ No release yet. To try it from source:
 ```sh
 cd /var/www/glpi/plugins
 git clone https://github.com/parime/glpi-docker-inventory.git dockerinventory
-cd dockerinventory && composer install --no-dev
 ```
 
 Then **Setup > Plugins**, install and enable "Docker Inventory".
+
+## Usage (batch 1: Portainer)
+
+1. **In Portainer**, create a dedicated user with minimal rights (read-only on the environments to
+   inventory) and an access token for it (*My account > Access tokens*).
+2. **In GLPI**, *Setup > Portainer connections* (or the plugin name in *Setup > Plugins*): add a
+   connection with the Portainer address (`https://portainer.exemple.test:9443`) and the key. Pick
+   the environment (Production, Staging...) given to the appliances the import will create. "Test
+   the connection", then "Import now".
+3. The import then runs **every hour** (*Setup > Automatic actions*, `portainerimport`).
+
+What you get:
+
+- *Assets > Container services*: every service, with image, tag, digest, replicas, status;
+- on each **Appliance** created for a stack, the "Services" tab;
+- on each **computer** whose name matches a Swarm node, the "Node services" tab.
+
+What the plugin writes **outside its own tables**: only the one-time creation of a stack's
+Appliance when no appliance with that name exists in the connection's entity. An existing
+appliance, a computer or an environment is never modified or created. The read right on services
+is granted in *Administration > Profiles*, "Docker Inventory" tab; connections require the *Setup*
+update right.
+
+**Portainer on a private network (GLPI 12).** By default GLPI 12 refuses calls to a private
+address. To allow them for Portainer only, add to `config/local_define.php`:
+
+```php
+define('GLPI_SERVERSIDE_URL_ALLOWED_PRIVATE_NETWORKS_CONTEXTS', [
+    \GlpiPlugin\Dockerinventory\Portainer\PortainerContext::class,
+]);
+```
 
 ## Links with the other plugins
 

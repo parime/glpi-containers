@@ -1,0 +1,25 @@
+{#
+ # -------------------------------------------------------------------------
+ # Docker Inventory plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-docker-inventory
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Pastille « Actif » / « Retiré » d'un service. #}
+{% if retired %}
+    <span class="badge bg-secondary text-white">
+        <i class="ti ti-archive me-1" aria-hidden="true"></i>{{ __('Retiré', 'dockerinventory') }}
+    </span>
+{% else %}
+    <span class="badge bg-success text-white">
+        <i class="ti ti-circle-check me-1" aria-hidden="true"></i>{{ __('Actif', 'dockerinventory') }}
+    </span>
+{% endif %}

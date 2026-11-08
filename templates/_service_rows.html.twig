@@ -1,0 +1,76 @@
+{#
+ # -------------------------------------------------------------------------
+ # Docker Inventory plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-docker-inventory
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Tableau de services (onglet des applications et des ordinateurs). `show_tasks` : colonne des
+   tâches en cours sur le nœud affiché. #}
+{% set latest_title = __('Tag mobile : la version réelle est donnée par l’empreinte.', 'dockerinventory') %}
+<table class="table table-hover table-sm card-table">
+    <thead>
+        <tr>
+            <th>{{ __('Service', 'dockerinventory') }}</th>
+            <th>{{ __('Image et tag', 'dockerinventory') }}</th>
+            <th>{{ __('Empreinte (digest)', 'dockerinventory') }}</th>
+            <th>{{ __('Réplicas', 'dockerinventory') }}</th>
+            {% if show_tasks|default(false) %}
+                <th>{{ __('Tâches sur ce nœud', 'dockerinventory') }}</th>
+            {% endif %}
+            <th>{{ __('Ports publiés', 'dockerinventory') }}</th>
+            <th>{{ __('Statut', 'dockerinventory') }}</th>
+            <th>{{ __('Vu la dernière fois', 'dockerinventory') }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for service in services %}
+            <tr class="{{ service.is_retired ? 'text-muted' : '' }}">
+                <td>
+                    <a href="{{ service.url }}"><i class="ti ti-brand-docker me-1"></i>{{ service.name }}</a>
+                    {% if service.stack_name %}
+                        <div class="small text-muted">
+                            {{ __('Stack', 'dockerinventory') }} : {{ service.stack_name }}
+                        </div>
+                    {% endif %}
+                </td>
+                <td>
+                    <div>{{ service.image }}</div>
+                    {% if service.tag == 'latest' %}
+                        <span class="badge bg-warning text-white" title="{{ latest_title }}">latest</span>
+                    {% else %}
+                        <span class="badge bg-blue-lt">{{ service.tag ?: '-' }}</span>
+                    {% endif %}
+                </td>
+                <td><code title="{{ service.digest }}">{{ service.digest_short ?: '-' }}</code></td>
+                <td>
+                    <span class="badge {{ service.replicas_ok ? 'bg-success' : 'bg-warning' }} text-white">
+                        {{ service.replicas }}
+                    </span>
+                </td>
+                {% if show_tasks|default(false) %}
+                    <td>{{ service.running_tasks }}</td>
+                {% endif %}
+                <td>
+                    {% for port in service.ports %}
+                        <span class="badge bg-secondary-lt me-1">{{ port }}</span>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endfor %}
+                </td>
+                <td class="text-nowrap">
+                    {{ include('@dockerinventory/_status_badge.html.twig', {retired: service.is_retired}) }}
+                </td>
+                <td class="text-nowrap">{{ service.last_seen|formatted_datetime }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

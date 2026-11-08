@@ -1,0 +1,58 @@
+{#
+ # -------------------------------------------------------------------------
+ # Docker Inventory plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-docker-inventory
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Connexion Portainer. La clé d'API n'est jamais renvoyée au navigateur : le champ reste vide,
+   et le laisser vide en modification conserve la clé enregistrée. #}
+{% extends 'generic_show_form.html.twig' %}
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+{% block form_fields %}
+    {% set key_helper = has_api_key
+        ? __('Une clé est enregistrée (chiffrée) : laisser vide pour la conserver.', 'dockerinventory')
+        : __("Jeton d'accès d'un utilisateur Portainer dédié, aux droits de lecture seuls.", 'dockerinventory') %}
+    {% set environment_helper = __(
+        "Appliqué seulement aux applications créées par l'import, jamais aux applications existantes.",
+        'dockerinventory'
+    ) %}
+
+    {{ fields.textField('name', item.fields['name'], __('Name'), {
+        required: true,
+        helper: __('Nom libre, par exemple « Portainer production ».', 'dockerinventory'),
+    }) }}
+    {{ fields.dropdownYesNo('is_active', item.isNewItem() ? 1 : item.fields['is_active'], __('Active'), {
+        helper: __("Une connexion inactive n'est pas importée par la tâche automatique.", 'dockerinventory'),
+    }) }}
+    {{ fields.textField('url', item.fields['url'], __('Adresse de Portainer', 'dockerinventory'), {
+        required: true,
+        placeholder: 'https://portainer.exemple.test:9443',
+        helper: __("Adresse de l'interface Portainer, sans /api à la fin.", 'dockerinventory'),
+    }) }}
+    {{ fields.passwordField('api_key', '', __("Clé d'API", 'dockerinventory'), {
+        required: item.isNewItem(),
+        clearable: false,
+        helper: key_helper,
+    }) }}
+    {{ fields.dropdownYesNo('allow_http', item.fields['allow_http'] ?? 0, __('Autoriser HTTP', 'dockerinventory'), {
+        helper: __("Déconseillé : la clé d'API circule alors en clair.", 'dockerinventory'),
+    }) }}
+    {{ fields.dropdownField(
+        'ApplianceEnvironment',
+        'applianceenvironments_id',
+        item.fields['applianceenvironments_id'],
+        __('Environnement des applications créées', 'dockerinventory'),
+        {helper: environment_helper}
+    ) }}
+    {{ fields.textareaField('comment', item.fields['comment'], _n('Comment', 'Comments', 1)) }}
+{% endblock %}

@@ -1,0 +1,103 @@
+{#
+ # -------------------------------------------------------------------------
+ # Docker Inventory plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-docker-inventory
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Sous le formulaire d'une connexion enregistrée : test, import immédiat, dernier compte rendu. #}
+{% set status_colors = {0: 'secondary', 1: 'success', 2: 'warning', 3: 'danger'} %}
+{% set status = item.fields['last_import_status']|default(0) %}
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="ti ti-refresh me-2" aria-hidden="true"></i>{{ __('Import depuis Portainer', 'dockerinventory') }}
+        </h3>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">
+            {{ __("L'import lit Portainer sans rien y modifier et tourne toutes les heures.", 'dockerinventory') }}
+            {{ __('Le bouton « Importer maintenant » le lance tout de suite.', 'dockerinventory') }}
+        </p>
+
+        <div class="mb-3">
+            <span class="me-2">{{ __('Dernier import', 'dockerinventory') }} :</span>
+            <span class="badge bg-{{ status_colors[status] ?? 'secondary' }} text-white">{{ status_label }}</span>
+            {% if item.fields['last_import_date'] %}
+                <span class="ms-2 text-muted">{{ item.fields['last_import_date']|formatted_datetime }}</span>
+            {% endif %}
+        </div>
+
+        {% if report %}
+            <ul class="list-inline mb-3">
+                <li class="list-inline-item">
+                    <i class="ti ti-stack-2" aria-hidden="true"></i>
+                    {{ __('Stacks', 'dockerinventory') }} : <strong>{{ report.stacks }}</strong>
+                </li>
+                <li class="list-inline-item">
+                    <i class="ti ti-brand-docker" aria-hidden="true"></i>
+                    {{ __('Services', 'dockerinventory') }} : <strong>{{ report.services }}</strong>
+                </li>
+                <li class="list-inline-item">
+                    <i class="ti ti-archive" aria-hidden="true"></i>
+                    {{ __('Retirés à cet import', 'dockerinventory') }} : <strong>{{ report.retired }}</strong>
+                </li>
+                <li class="list-inline-item">
+                    <i class="ti ti-server" aria-hidden="true"></i>
+                    {{ __('Nœuds', 'dockerinventory') }} : <strong>{{ report.nodes }}</strong>
+                    ({{ __('rattachés à un ordinateur', 'dockerinventory') }} : {{ report.linked_nodes }})
+                </li>
+                <li class="list-inline-item">
+                    <i class="ti ti-apps" aria-hidden="true"></i>
+                    {{ __('Applications créées', 'dockerinventory') }} :
+                    <strong>{{ report.appliances_created }}</strong>
+                </li>
+            </ul>
+            {% if report.errors is not empty %}
+                <div class="alert alert-warning">
+                    <ul class="mb-0">
+                        {% for error in report.errors %}
+                            <li>
+                                {% if error.endpoint %}<strong>{{ error.endpoint }}</strong> : {% endif %}
+                                {{ error_labels[error.code] ?? error.code }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <form method="post" action="{{ item.getFormURL() }}" class="d-flex flex-wrap gap-2">
+            <input type="hidden" name="id" value="{{ item.getID() }}">
+            <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" name="test" value="1" class="btn btn-outline-secondary">
+                <i class="ti ti-plug-connected me-1" aria-hidden="true"></i>
+                {{ __('Tester la connexion', 'dockerinventory') }}
+            </button>
+            <button type="submit" name="import" value="1" class="btn btn-primary">
+                <i class="ti ti-download me-1" aria-hidden="true"></i>
+                {{ __('Importer maintenant', 'dockerinventory') }}
+            </button>
+        </form>
+
+        <details class="mt-3 text-muted">
+            <summary>{{ __('Portainer sur un réseau privé (GLPI 12)', 'dockerinventory') }}</summary>
+            <p class="mt-2 mb-1">
+                {{ __('GLPI 12 refuse par défaut les appels vers un réseau privé.', 'dockerinventory') }}
+                {{ __('Pour Portainer seulement, ajouter dans config/local_define.php :', 'dockerinventory') }}
+            </p>
+            <pre class="mb-0"><code>define('GLPI_SERVERSIDE_URL_ALLOWED_PRIVATE_NETWORKS_CONTEXTS', [
+    '{{ context_class }}',
+]);</code></pre>
+        </details>
+    </div>
+</div>

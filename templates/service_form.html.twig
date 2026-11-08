@@ -1,0 +1,107 @@
+{#
+ # -------------------------------------------------------------------------
+ # Docker Inventory plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-docker-inventory
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Fiche d'un service, en lecture seule : tenue à jour par l'import Portainer. #}
+{% extends 'generic_show_form.html.twig' %}
+{% import 'components/form/fields_macros.html.twig' as fields %}
+
+{% block form_fields %}
+    {% set status_html %}
+        {{ include('@dockerinventory/_status_badge.html.twig', {retired: service.is_retired}) }}
+        {% if service.is_retired and service.date_retired %}
+            <span class="ms-2 text-muted">
+                {{ __('depuis le', 'dockerinventory') }} {{ service.date_retired|formatted_datetime }}
+            </span>
+        {% endif %}
+    {% endset %}
+    {% set appliance_html %}
+        {% if appliance %}
+            <a href="{{ appliance.url }}"><i class="ti ti-apps me-1"></i>{{ appliance.name }}</a>
+        {% elseif service.stack_name %}
+            {{ service.stack_name }}
+            <span class="text-muted">({{ __('stack hors Portainer', 'dockerinventory') }})</span>
+        {% else %}
+            <span class="text-muted">{{ __('Aucune stack', 'dockerinventory') }}</span>
+        {% endif %}
+    {% endset %}
+    {% set replicas_html %}
+        {% set replicas_class = service.replicas_ok ? 'bg-success' : 'bg-warning' %}
+        <span class="badge {{ replicas_class }} text-white">{{ service.replicas }}</span>
+        <span class="ms-2 text-muted">{{ __('en cours / voulus', 'dockerinventory') }}</span>
+    {% endset %}
+    {% set lists = {
+        (__('Ports publiés', 'dockerinventory')): service.ports,
+        (__('Réseaux', 'dockerinventory')): service.networks,
+        (__('Secrets (noms)', 'dockerinventory')): service.secrets,
+    } %}
+
+    {{ fields.readOnlyField('name', service.name, __('Name')) }}
+    {{ fields.field('status', status_html, __('Statut', 'dockerinventory')) }}
+    {{ fields.field('appliance', appliance_html, __('Application (stack)', 'dockerinventory')) }}
+    {{ fields.readOnlyField('endpoint', service.endpoint, __('Environnement Portainer', 'dockerinventory')) }}
+    {{ fields.readOnlyField('image', service.image, __('Image', 'dockerinventory')) }}
+    {{ fields.readOnlyField('tag', service.tag, __('Tag (version déployée)', 'dockerinventory')) }}
+    {{ fields.readOnlyField('digest', service.digest ?: '-', __('Empreinte (digest)', 'dockerinventory')) }}
+    {{ fields.field('replicas', replicas_html, __('Réplicas', 'dockerinventory')) }}
+    {% for label, values in lists %}
+        {% set list_html %}
+            {% for value in values %}
+                <span class="badge bg-blue-lt me-1 mb-1">{{ value }}</span>
+            {% else %}
+                <span class="text-muted">-</span>
+            {% endfor %}
+        {% endset %}
+        {{ fields.field('list_' ~ loop.index, list_html, label) }}
+    {% endfor %}
+    {{ fields.readOnlyField(
+        'last_seen',
+        service.last_seen|formatted_datetime,
+        __('Vu la dernière fois', 'dockerinventory')
+    ) }}
+
+    {{ fields.smallTitle(__('Nœuds', 'dockerinventory'), 'ti ti-server') }}
+    <div class="col-12 mb-3">
+        {% if nodes is empty %}
+            <p class="text-muted">{{ __('Aucune tâche en cours connue pour ce service.', 'dockerinventory') }}</p>
+        {% else %}
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>{{ __("Nom d'hôte", 'dockerinventory') }}</th>
+                        <th>{{ __('Ordinateur', 'dockerinventory') }}</th>
+                        <th>{{ __('Tâches en cours', 'dockerinventory') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for node in nodes %}
+                        <tr>
+                            <td>{{ node.hostname }}</td>
+                            <td>
+                                {% if node.computer %}
+                                    <a href="{{ node.computer.url }}">
+                                        <i class="ti ti-device-desktop me-1"></i>{{ node.computer.name }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">{{ __('Non rattaché', 'dockerinventory') }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ node.running_tasks }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

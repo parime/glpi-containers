@@ -1,0 +1,402 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: dockerinventory\n"
+"PO-Revision-Date: 2026-11-08 12:00+0100\n"
+"Last-Translator: Vincent GUILLOTTE\n"
+"Language-Team: fr_FR\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: templates/_service_rows.html.twig
+msgid "Tag mobile : la version réelle est donnée par l’empreinte."
+msgstr "Tag mobile : la version réelle est donnée par l’empreinte."
+
+#: templates/_service_rows.html.twig
+msgid "Service"
+msgstr "Service"
+
+#: templates/_service_rows.html.twig
+msgid "Image et tag"
+msgstr "Image et tag"
+
+#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:97
+msgid "Empreinte (digest)"
+msgstr "Empreinte (digest)"
+
+#: templates/_service_rows.html.twig templates/service_form.html.twig
+msgid "Réplicas"
+msgstr "Réplicas"
+
+#: templates/_service_rows.html.twig
+msgid "Tâches sur ce nœud"
+msgstr "Tâches sur ce nœud"
+
+#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:104
+msgid "Ports publiés"
+msgstr "Ports publiés"
+
+#: templates/_service_rows.html.twig templates/service_form.html.twig
+msgid "Statut"
+msgstr "Statut"
+
+#: templates/_service_rows.html.twig templates/computer_nodes.html.twig templates/service_form.html.twig src/Service.php:102
+msgid "Vu la dernière fois"
+msgstr "Vu la dernière fois"
+
+#: templates/_service_rows.html.twig src/Service.php:100
+msgid "Stack"
+msgstr "Stack"
+
+#: templates/computer_nodes.html.twig
+msgid "Cet ordinateur n'est rattaché à aucun nœud Docker Swarm."
+msgstr "Cet ordinateur n'est rattaché à aucun nœud Docker Swarm."
+
+#: templates/computer_nodes.html.twig
+msgid "Le rattachement se fait à l'import Portainer, par nom d'hôte."
+msgstr "Le rattachement se fait à l'import Portainer, par nom d'hôte."
+
+#: templates/computer_nodes.html.twig templates/_status_badge.html.twig src/Service.php:101
+msgid "Retiré"
+msgstr "Retiré"
+
+#: templates/computer_nodes.html.twig
+msgid "Version de Docker"
+msgstr "Version de Docker"
+
+#: templates/computer_nodes.html.twig
+msgid "Adresse"
+msgstr "Adresse"
+
+#: templates/computer_nodes.html.twig
+msgid "Aucune tâche de service en cours sur ce nœud."
+msgstr "Aucune tâche de service en cours sur ce nœud."
+
+#: templates/_status_badge.html.twig
+msgid "Actif"
+msgstr "Actif"
+
+#: templates/service_form.html.twig
+msgid "depuis le"
+msgstr "depuis le"
+
+#: templates/service_form.html.twig
+msgid "stack hors Portainer"
+msgstr "stack hors Portainer"
+
+#: templates/service_form.html.twig
+msgid "Aucune stack"
+msgstr "Aucune stack"
+
+#: templates/service_form.html.twig
+msgid "en cours / voulus"
+msgstr "en cours / voulus"
+
+#: templates/service_form.html.twig src/Service.php:105
+msgid "Réseaux"
+msgstr "Réseaux"
+
+#: templates/service_form.html.twig src/Service.php:106
+msgid "Secrets (noms)"
+msgstr "Secrets (noms)"
+
+#: templates/service_form.html.twig
+msgid "Application (stack)"
+msgstr "Application (stack)"
+
+#: templates/service_form.html.twig src/Service.php:103
+msgid "Environnement Portainer"
+msgstr "Environnement Portainer"
+
+#: templates/service_form.html.twig src/Service.php:95
+msgid "Image"
+msgstr "Image"
+
+#: templates/service_form.html.twig
+msgid "Tag (version déployée)"
+msgstr "Tag (version déployée)"
+
+#: templates/service_form.html.twig templates/connection_actions.html.twig
+msgid "Nœuds"
+msgstr "Nœuds"
+
+#: templates/service_form.html.twig
+msgid "Aucune tâche en cours connue pour ce service."
+msgstr "Aucune tâche en cours connue pour ce service."
+
+#: templates/service_form.html.twig
+msgid "Nom d'hôte"
+msgstr "Nom d'hôte"
+
+#: templates/service_form.html.twig
+msgid "Ordinateur"
+msgstr "Ordinateur"
+
+#: templates/service_form.html.twig
+msgid "Tâches en cours"
+msgstr "Tâches en cours"
+
+#: templates/service_form.html.twig
+msgid "Non rattaché"
+msgstr "Non rattaché"
+
+#: templates/connection_actions.html.twig
+msgid "Import depuis Portainer"
+msgstr "Import depuis Portainer"
+
+#: templates/connection_actions.html.twig
+msgid "L'import lit Portainer sans rien y modifier et tourne toutes les heures."
+msgstr "L'import lit Portainer sans rien y modifier et tourne toutes les heures."
+
+#: templates/connection_actions.html.twig
+msgid "Le bouton « Importer maintenant » le lance tout de suite."
+msgstr "Le bouton « Importer maintenant » le lance tout de suite."
+
+#: templates/connection_actions.html.twig src/Connection.php:113
+msgid "Dernier import"
+msgstr "Dernier import"
+
+#: templates/connection_actions.html.twig
+msgid "Stacks"
+msgstr "Stacks"
+
+#: templates/connection_actions.html.twig src/Service.php:174
+msgid "Services"
+msgstr "Services"
+
+#: templates/connection_actions.html.twig
+msgid "Retirés à cet import"
+msgstr "Retirés à cet import"
+
+#: templates/connection_actions.html.twig
+msgid "rattachés à un ordinateur"
+msgstr "rattachés à un ordinateur"
+
+#: templates/connection_actions.html.twig
+msgid "Applications créées"
+msgstr "Applications créées"
+
+#: templates/connection_actions.html.twig
+msgid "Tester la connexion"
+msgstr "Tester la connexion"
+
+#: templates/connection_actions.html.twig
+msgid "Importer maintenant"
+msgstr "Importer maintenant"
+
+#: templates/connection_actions.html.twig
+msgid "Portainer sur un réseau privé (GLPI 12)"
+msgstr "Portainer sur un réseau privé (GLPI 12)"
+
+#: templates/connection_actions.html.twig
+msgid "GLPI 12 refuse par défaut les appels vers un réseau privé."
+msgstr "GLPI 12 refuse par défaut les appels vers un réseau privé."
+
+#: templates/connection_actions.html.twig
+msgid "Pour Portainer seulement, ajouter dans config/local_define.php :"
+msgstr "Pour Portainer seulement, ajouter dans config/local_define.php :"
+
+#: templates/appliance_services.html.twig
+msgid "Services Docker Swarm de cette stack"
+msgstr "Services Docker Swarm de cette stack"
+
+#: templates/appliance_services.html.twig
+msgid "Aucun service importé pour cette application."
+msgstr "Aucun service importé pour cette application."
+
+#: templates/appliance_services.html.twig
+msgid "Elle n'est peut-être liée à aucune stack Portainer."
+msgstr "Elle n'est peut-être liée à aucune stack Portainer."
+
+#: templates/appliance_services.html.twig
+msgid "Données importées de Portainer en lecture seule."
+msgstr "Données importées de Portainer en lecture seule."
+
+#: templates/appliance_services.html.twig
+msgid "Un service disparu est marqué « Retiré », jamais supprimé."
+msgstr "Un service disparu est marqué « Retiré », jamais supprimé."
+
+#: templates/connection_form.html.twig
+msgid "Une clé est enregistrée (chiffrée) : laisser vide pour la conserver."
+msgstr "Une clé est enregistrée (chiffrée) : laisser vide pour la conserver."
+
+#: templates/connection_form.html.twig
+msgid "Jeton d'accès d'un utilisateur Portainer dédié, aux droits de lecture seuls."
+msgstr "Jeton d'accès d'un utilisateur Portainer dédié, aux droits de lecture seuls."
+
+#: templates/connection_form.html.twig
+msgid "Appliqué seulement aux applications créées par l'import, jamais aux applications existantes."
+msgstr "Appliqué seulement aux applications créées par l'import, jamais aux applications existantes."
+
+#: templates/connection_form.html.twig
+msgid "Nom libre, par exemple « Portainer production »."
+msgstr "Nom libre, par exemple « Portainer production »."
+
+#: templates/connection_form.html.twig
+msgid "Une connexion inactive n'est pas importée par la tâche automatique."
+msgstr "Une connexion inactive n'est pas importée par la tâche automatique."
+
+#: templates/connection_form.html.twig src/Connection.php:99
+msgid "Adresse de Portainer"
+msgstr "Adresse de Portainer"
+
+#: templates/connection_form.html.twig
+msgid "Adresse de l'interface Portainer, sans /api à la fin."
+msgstr "Adresse de l'interface Portainer, sans /api à la fin."
+
+#: templates/connection_form.html.twig
+msgid "Clé d'API"
+msgstr "Clé d'API"
+
+#: templates/connection_form.html.twig
+msgid "Autoriser HTTP"
+msgstr "Autoriser HTTP"
+
+#: templates/connection_form.html.twig
+msgid "Déconseillé : la clé d'API circule alors en clair."
+msgstr "Déconseillé : la clé d'API circule alors en clair."
+
+#: templates/connection_form.html.twig src/Connection.php:121
+msgid "Environnement des applications créées"
+msgstr "Environnement des applications créées"
+
+#: front/connection.form.php:48
+#, php-format
+msgid "Import terminé (%1$s) : %2$d stacks, %3$d services, %4$d retirés, %5$d nœuds."
+msgstr "Import terminé (%1$s) : %2$d stacks, %3$d services, %4$d retirés, %5$d nœuds."
+
+#: src/Connection.php:51
+msgid "Connexions Portainer"
+msgstr "Connexions Portainer"
+
+#: src/Connection.php:51
+msgid "Connexion Portainer"
+msgstr "Connexion Portainer"
+
+#: src/Connection.php:164
+msgid "La clé d'API Portainer est obligatoire."
+msgstr "La clé d'API Portainer est obligatoire."
+
+#: src/Connection.php:244
+#, php-format
+msgid "Connexion réussie : %d environnement(s) Portainer visible(s) avec cette clé."
+msgstr "Connexion réussie : %d environnement(s) Portainer visible(s) avec cette clé."
+
+#: src/Connection.php:253
+msgid "Réussi"
+msgstr "Réussi"
+
+#: src/Connection.php:254
+msgid "Partiel"
+msgstr "Partiel"
+
+#: src/Connection.php:255
+msgid "Échec"
+msgstr "Échec"
+
+#: src/Connection.php:256
+msgid "Jamais lancé"
+msgstr "Jamais lancé"
+
+#: src/Connection.php:266
+msgid "Clé d'API refusée par Portainer (401)."
+msgstr "Clé d'API refusée par Portainer (401)."
+
+#: src/Connection.php:267
+msgid "Accès refusé par Portainer (403) pour cette clé."
+msgstr "Accès refusé par Portainer (403) pour cette clé."
+
+#: src/Connection.php:268
+msgid "Adresse introuvable (404) : vérifier l'adresse."
+msgstr "Adresse introuvable (404) : vérifier l'adresse."
+
+#: src/Connection.php:269
+msgid "Cet environnement n'est pas un cluster Swarm."
+msgstr "Cet environnement n'est pas un cluster Swarm."
+
+#: src/Connection.php:270
+msgid "Réseau privé refusé par GLPI (voir README)."
+msgstr "Réseau privé refusé par GLPI (voir README)."
+
+#: src/Connection.php:271
+msgid "Réponse inattendue : est-ce bien Portainer ?"
+msgstr "Réponse inattendue : est-ce bien Portainer ?"
+
+#: src/Connection.php:272
+msgid "Portainer injoignable (réseau, certificat...)."
+msgstr "Portainer injoignable (réseau, certificat...)."
+
+#: src/Connection.php:279
+msgid "HTTPS obligatoire (sauf « Autoriser HTTP »)."
+msgstr "HTTPS obligatoire (sauf « Autoriser HTTP »)."
+
+#: src/Connection.php:280
+msgid "L'adresse ne doit pas contenir d'identifiants."
+msgstr "L'adresse ne doit pas contenir d'identifiants."
+
+#: src/Connection.php:282
+#, php-format
+msgid "Adresse invalide (exemple : %s)."
+msgstr "Adresse invalide (exemple : %s)."
+
+#: src/Connection.php:293
+msgid "Import des stacks et services Docker Swarm depuis Portainer"
+msgstr "Import des stacks et services Docker Swarm depuis Portainer"
+
+#: src/Connection.php:312
+#, php-format
+msgid "%1$s : %2$s (%3$d services, %4$d retirés, %5$d nœuds)"
+msgstr "%1$s : %2$s (%3$d services, %4$d retirés, %5$d nœuds)"
+
+#: src/Importer.php:259
+#, php-format
+msgid "Créée par le plugin Inventaire Docker pour la stack Portainer « %1$s » (%2$s)."
+msgstr "Créée par le plugin Inventaire Docker pour la stack Portainer « %1$s » (%2$s)."
+
+#: src/Node.php:37
+msgid "Nœuds Swarm"
+msgstr "Nœuds Swarm"
+
+#: src/Node.php:37
+msgid "Nœud Swarm"
+msgstr "Nœud Swarm"
+
+#: src/Node.php:50
+msgid "Services du nœud"
+msgstr "Services du nœud"
+
+#: src/Profile.php:35
+msgid "Inventaire Docker"
+msgstr "Inventaire Docker"
+
+#: src/Service.php:40
+msgid "Services de conteneurs"
+msgstr "Services de conteneurs"
+
+#: src/Service.php:41
+msgid "Service de conteneur"
+msgstr "Service de conteneur"
+
+#: src/Service.php:96
+msgid "Tag"
+msgstr "Tag"
+
+#: src/Service.php:98
+msgid "Réplicas voulus"
+msgstr "Réplicas voulus"
+
+#: src/Service.php:99
+msgid "Réplicas en cours"
+msgstr "Réplicas en cours"
+
+#: src/Service.php:107
+msgid "Retiré le"
+msgstr "Retiré le"
+
+#: src/Service.php:232
+#, php-format
+msgid "%d (global)"
+msgstr "%d (global)"

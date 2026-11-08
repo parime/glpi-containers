@@ -1,0 +1,2 @@
+# Exceptions justifiées aux contrôles de sécurité communs (voir parime/glpi-plugin-security).
+# Une ligne par exception : « <contrôle> <identifiant> : <raison> ». Aucune à ce jour.

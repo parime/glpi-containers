@@ -76,7 +76,7 @@ Ce que le plugin écrit **hors de ses propres tables** : uniquement la création
 l'Application d'une stack quand aucune application de ce nom n'existe dans l'entité de la
 connexion. Une application existante, un ordinateur ou un environnement ne sont jamais modifiés ni
 créés. Le droit de lecture des services se donne dans *Administration > Profils*, onglet
-« Conteneurs » ; les connexions sont réservées au droit *Configuration* en modification.
+« Inventaire Docker » ; les connexions sont réservées au droit *Configuration* en modification.
 
 **Portainer sur un réseau privé (GLPI 12).** GLPI 12 refuse par défaut les appels vers une adresse
 privée. Pour les autoriser pour Portainer seulement, ajouter dans `config/local_define.php` :

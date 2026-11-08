@@ -23,7 +23,7 @@ msgstr "Service"
 msgid "Image et tag"
 msgstr "Image and tag"
 
-#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:94
+#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:97
 msgid "Empreinte (digest)"
 msgstr "Digest"
 
@@ -35,7 +35,7 @@ msgstr "Replicas"
 msgid "Tâches sur ce nœud"
 msgstr "Tasks on this node"
 
-#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:101
+#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:104
 msgid "Ports publiés"
 msgstr "Published ports"
 
@@ -43,11 +43,11 @@ msgstr "Published ports"
 msgid "Statut"
 msgstr "Status"
 
-#: templates/_service_rows.html.twig templates/computer_nodes.html.twig templates/service_form.html.twig src/Service.php:99
+#: templates/_service_rows.html.twig templates/computer_nodes.html.twig templates/service_form.html.twig src/Service.php:102
 msgid "Vu la dernière fois"
 msgstr "Last seen"
 
-#: templates/_service_rows.html.twig src/Service.php:97
+#: templates/_service_rows.html.twig src/Service.php:100
 msgid "Stack"
 msgstr "Stack"
 
@@ -59,7 +59,7 @@ msgstr "This computer is not linked to any Docker Swarm node."
 msgid "Le rattachement se fait à l'import Portainer, par nom d'hôte."
 msgstr "Nodes are linked during the Portainer import, by host name."
 
-#: templates/computer_nodes.html.twig templates/_status_badge.html.twig src/Service.php:98
+#: templates/computer_nodes.html.twig templates/_status_badge.html.twig src/Service.php:101
 msgid "Retiré"
 msgstr "Retired"
 
@@ -95,11 +95,11 @@ msgstr "No stack"
 msgid "en cours / voulus"
 msgstr "running / desired"
 
-#: templates/service_form.html.twig src/Service.php:102
+#: templates/service_form.html.twig src/Service.php:105
 msgid "Réseaux"
 msgstr "Networks"
 
-#: templates/service_form.html.twig src/Service.php:103
+#: templates/service_form.html.twig src/Service.php:106
 msgid "Secrets (noms)"
 msgstr "Secrets (names)"
 
@@ -107,11 +107,11 @@ msgstr "Secrets (names)"
 msgid "Application (stack)"
 msgstr "Appliance (stack)"
 
-#: templates/service_form.html.twig src/Service.php:100
+#: templates/service_form.html.twig src/Service.php:103
 msgid "Environnement Portainer"
 msgstr "Portainer environment"
 
-#: templates/service_form.html.twig src/Service.php:92
+#: templates/service_form.html.twig src/Service.php:95
 msgid "Image"
 msgstr "Image"
 
@@ -163,7 +163,7 @@ msgstr "Last import"
 msgid "Stacks"
 msgstr "Stacks"
 
-#: templates/connection_actions.html.twig src/Service.php:171
+#: templates/connection_actions.html.twig src/Service.php:174
 msgid "Services"
 msgstr "Services"
 
@@ -351,7 +351,7 @@ msgstr "Import Docker Swarm stacks and services from Portainer"
 msgid "%1$s : %2$s (%3$d services, %4$d retirés, %5$d nœuds)"
 msgstr "%1$s: %2$s (%3$d services, %4$d retired, %5$d nodes)"
 
-#: src/Importer.php:257
+#: src/Importer.php:259
 #, php-format
 msgid "Créée par le plugin Inventaire Docker pour la stack Portainer « %1$s » (%2$s)."
 msgstr "Created by the Docker Inventory plugin for the Portainer stack “%1$s” (%2$s)."
@@ -369,8 +369,8 @@ msgid "Services du nœud"
 msgstr "Node services"
 
 #: src/Profile.php:35
-msgid "Conteneurs"
-msgstr "Containers"
+msgid "Inventaire Docker"
+msgstr "Docker Inventory"
 
 #: src/Service.php:40
 msgid "Services de conteneurs"
@@ -380,23 +380,23 @@ msgstr "Container services"
 msgid "Service de conteneur"
 msgstr "Container service"
 
-#: src/Service.php:93
+#: src/Service.php:96
 msgid "Tag"
 msgstr "Tag"
 
-#: src/Service.php:95
+#: src/Service.php:98
 msgid "Réplicas voulus"
 msgstr "Desired replicas"
 
-#: src/Service.php:96
+#: src/Service.php:99
 msgid "Réplicas en cours"
 msgstr "Running replicas"
 
-#: src/Service.php:104
+#: src/Service.php:107
 msgid "Retiré le"
 msgstr "Retired on"
 
-#: src/Service.php:229
+#: src/Service.php:232
 #, php-format
 msgid "%d (global)"
 msgstr "%d (global)"

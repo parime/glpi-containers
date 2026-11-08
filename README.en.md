@@ -74,7 +74,7 @@ What you get:
 What the plugin writes **outside its own tables**: only the one-time creation of a stack's
 Appliance when no appliance with that name exists in the connection's entity. An existing
 appliance, a computer or an environment is never modified or created. The read right on services
-is granted in *Administration > Profiles*, "Containers" tab; connections require the *Setup*
+is granted in *Administration > Profiles*, "Docker Inventory" tab; connections require the *Setup*
 update right.
 
 **Portainer on a private network (GLPI 12).** By default GLPI 12 refuses calls to a private

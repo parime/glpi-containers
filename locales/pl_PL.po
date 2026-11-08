@@ -23,7 +23,7 @@ msgstr "Usługa"
 msgid "Image et tag"
 msgstr "Obraz i tag"
 
-#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:94
+#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:97
 msgid "Empreinte (digest)"
 msgstr "Skrót (digest)"
 
@@ -35,7 +35,7 @@ msgstr "Repliki"
 msgid "Tâches sur ce nœud"
 msgstr "Zadania na tym węźle"
 
-#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:101
+#: templates/_service_rows.html.twig templates/service_form.html.twig src/Service.php:104
 msgid "Ports publiés"
 msgstr "Opublikowane porty"
 
@@ -43,11 +43,11 @@ msgstr "Opublikowane porty"
 msgid "Statut"
 msgstr "Status"
 
-#: templates/_service_rows.html.twig templates/computer_nodes.html.twig templates/service_form.html.twig src/Service.php:99
+#: templates/_service_rows.html.twig templates/computer_nodes.html.twig templates/service_form.html.twig src/Service.php:102
 msgid "Vu la dernière fois"
 msgstr "Ostatnio widziany"
 
-#: templates/_service_rows.html.twig src/Service.php:97
+#: templates/_service_rows.html.twig src/Service.php:100
 msgid "Stack"
 msgstr "Stos (stack)"
 
@@ -59,7 +59,7 @@ msgstr "Ten komputer nie jest powiązany z żadnym węzłem Docker Swarm."
 msgid "Le rattachement se fait à l'import Portainer, par nom d'hôte."
 msgstr "Powiązanie następuje podczas importu z Portainera, według nazwy hosta."
 
-#: templates/computer_nodes.html.twig templates/_status_badge.html.twig src/Service.php:98
+#: templates/computer_nodes.html.twig templates/_status_badge.html.twig src/Service.php:101
 msgid "Retiré"
 msgstr "Wycofana"
 
@@ -95,11 +95,11 @@ msgstr "Brak stosu"
 msgid "en cours / voulus"
 msgstr "działające / oczekiwane"
 
-#: templates/service_form.html.twig src/Service.php:102
+#: templates/service_form.html.twig src/Service.php:105
 msgid "Réseaux"
 msgstr "Sieci"
 
-#: templates/service_form.html.twig src/Service.php:103
+#: templates/service_form.html.twig src/Service.php:106
 msgid "Secrets (noms)"
 msgstr "Sekrety (nazwy)"
 
@@ -107,11 +107,11 @@ msgstr "Sekrety (nazwy)"
 msgid "Application (stack)"
 msgstr "Aplikacja (stos)"
 
-#: templates/service_form.html.twig src/Service.php:100
+#: templates/service_form.html.twig src/Service.php:103
 msgid "Environnement Portainer"
 msgstr "Środowisko Portainera"
 
-#: templates/service_form.html.twig src/Service.php:92
+#: templates/service_form.html.twig src/Service.php:95
 msgid "Image"
 msgstr "Obraz"
 
@@ -163,7 +163,7 @@ msgstr "Ostatni import"
 msgid "Stacks"
 msgstr "Stosy"
 
-#: templates/connection_actions.html.twig src/Service.php:171
+#: templates/connection_actions.html.twig src/Service.php:174
 msgid "Services"
 msgstr "Usługi"
 
@@ -351,7 +351,7 @@ msgstr "Import stosów i usług Docker Swarm z Portainera"
 msgid "%1$s : %2$s (%3$d services, %4$d retirés, %5$d nœuds)"
 msgstr "%1$s: %2$s (%3$d usług, %4$d wycofanych, %5$d węzłów)"
 
-#: src/Importer.php:257
+#: src/Importer.php:259
 #, php-format
 msgid "Créée par le plugin Inventaire Docker pour la stack Portainer « %1$s » (%2$s)."
 msgstr "Utworzona przez wtyczkę Docker Inventory dla stosu Portainera „%1$s” (%2$s)."
@@ -369,8 +369,8 @@ msgid "Services du nœud"
 msgstr "Usługi węzła"
 
 #: src/Profile.php:35
-msgid "Conteneurs"
-msgstr "Kontenery"
+msgid "Inventaire Docker"
+msgstr "Inwentarz Docker"
 
 #: src/Service.php:40
 msgid "Services de conteneurs"
@@ -380,23 +380,23 @@ msgstr "Usługi kontenerowe"
 msgid "Service de conteneur"
 msgstr "Usługa kontenerowa"
 
-#: src/Service.php:93
+#: src/Service.php:96
 msgid "Tag"
 msgstr "Tag"
 
-#: src/Service.php:95
+#: src/Service.php:98
 msgid "Réplicas voulus"
 msgstr "Oczekiwane repliki"
 
-#: src/Service.php:96
+#: src/Service.php:99
 msgid "Réplicas en cours"
 msgstr "Działające repliki"
 
-#: src/Service.php:104
+#: src/Service.php:107
 msgid "Retiré le"
 msgstr "Wycofana dnia"
 
-#: src/Service.php:229
+#: src/Service.php:232
 #, php-format
 msgid "%d (global)"
 msgstr "%d (globalna)"

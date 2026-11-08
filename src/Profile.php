@@ -24,7 +24,7 @@ use Glpi\Application\View\TemplateRenderer;
 use Session;
 
 /**
- * Onglet « Conteneurs » des profils : le droit du plugin s'attribue depuis Administration >
+ * Onglet « Inventaire Docker » des profils : le droit du plugin s'attribue depuis Administration >
  * Profils, avec la matrice du cœur (enregistrée par front/profile.form.php du cœur, droit
  * « profile »). Lecture seule en lot 1 : un seul niveau, Lire.
  */
@@ -32,7 +32,7 @@ class Profile extends CommonGLPI
 {
     public static function getTypeName($nb = 0)
     {
-        return __('Conteneurs', 'dockerinventory');
+        return __('Inventaire Docker', 'dockerinventory');
     }
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)

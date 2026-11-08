@@ -29,7 +29,7 @@ dockerinventory/
 │   ├── Importer.php           import : stacks, services, nœuds, tâches en cours, retraits
 │   ├── Service.php            service Swarm (lecture seule) ; onglet « Services » des applications
 │   ├── Node.php               nœud Swarm ; onglet « Services du nœud » des ordinateurs
-│   ├── Profile.php            onglet « Conteneurs » des profils (droit plugin_dockerinventory_service)
+│   ├── Profile.php            onglet « Inventaire Docker » des profils (droit plugin_dockerinventory_service)
 │   ├── Portainer/
 │   │   ├── PortainerClient.php     lecture seule : /api/endpoints, /api/stacks, /docker/{services,
 │   │   │                           nodes,tasks,networks}, en-tête X-API-Key, transport injectable

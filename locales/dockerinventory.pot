@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-08 15:15+0000\n"
+"POT-Creation-Date: 2026-11-08 16:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,7 +30,7 @@ msgid "Image et tag"
 msgstr ""
 
 #: templates/_service_rows.html.twig templates/service_form.html.twig
-#: src/Service.php:94
+#: src/Service.php:97
 msgid "Empreinte (digest)"
 msgstr ""
 
@@ -43,7 +43,7 @@ msgid "Tâches sur ce nœud"
 msgstr ""
 
 #: templates/_service_rows.html.twig templates/service_form.html.twig
-#: src/Service.php:101
+#: src/Service.php:104
 msgid "Ports publiés"
 msgstr ""
 
@@ -52,11 +52,11 @@ msgid "Statut"
 msgstr ""
 
 #: templates/_service_rows.html.twig templates/computer_nodes.html.twig
-#: templates/service_form.html.twig src/Service.php:99
+#: templates/service_form.html.twig src/Service.php:102
 msgid "Vu la dernière fois"
 msgstr ""
 
-#: templates/_service_rows.html.twig src/Service.php:97
+#: templates/_service_rows.html.twig src/Service.php:100
 msgid "Stack"
 msgstr ""
 
@@ -69,7 +69,7 @@ msgid "Le rattachement se fait à l'import Portainer, par nom d'hôte."
 msgstr ""
 
 #: templates/computer_nodes.html.twig templates/_status_badge.html.twig
-#: src/Service.php:98
+#: src/Service.php:101
 msgid "Retiré"
 msgstr ""
 
@@ -105,11 +105,11 @@ msgstr ""
 msgid "en cours / voulus"
 msgstr ""
 
-#: templates/service_form.html.twig src/Service.php:102
+#: templates/service_form.html.twig src/Service.php:105
 msgid "Réseaux"
 msgstr ""
 
-#: templates/service_form.html.twig src/Service.php:103
+#: templates/service_form.html.twig src/Service.php:106
 msgid "Secrets (noms)"
 msgstr ""
 
@@ -117,11 +117,11 @@ msgstr ""
 msgid "Application (stack)"
 msgstr ""
 
-#: templates/service_form.html.twig src/Service.php:100
+#: templates/service_form.html.twig src/Service.php:103
 msgid "Environnement Portainer"
 msgstr ""
 
-#: templates/service_form.html.twig src/Service.php:92
+#: templates/service_form.html.twig src/Service.php:95
 msgid "Image"
 msgstr ""
 
@@ -174,7 +174,7 @@ msgstr ""
 msgid "Stacks"
 msgstr ""
 
-#: templates/connection_actions.html.twig src/Service.php:171
+#: templates/connection_actions.html.twig src/Service.php:174
 msgid "Services"
 msgstr ""
 
@@ -367,7 +367,7 @@ msgstr ""
 msgid "%1$s : %2$s (%3$d services, %4$d retirés, %5$d nœuds)"
 msgstr ""
 
-#: src/Importer.php:257
+#: src/Importer.php:259
 #, php-format
 msgid ""
 "Créée par le plugin Inventaire Docker pour la stack Portainer « %1$s » "
@@ -387,7 +387,7 @@ msgid "Services du nœud"
 msgstr ""
 
 #: src/Profile.php:35
-msgid "Conteneurs"
+msgid "Inventaire Docker"
 msgstr ""
 
 #: src/Service.php:40
@@ -398,23 +398,23 @@ msgstr ""
 msgid "Service de conteneur"
 msgstr ""
 
-#: src/Service.php:93
+#: src/Service.php:96
 msgid "Tag"
 msgstr ""
 
-#: src/Service.php:95
+#: src/Service.php:98
 msgid "Réplicas voulus"
 msgstr ""
 
-#: src/Service.php:96
+#: src/Service.php:99
 msgid "Réplicas en cours"
 msgstr ""
 
-#: src/Service.php:104
+#: src/Service.php:107
 msgid "Retiré le"
 msgstr ""
 
-#: src/Service.php:229
+#: src/Service.php:232
 #, php-format
 msgid "%d (global)"
 msgstr ""

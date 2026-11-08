@@ -1,4 +1,4 @@
-# Conteneurs pour GLPI
+# Inventaire Docker pour GLPI
 
 [🇬🇧 English](README.en.md)
 
@@ -50,11 +50,11 @@ Pas encore de version publiée. Pour un essai depuis les sources :
 
 ```sh
 cd /var/www/glpi/plugins
-git clone https://github.com/parime/glpi-containers.git containers
-cd containers && composer install --no-dev
+git clone https://github.com/parime/glpi-docker-inventory.git dockerinventory
+cd dockerinventory && composer install --no-dev
 ```
 
-Puis **Configuration > Plugins**, installer et activer « Conteneurs ».
+Puis **Configuration > Plugins**, installer et activer « Inventaire Docker ».
 
 ## Liens avec les autres plugins
 

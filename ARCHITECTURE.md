@@ -1,13 +1,14 @@
 # Architecture
 
-Plugin GLPI `containers` (dossier `plugins/containers`), espace de noms `GlpiPlugin\Containers`.
+Plugin GLPI « Inventaire Docker » : clé `dockerinventory` (dossier `plugins/dockerinventory`), espace de
+noms `GlpiPlugin\Dockerinventory`.
 
 ## Arborescence
 
 Les éléments marqués *(lot 2)* ou *(lot 3)* sont prévus et n'existent pas encore.
 
 ```text
-containers/
+dockerinventory/
 ├── setup.php                  version, compatibilité GLPI 11 et 12, hooks
 ├── hook.php                   installation, mise à jour, désinstallation
 ├── composer.json
@@ -19,7 +20,7 @@ containers/
 │   └── version.php            tableau des versions par service              (lot 2)
 ├── src/
 │   ├── Compat/                écarts entre GLPI 11 et 12 (classes de base, client HTTP)
-│   ├── Install/Installer.php  schéma (tables glpi_plugin_containers_*)
+│   ├── Install/Installer.php  schéma (tables glpi_plugin_dockerinventory_*)
 │   ├── Connection.php         connexion à une source : type, URL, clé chiffrée
 │   ├── Service.php            service Swarm importé
 │   ├── Node.php               nœud Swarm, rattaché à un ordinateur
@@ -52,10 +53,10 @@ containers/
 
 | Table | Contenu |
 | --- | --- |
-| `glpi_plugin_containers_connections` | Source (portainer, wud, harbor), URL, clé chiffrée, entité, dernier import |
-| `glpi_plugin_containers_services` | Service Swarm : stack (Application), image, tag, empreinte, réplicas, état « retiré » |
-| `glpi_plugin_containers_nodes` | Nœud Swarm ↔ ordinateur GLPI |
-| `glpi_plugin_containers_imageversions` *(lot 2)* | Service, tag et empreinte déployés, dernière version, type d'écart, source (wud ou registre), date de vérification |
+| `glpi_plugin_dockerinventory_connections` | Source (portainer, wud, harbor), URL, clé chiffrée, entité, dernier import |
+| `glpi_plugin_dockerinventory_services` | Service Swarm : stack (Application), image, tag, empreinte, réplicas, état « retiré » |
+| `glpi_plugin_dockerinventory_nodes` | Nœud Swarm ↔ ordinateur GLPI |
+| `glpi_plugin_dockerinventory_imageversions` *(lot 2)* | Service, tag et empreinte déployés, dernière version, type d'écart, source (wud ou registre), date de vérification |
 
 ## WUD (lot 2)
 

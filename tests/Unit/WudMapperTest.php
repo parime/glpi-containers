@@ -62,11 +62,13 @@ final class WudMapperTest extends TestCase
     {
         $fixture = self::fixture();
         $api = WudMapper::mapContainer($fixture['boutique_api.1.t04']);
-        $this->assertSame('registry.exemple.test:5000/boutique/api', $api['image_key'] ?? null);
+        $this->assertNotNull($api);
+        $this->assertSame('registry.exemple.test:5000/boutique/api', $api['image_key']);
 
         $adminer = WudMapper::mapContainer($fixture['outils-recette-adminer-1']);
-        $this->assertFalse($adminer['is_swarm'] ?? null);
-        $this->assertSame('docker.io/library/adminer', $adminer['image_key'] ?? null);
+        $this->assertNotNull($adminer);
+        $this->assertFalse($adminer['is_swarm']);
+        $this->assertSame('docker.io/library/adminer', $adminer['image_key']);
 
         // Ni étiquettes ni nom de tâche : on ne sait pas s'il est dans Swarm.
         $db = WudMapper::mapContainer($fixture['db-boutique']);
@@ -75,8 +77,9 @@ final class WudMapperTest extends TestCase
         $this->assertSame('', $db['service_name']);
 
         $backup = WudMapper::mapContainer($fixture['sauvegarde-nocturne']);
-        $this->assertFalse($backup['has_result'] ?? true);
-        $this->assertSame('Registry responded with 503', $backup['error'] ?? null);
+        $this->assertNotNull($backup);
+        $this->assertFalse($backup['has_result']);
+        $this->assertSame('Registry responded with 503', $backup['error']);
     }
 
     public function testToleratesMissingAndUnknownFields(): void

@@ -42,7 +42,8 @@ function plugin_init_dockerinventory(): void
         return;
     }
 
-    // Clé d'API Portainer (ou mot de passe WUD) chiffrée avec la clé de GLPI : rechiffrée par « glpi:security:change_key ».
+    // Clé d'API Portainer (ou mot de passe WUD) chiffrée avec la clé de GLPI : rechiffrée par
+    // « glpi:security:change_key ».
     $PLUGIN_HOOKS[Hooks::SECURED_FIELDS]['dockerinventory'] = ['glpi_plugin_dockerinventory_connections.api_key'];
 
     // Onglets « Services » et « Versions » sur les applications, « Services du nœud » sur les

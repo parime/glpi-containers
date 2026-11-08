@@ -315,7 +315,8 @@ final class WudImporterTest extends TestCase
         $this->assertSame(Connection::STATUS_ERROR, $report['status']);
         $this->assertSame([['endpoint' => '', 'code' => 'wud_unauthorized']], $report['errors']);
         $this->assertSame(array_keys($before), array_keys($this->versions()));
-        $this->assertSame(Connection::STATUS_ERROR, (int) $this->connection($this->wudId)->fields['last_import_status']);
+        $status = (int) $this->connection($this->wudId)->fields['last_import_status'];
+        $this->assertSame(Connection::STATUS_ERROR, $status);
     }
 
     public function testRetiredServiceIsNotLinked(): void
@@ -342,13 +343,14 @@ final class WudImporterTest extends TestCase
             $rows,
             static fn (array $row): bool => str_starts_with((string) $row['connection_name'], 'WUD PHPUnit')
         ));
+        $names = static fn (array $row): string => $row['service']['name'];
         $all = ImageVersion::overview('', 0);
         $this->assertCount(7, $mine($all['services']));
         $this->assertCount(2, $mine($all['unmatched']));
         $this->assertArrayHasKey($this->environmentId, $all['environments']);
 
         $major = $mine(ImageVersion::overview('major', 0)['services']);
-        $this->assertSame(['boutique_db'], array_map(static fn (array $row): string => $row['service']['name'], $major));
+        $this->assertSame(['boutique_db'], array_map($names, $major));
 
         $outdated = $mine(ImageVersion::overview(ImageVersion::FILTER_OUTDATED, 0)['services']);
         $this->assertSame(['major', 'minor', 'patch', 'digest'], array_column($outdated, 'gap_code'));
@@ -357,7 +359,7 @@ final class WudImporterTest extends TestCase
         // (sans stack, donc sans application) seulement avec « sans environnement ».
         $this->assertCount(6, $mine(ImageVersion::overview('', $this->environmentId)['services']));
         $without = $mine(ImageVersion::overview('', -1)['services']);
-        $this->assertSame(['outil_isole'], array_map(static fn (array $row): string => $row['service']['name'], $without));
+        $this->assertSame(['outil_isole'], array_map($names, $without));
         $this->assertSame([], $mine(ImageVersion::overview('', $this->environmentId)['unmatched']));
     }
 

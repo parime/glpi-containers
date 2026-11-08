@@ -49,6 +49,9 @@ final class ImporterTest extends TestCase
 
     private int $environmentId = 0;
 
+    /** Entité propre au test : ni applications ni ordinateurs de l'instance ne s'y trouvent. */
+    private int $entityId = 0;
+
     /** @var list<int> */
     private array $computerIds = [];
 
@@ -59,15 +62,17 @@ final class ImporterTest extends TestCase
             true
         );
         $suffix = bin2hex(random_bytes(4));
+        $this->entityId = (int) (new \Entity())->add(['name' => 'PHPUnit Docker ' . $suffix, 'entities_id' => 0]);
+        $this->assertGreaterThan(0, $this->entityId);
         $this->environmentId = (int) (new ApplianceEnvironment())->add(['name' => 'Production PHPUnit ' . $suffix]);
         $computer = new Computer();
         foreach (['swarm-node-01', 'swarm-node-02.exemple.test'] as $name) {
-            $this->computerIds[] = (int) $computer->add(['name' => $name, 'entities_id' => 0]);
+            $this->computerIds[] = (int) $computer->add(['name' => $name, 'entities_id' => $this->entityId]);
         }
         $connection = new Connection();
         $this->connectionId = (int) $connection->add([
             'name'                     => 'Portainer PHPUnit ' . $suffix,
-            'entities_id'              => 0,
+            'entities_id'              => $this->entityId,
             'url'                      => 'https://portainer.exemple.test:9443/',
             'api_key'                  => self::KEY,
             'applianceenvironments_id' => $this->environmentId,
@@ -102,6 +107,7 @@ final class ImporterTest extends TestCase
             (new Computer())->delete(['id' => $id], true);
         }
         (new ApplianceEnvironment())->delete(['id' => $this->environmentId], true);
+        (new \Entity())->delete(['id' => $this->entityId], true);
     }
 
     private function importer(): Importer
@@ -299,7 +305,10 @@ final class ImporterTest extends TestCase
     public function testAmbiguousHostnameLinksNoComputer(): void
     {
         // Deuxième ordinateur au même nom court : le nœud n'est rattaché à aucun des deux.
-        $this->computerIds[] = (int) (new Computer())->add(['name' => 'swarm-node-01', 'entities_id' => 0]);
+        $this->computerIds[] = (int) (new Computer())->add([
+            'name'        => 'swarm-node-01',
+            'entities_id' => $this->entityId,
+        ]);
 
         $report = $this->importer()->import($this->connection());
 

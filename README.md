@@ -12,8 +12,8 @@ Il répond à la question « qu'est-ce qui tourne, en quelle version, est-ce à 
 vulnérable ? », que GLPI ne sait pas traiter seul : son onglet « Virtualisation » liste des
 conteneurs isolés, sans stack, sans service, sans réplicas ni version.
 
-> **État** : en développement, aucune version publiée. Le lot 1 (Portainer) est en cours ; WUD et
-> Harbor suivent. Voir [ROADMAP.md](ROADMAP.md).
+> **État** : version 0.1.0 publiée avec le lot 1 (Portainer). WUD et Harbor suivent. Voir
+> [ROADMAP.md](ROADMAP.md).
 
 ## Principes
 
@@ -46,11 +46,12 @@ nécessaire. La documentation d'installation le précisera.
 
 ## Installation
 
-Pas encore de version publiée. Pour un essai depuis les sources :
+Téléchargez l'archive `glpi-docker-inventory-X.Y.Z.zip` de la [dernière version](https://github.com/parime/glpi-docker-inventory/releases/latest) (son
+empreinte SHA-256 est publiée à côté), puis décompressez-la dans le dossier `plugins` de GLPI :
 
 ```sh
 cd /var/www/glpi/plugins
-git clone https://github.com/parime/glpi-docker-inventory.git dockerinventory
+unzip glpi-docker-inventory-X.Y.Z.zip   # crée le dossier dockerinventory/
 ```
 
 Puis **Configuration > Plugins**, installer et activer « Inventaire Docker ».

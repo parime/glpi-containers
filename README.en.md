@@ -12,8 +12,8 @@ It answers "what is running, in which version, is it up to date, is it vulnerabl
 cannot do on its own: its "Virtualization" tab lists isolated containers, with no stack, service,
 replicas or version.
 
-> **Status**: under development, no release yet. Lot 1 (Portainer) is in progress; WUD and Harbor
-> follow. See [ROADMAP.md](ROADMAP.md).
+> **Status**: version 0.1.0 released with lot 1 (Portainer). WUD and Harbor follow. See
+> [ROADMAP.md](ROADMAP.md).
 
 ## Principles
 
@@ -46,11 +46,12 @@ installation guide will say so.
 
 ## Installation
 
-No release yet. To try it from source:
+Download the `glpi-docker-inventory-X.Y.Z.zip` archive from the [latest release](https://github.com/parime/glpi-docker-inventory/releases/latest) (its
+SHA-256 checksum is published next to it), then unzip it into the GLPI `plugins` folder:
 
 ```sh
 cd /var/www/glpi/plugins
-git clone https://github.com/parime/glpi-docker-inventory.git dockerinventory
+unzip glpi-docker-inventory-X.Y.Z.zip   # creates the dockerinventory/ folder
 ```
 
 Then **Setup > Plugins**, install and enable "Docker Inventory".

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "📖 Documentation"
+    url: https://github.com/parime/glpi-containers#readme
+    about: "README, ARCHITECTURE.md et ROADMAP.md avant d'ouvrir une issue · README, ARCHITECTURE.md and ROADMAP.md before opening an issue"

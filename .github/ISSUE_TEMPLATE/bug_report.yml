@@ -1,0 +1,82 @@
+name: "🐛 Bug / Anomalie"
+description: "Signaler un comportement anormal du plugin · Report a plugin bug"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de vérifier qu'aucune issue existante ne décrit déjà ce problème avant d'en ouvrir une nouvelle.
+        N'indiquez aucune adresse, aucun nom de serveur et aucune clé de votre environnement réel.
+        Please check existing issues first. Do not share any address, server name or key from your real environment.
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: "Version du plugin · Plugin version"
+      description: "Configuration > Plugins, ou tag Git installé · Setup > Plugins, or installed Git tag"
+      placeholder: "v0.2.0"
+    validations:
+      required: true
+
+  - type: input
+    id: glpi-version
+    attributes:
+      label: "Version de GLPI · GLPI version"
+      placeholder: "11.0.12"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: source
+    attributes:
+      label: "Source concernée · Source involved"
+      options:
+        - Portainer
+        - What's Up Docker (WUD)
+        - Harbor
+        - "Registre (Docker Hub, autre) · Registry (Docker Hub, other)"
+        - "Aucune / interface GLPI · None / GLPI interface"
+    validations:
+      required: true
+
+  - type: input
+    id: source-version
+    attributes:
+      label: "Version de la source · Source version"
+      placeholder: "Portainer CE 2.27, WUD 8.1, Harbor 2.13"
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Comportement attendu · Expected behavior"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: "Comportement observé · Actual behavior"
+      description: "Message d'erreur exact, capture d'écran si pertinent · Exact error message, screenshot if relevant"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Étapes de reproduction · Steps to reproduce"
+      placeholder: |
+        1. …
+        2. …
+        3. …
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: "Contexte additionnel · Additional context"
+      description: "Logs GLPI (files/_log/php-errors.log), plugins tiers actifs… · GLPI logs, active third-party plugins…"
+    validations:
+      required: false

@@ -1,0 +1,510 @@
+{
+  "app": {
+    "name": "wud",
+    "version": "8.1.1"
+  },
+  "simulate": null,
+  "containers": [
+    {
+      "id": "a1000000000000000000000000000000000000000000000000000000000000a1",
+      "name": "boutique_web.1.t01",
+      "watcher": "swarm-node-01",
+      "includeTags": "^\\d+\\.\\d+\\.\\d+$",
+      "image": {
+        "id": "sha256:a1000000000000000000000000000000000000000000000000000000000000a1",
+        "registry": {
+          "name": "hub",
+          "url": "https://registry-1.docker.io/v2"
+        },
+        "name": "boutique/web",
+        "tag": {
+          "value": "2.4.1",
+          "semver": true
+        },
+        "digest": {
+          "watch": false,
+          "value": "sha256:1f1e1d1c1b1a19181716151413121110f1e1d1c1b1a191817161514131211100",
+          "repo": "sha256:1f1e1d1c1b1a19181716151413121110f1e1d1c1b1a191817161514131211100"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": true,
+      "status": "running",
+      "result": {
+        "tag": "2.5.0",
+        "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+      },
+      "updateKind": {
+        "kind": "tag",
+        "localValue": "2.4.1",
+        "remoteValue": "2.5.0",
+        "semverDiff": "minor"
+      },
+      "labels": {
+        "com.docker.stack.namespace": "boutique",
+        "com.docker.swarm.service.name": "boutique_web",
+        "com.docker.swarm.service.id": "svc-boutique-web",
+        "com.docker.swarm.task.name": "boutique_web.1.t01",
+        "com.docker.swarm.task.id": "t01"
+      }
+    },
+    {
+      "id": "a2000000000000000000000000000000000000000000000000000000000000a2",
+      "name": "boutique_web.2.t02",
+      "watcher": "swarm-node-02",
+      "includeTags": "^\\d+\\.\\d+\\.\\d+$",
+      "image": {
+        "id": "sha256:a2000000000000000000000000000000000000000000000000000000000000a2",
+        "registry": {
+          "name": "hub",
+          "url": "https://registry-1.docker.io/v2"
+        },
+        "name": "boutique/web",
+        "tag": {
+          "value": "2.4.1",
+          "semver": true
+        },
+        "digest": {
+          "watch": false,
+          "value": "sha256:1f1e1d1c1b1a19181716151413121110f1e1d1c1b1a191817161514131211100",
+          "repo": "sha256:1f1e1d1c1b1a19181716151413121110f1e1d1c1b1a191817161514131211100"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": true,
+      "status": "running",
+      "result": {
+        "tag": "2.5.0",
+        "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+      },
+      "updateKind": {
+        "kind": "tag",
+        "localValue": "2.4.1",
+        "remoteValue": "2.5.0",
+        "semverDiff": "minor"
+      },
+      "labels": {
+        "com.docker.stack.namespace": "boutique",
+        "com.docker.swarm.service.name": "boutique_web",
+        "com.docker.swarm.service.id": "svc-boutique-web",
+        "com.docker.swarm.task.name": "boutique_web.2.t02",
+        "com.docker.swarm.task.id": "t02"
+      }
+    },
+    {
+      "id": "a3000000000000000000000000000000000000000000000000000000000000a3",
+      "name": "boutique_web.3.t03",
+      "watcher": "swarm-node-02",
+      "includeTags": "^\\d+\\.\\d+\\.\\d+$",
+      "image": {
+        "id": "sha256:a3000000000000000000000000000000000000000000000000000000000000a3",
+        "registry": {
+          "name": "hub",
+          "url": "https://registry-1.docker.io/v2"
+        },
+        "name": "boutique/web",
+        "tag": {
+          "value": "2.4.0",
+          "semver": true
+        },
+        "digest": {
+          "watch": false,
+          "value": "sha256:2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e",
+          "repo": "sha256:2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": true,
+      "status": "running",
+      "result": {
+        "tag": "2.5.0",
+        "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+      },
+      "updateKind": {
+        "kind": "tag",
+        "localValue": "2.4.0",
+        "remoteValue": "2.5.0",
+        "semverDiff": "minor"
+      },
+      "labels": {
+        "com.docker.stack.namespace": "boutique",
+        "com.docker.swarm.service.name": "boutique_web",
+        "com.docker.swarm.service.id": "svc-boutique-web",
+        "com.docker.swarm.task.name": "boutique_web.3.t03",
+        "com.docker.swarm.task.id": "t03"
+      }
+    },
+    {
+      "id": "b1000000000000000000000000000000000000000000000000000000000000b1",
+      "name": "boutique_api.1.t04",
+      "watcher": "swarm-node-01",
+      "includeTags": "^\\d+\\.\\d+\\.\\d+$",
+      "image": {
+        "id": "sha256:b1000000000000000000000000000000000000000000000000000000000000b1",
+        "registry": {
+          "name": "private",
+          "url": "https://registry.exemple.test:5000/v2"
+        },
+        "name": "boutique/api",
+        "tag": {
+          "value": "1.9.0",
+          "semver": true
+        },
+        "digest": {
+          "watch": false,
+          "value": "sha256:3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a",
+          "repo": "sha256:3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": true,
+      "status": "running",
+      "result": {
+        "tag": "1.9.3",
+        "digest": "sha256:3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b3b"
+      },
+      "updateKind": {
+        "kind": "tag",
+        "localValue": "1.9.0",
+        "remoteValue": "1.9.3",
+        "semverDiff": "patch"
+      },
+      "labels": {
+        "com.docker.stack.namespace": "boutique",
+        "com.docker.swarm.service.name": "boutique_api",
+        "com.docker.swarm.service.id": "svc-boutique-api",
+        "com.docker.swarm.task.name": "boutique_api.1.t04",
+        "com.docker.swarm.task.id": "t04"
+      }
+    },
+    {
+      "id": "c1000000000000000000000000000000000000000000000000000000000000c1",
+      "name": "db-boutique",
+      "watcher": "swarm-node-01",
+      "includeTags": "^\\d+\\.\\d+\\.\\d+$",
+      "image": {
+        "id": "sha256:c1000000000000000000000000000000000000000000000000000000000000c1",
+        "registry": {
+          "name": "hub",
+          "url": "https://registry-1.docker.io/v2"
+        },
+        "name": "library/postgres",
+        "tag": {
+          "value": "16.4",
+          "semver": true
+        },
+        "digest": {
+          "watch": false,
+          "value": "sha256:4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c",
+          "repo": "sha256:4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c4c"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": true,
+      "status": "running",
+      "result": {
+        "tag": "17.2",
+        "digest": "sha256:4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d4d"
+      },
+      "updateKind": {
+        "kind": "tag",
+        "localValue": "16.4",
+        "remoteValue": "17.2",
+        "semverDiff": "major"
+      }
+    },
+    {
+      "id": "d1000000000000000000000000000000000000000000000000000000000000d1",
+      "name": "boutique_cache.1.t11",
+      "watcher": "swarm-node-01",
+      "includeTags": "^\\d+\\.\\d+\\.\\d+$",
+      "image": {
+        "id": "sha256:d1000000000000000000000000000000000000000000000000000000000000d1",
+        "registry": {
+          "name": "hub",
+          "url": "https://registry-1.docker.io/v2"
+        },
+        "name": "library/redis",
+        "tag": {
+          "value": "7.4.1",
+          "semver": true
+        },
+        "digest": {
+          "watch": true,
+          "value": "sha256:6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a",
+          "repo": "sha256:6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": true,
+      "status": "running",
+      "result": {
+        "tag": "7.4.1",
+        "digest": "sha256:6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b"
+      },
+      "updateKind": {
+        "kind": "digest",
+        "localValue": "sha256:6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a6a",
+        "remoteValue": "sha256:6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b"
+      },
+      "labels": {
+        "com.docker.stack.namespace": "boutique",
+        "com.docker.swarm.service.name": "boutique_cache",
+        "com.docker.swarm.service.id": "svc-boutique-cache",
+        "com.docker.swarm.task.name": "boutique_cache.1.t11",
+        "com.docker.swarm.task.id": "t11"
+      }
+    },
+    {
+      "id": "e1000000000000000000000000000000000000000000000000000000000000e1",
+      "name": "supervision_agent.node-0001.t07",
+      "watcher": "swarm-node-01",
+      "image": {
+        "id": "sha256:e1000000000000000000000000000000000000000000000000000000000000e1",
+        "registry": {
+          "name": "hub",
+          "url": "https://registry-1.docker.io/v2"
+        },
+        "name": "grafana/alloy",
+        "tag": {
+          "value": "latest",
+          "semver": false
+        },
+        "digest": {
+          "watch": true,
+          "value": "sha256:7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a",
+          "repo": "sha256:7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": true,
+      "status": "running",
+      "result": {
+        "tag": "latest",
+        "digest": "sha256:7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b"
+      },
+      "updateKind": {
+        "kind": "digest",
+        "localValue": "sha256:7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a",
+        "remoteValue": "sha256:7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b"
+      },
+      "labels": {
+        "com.docker.stack.namespace": "supervision",
+        "com.docker.swarm.service.name": "supervision_agent",
+        "com.docker.swarm.service.id": "svc-supervision-agent",
+        "com.docker.swarm.task.name": "supervision_agent.node-0001.t07",
+        "com.docker.swarm.task.id": "t07"
+      }
+    },
+    {
+      "id": "e2000000000000000000000000000000000000000000000000000000000000e2",
+      "name": "supervision_agent.node-0002.t08",
+      "watcher": "swarm-node-02",
+      "image": {
+        "id": "sha256:e2000000000000000000000000000000000000000000000000000000000000e2",
+        "registry": {
+          "name": "hub",
+          "url": "https://registry-1.docker.io/v2"
+        },
+        "name": "grafana/alloy",
+        "tag": {
+          "value": "latest",
+          "semver": false
+        },
+        "digest": {
+          "watch": true,
+          "value": "sha256:7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a",
+          "repo": "sha256:7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": true,
+      "status": "running",
+      "result": {
+        "tag": "latest",
+        "digest": "sha256:7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b"
+      },
+      "updateKind": {
+        "kind": "digest",
+        "localValue": "sha256:7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a",
+        "remoteValue": "sha256:7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b7b"
+      },
+      "labels": {
+        "com.docker.stack.namespace": "supervision",
+        "com.docker.swarm.service.name": "supervision_agent",
+        "com.docker.swarm.service.id": "svc-supervision-agent",
+        "com.docker.swarm.task.name": "supervision_agent.node-0002.t08",
+        "com.docker.swarm.task.id": "t08"
+      }
+    },
+    {
+      "id": "f1000000000000000000000000000000000000000000000000000000000000f1",
+      "name": "supervision_grafana.1.t10",
+      "watcher": "swarm-node-01",
+      "includeTags": "^\\d+\\.\\d+\\.\\d+$",
+      "image": {
+        "id": "sha256:f1000000000000000000000000000000000000000000000000000000000000f1",
+        "registry": {
+          "name": "hub",
+          "url": "https://registry-1.docker.io/v2"
+        },
+        "name": "grafana/grafana",
+        "tag": {
+          "value": "11.2.0",
+          "semver": true
+        },
+        "digest": {
+          "watch": false,
+          "value": "sha256:8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a",
+          "repo": "sha256:8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": false,
+      "status": "running",
+      "result": {
+        "tag": "11.2.0",
+        "digest": "sha256:8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a8a"
+      },
+      "updateKind": {
+        "kind": "unknown"
+      },
+      "labels": {
+        "com.docker.stack.namespace": "supervision",
+        "com.docker.swarm.service.name": "supervision_grafana",
+        "com.docker.swarm.service.id": "svc-supervision-grafana",
+        "com.docker.swarm.task.name": "supervision_grafana.1.t10",
+        "com.docker.swarm.task.id": "t10"
+      }
+    },
+    {
+      "id": "f2000000000000000000000000000000000000000000000000000000000000f2",
+      "name": "outil_isole.1.t09",
+      "watcher": "swarm-node-02",
+      "image": {
+        "id": "sha256:f2000000000000000000000000000000000000000000000000000000000000f2",
+        "registry": {
+          "name": "hub",
+          "url": "https://registry-1.docker.io/v2"
+        },
+        "name": "library/nginx",
+        "tag": {
+          "value": "latest",
+          "semver": false
+        },
+        "digest": {
+          "watch": false,
+          "value": "sha256:9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a",
+          "repo": "sha256:9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": false,
+      "status": "running",
+      "result": {
+        "tag": "latest",
+        "digest": "sha256:9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a9a"
+      },
+      "labels": {
+        "com.docker.stack.namespace": "outil",
+        "com.docker.swarm.service.name": "outil_isole",
+        "com.docker.swarm.service.id": "svc-outil-isole",
+        "com.docker.swarm.task.name": "outil_isole.1.t09",
+        "com.docker.swarm.task.id": "t09"
+      }
+    },
+    {
+      "id": "0a000000000000000000000000000000000000000000000000000000000000a0",
+      "name": "outils-recette-adminer-1",
+      "watcher": "docker-recette",
+      "includeTags": "^\\d+\\.\\d+\\.\\d+$",
+      "image": {
+        "id": "sha256:0a000000000000000000000000000000000000000000000000000000000000a0",
+        "registry": {
+          "name": "hub",
+          "url": "https://registry-1.docker.io/v2"
+        },
+        "name": "library/adminer",
+        "tag": {
+          "value": "4.8.1",
+          "semver": true
+        },
+        "digest": {
+          "watch": false,
+          "value": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "repo": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": true,
+      "status": "running",
+      "result": {
+        "tag": "4.8.4",
+        "digest": "sha256:abababababababababababababababababababababababababababababababab"
+      },
+      "updateKind": {
+        "kind": "tag",
+        "localValue": "4.8.1",
+        "remoteValue": "4.8.4",
+        "semverDiff": "patch"
+      },
+      "labels": {
+        "com.docker.compose.project": "outils-recette",
+        "com.docker.compose.service": "adminer"
+      }
+    },
+    {
+      "id": "0b000000000000000000000000000000000000000000000000000000000000b0",
+      "name": "sauvegarde-nocturne",
+      "watcher": "docker-recette",
+      "includeTags": "^\\d+\\.\\d+\\.\\d+$",
+      "image": {
+        "id": "sha256:0b000000000000000000000000000000000000000000000000000000000000b0",
+        "registry": {
+          "name": "private",
+          "url": "https://registry.exemple.test:5000/v2"
+        },
+        "name": "outils/sauvegarde",
+        "tag": {
+          "value": "0.17.1",
+          "semver": true
+        },
+        "digest": {
+          "watch": false,
+          "value": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "repo": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "architecture": "amd64",
+        "os": "linux",
+        "created": "2026-10-01T08:00:00.000Z"
+      },
+      "updateAvailable": false,
+      "status": "running",
+      "error": {
+        "message": "Registry responded with 503"
+      }
+    }
+  ]
+}

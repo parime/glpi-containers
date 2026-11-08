@@ -92,6 +92,30 @@
           }
         },
         {
+          "ID": "svc-boutique-cache",
+          "Spec": {
+            "Name": "boutique_cache",
+            "Labels": {"com.docker.stack.namespace": "boutique"},
+            "Mode": {"Replicated": {"Replicas": 1}},
+            "TaskTemplate": {
+              "ContainerSpec": {"Image": "redis:7.4.1"},
+              "Networks": [{"Target": "net-back-0001"}]
+            }
+          }
+        },
+        {
+          "ID": "svc-supervision-grafana",
+          "Spec": {
+            "Name": "supervision_grafana",
+            "Labels": {"com.docker.stack.namespace": "supervision"},
+            "Mode": {"Replicated": {"Replicas": 1}},
+            "TaskTemplate": {
+              "ContainerSpec": {"Image": "grafana/grafana:11.2.0"},
+              "Networks": [{"Target": "net-supervision-0001"}]
+            }
+          }
+        },
+        {
           "ID": "svc-supervision-agent",
           "Spec": {
             "Name": "supervision_agent",
@@ -122,7 +146,9 @@
         {"ID": "t06", "ServiceID": "svc-boutique-db", "NodeID": "node-0001", "Status": {"State": "running"}},
         {"ID": "t07", "ServiceID": "svc-supervision-agent", "NodeID": "node-0001", "Status": {"State": "running"}},
         {"ID": "t08", "ServiceID": "svc-supervision-agent", "NodeID": "node-0002", "Status": {"State": "running"}},
-        {"ID": "t09", "ServiceID": "svc-outil-isole", "NodeID": "node-0002", "Status": {"State": "running"}}
+        {"ID": "t09", "ServiceID": "svc-outil-isole", "NodeID": "node-0002", "Status": {"State": "running"}},
+        {"ID": "t10", "ServiceID": "svc-supervision-grafana", "NodeID": "node-0002", "Status": {"State": "running"}},
+        {"ID": "t11", "ServiceID": "svc-boutique-cache", "NodeID": "node-0001", "Status": {"State": "running"}}
       ]
     },
     "2": {"swarm": false}

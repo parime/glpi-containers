@@ -198,7 +198,7 @@ final class ImporterTest extends TestCase
 
         $this->assertSame(Connection::STATUS_OK, $report['status'], json_encode($report) ?: '');
         $this->assertSame(2, $report['stacks']);
-        $this->assertSame(5, $report['services']);
+        $this->assertSame(7, $report['services']);
         $this->assertSame(3, $report['nodes']);
         $this->assertSame(2, $report['linked_nodes']);
         $this->assertSame(2, $report['appliances_created']);
@@ -232,7 +232,7 @@ final class ImporterTest extends TestCase
         $this->assertSame(0, $nodes['swarm-node-03.exemple.test']);
 
         $report = json_decode((string) $this->connection()->fields['last_import_report'], true);
-        $this->assertSame(5, $report['services']);
+        $this->assertSame(7, $report['services']);
         $this->assertStringNotContainsString(self::KEY, (string) $this->connection()->fields['last_import_report']);
     }
 

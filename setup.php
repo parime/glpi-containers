@@ -17,6 +17,7 @@
 
 use Glpi\Plugin\Hooks;
 use GlpiPlugin\Dockerinventory\Connection;
+use GlpiPlugin\Dockerinventory\ImageVersion;
 use GlpiPlugin\Dockerinventory\Node;
 use GlpiPlugin\Dockerinventory\Profile;
 use GlpiPlugin\Dockerinventory\Service;
@@ -41,20 +42,21 @@ function plugin_init_dockerinventory(): void
         return;
     }
 
-    // Clé d'API Portainer chiffrée avec la clé de GLPI : rechiffrée par « glpi:security:change_key ».
+    // Clé d'API Portainer (ou mot de passe WUD) chiffrée avec la clé de GLPI : rechiffrée par « glpi:security:change_key ».
     $PLUGIN_HOOKS[Hooks::SECURED_FIELDS]['dockerinventory'] = ['glpi_plugin_dockerinventory_connections.api_key'];
 
-    // Onglet « Services » sur les applications, « Services du nœud » sur les ordinateurs, droits
-    // du plugin sur les profils.
+    // Onglets « Services » et « Versions » sur les applications, « Services du nœud » sur les
+    // ordinateurs, droits du plugin sur les profils.
     Plugin::registerClass(Service::class, ['addtabon' => ['Appliance']]);
+    Plugin::registerClass(ImageVersion::class, ['addtabon' => ['Appliance']]);
     Plugin::registerClass(Node::class, ['addtabon' => ['Computer']]);
     Plugin::registerClass(Profile::class, ['addtabon' => ['Profile']]);
     Plugin::registerClass(Connection::class);
 
-    // Liste des services dans Parc ; connexions Portainer dans Configuration (et depuis le nom du
-    // plugin dans Configuration > Plugins).
+    // Services et versions des images dans Parc ; connexions (Portainer, WUD) dans Configuration
+    // (et depuis le nom du plugin dans Configuration > Plugins).
     $PLUGIN_HOOKS[Hooks::MENU_TOADD]['dockerinventory'] = [
-        'assets' => [Service::class],
+        'assets' => [Service::class, ImageVersion::class],
         'config' => [Connection::class],
     ];
     $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['dockerinventory'] = 'front/connection.php';

@@ -1,0 +1,19 @@
+{#
+ # -------------------------------------------------------------------------
+ # Docker Inventory plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-docker-inventory
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Pastille d'écart de version (ImageVersion::gapInfo()) : couleur, icône, libellé, aide au survol. #}
+<span class="badge bg-{{ gap.color }} text-white text-nowrap" title="{{ gap.help }}" data-bs-toggle="tooltip">
+    <i class="{{ gap.icon }} me-1" aria-hidden="true"></i>{{ gap.label }}
+</span>

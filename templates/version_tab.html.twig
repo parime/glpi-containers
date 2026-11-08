@@ -1,0 +1,137 @@
+{#
+ # -------------------------------------------------------------------------
+ # Docker Inventory plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-docker-inventory
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Onglet « Versions » d'un service (détail) ou d'une application (tableau de ses services). #}
+{% if rows is empty %}
+    <div class="alert alert-info">
+        <i class="ti ti-info-circle me-2" aria-hidden="true"></i>
+        {% if not has_wud %}
+            {{ __(
+                'Aucune connexion What’s Up Docker n’est déclarée : la version disponible est inconnue.',
+                'dockerinventory'
+            ) }}
+            {% if can_configure %}
+                <a href="{{ connection_url }}" class="ms-1">{{ __('Ajouter une connexion WUD', 'dockerinventory') }}</a>
+            {% endif %}
+        {% elseif for_service %}
+            {{ __('Aucun conteneur suivi par WUD n’a été rattaché à ce service.', 'dockerinventory') }}
+            {{ __('Vérifier que WUD surveille ce service, puis relire WUD.', 'dockerinventory') }}
+        {% else %}
+            {{ __('Aucun service de cette application n’est suivi par WUD.', 'dockerinventory') }}
+        {% endif %}
+    </div>
+{% elseif for_service %}
+    {% for row in rows %}
+        <div class="card mb-3">
+            <div class="card-header d-flex flex-wrap align-items-center gap-2">
+                <h3 class="card-title mb-0">
+                    <i class="ti ti-versions me-2" aria-hidden="true"></i>
+                    {{ __('Version de l’image', 'dockerinventory') }}
+                </h3>
+                {{ include('@dockerinventory/_version_badge.html.twig', {gap: row.gap}) }}
+                {% if row.is_out_of_sync %}
+                    <span class="badge bg-warning text-white">
+                        <i class="ti ti-arrows-split me-1" aria-hidden="true"></i>
+                        {{ __('Réplicas désynchronisés', 'dockerinventory') }}
+                    </span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-3 fs-3">
+                    <span class="badge bg-blue-lt fs-3">{{ row.deployed_tag ?: '-' }}</span>
+                    <i class="ti ti-arrow-right text-muted" aria-hidden="true"></i>
+                    <span class="badge bg-green-lt fs-3">{{ row.latest_tag ?: '-' }}</span>
+                    <span class="text-muted fs-5">{{ row.gap.help }}</span>
+                </div>
+                {% if row.is_out_of_sync %}
+                    <div class="alert alert-warning">
+                        <i class="ti ti-arrows-split me-2" aria-hidden="true"></i>
+                        {{ __(
+                            'Conteneurs dans des versions différentes (mise à jour en cours ou bloquée) :',
+                            'dockerinventory'
+                        ) }}
+                        <strong>{{ row.deployed_versions }}</strong>
+                    </div>
+                {% endif %}
+                {% if row.gap_code == 'untrackable' %}
+                    <div class="alert alert-secondary">
+                        <i class="ti ti-eye-off me-2" aria-hidden="true"></i>
+                        {{ __('Ce tag ne désigne pas une version précise.', 'dockerinventory') }}
+                        {{ __(
+                            'Préférer un tag versionné (1.2.3) pour savoir ce qui tourne vraiment.',
+                            'dockerinventory'
+                        ) }}
+                        {% if row.update_available %}
+                            {{ __('WUD signale une nouvelle empreinte pour ce tag.', 'dockerinventory') }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">{{ __('Image', 'dockerinventory') }}</dt>
+                    <dd class="col-sm-9">
+                        {{ row.image ?: '-' }}
+                        {% if row.registry_link %}
+                            <a href="{{ row.registry_link }}" target="_blank" rel="noopener noreferrer" class="ms-2">
+                                <i class="ti ti-external-link me-1" aria-hidden="true"></i>
+                                {{ __('Page du registre', 'dockerinventory') }}
+                            </a>
+                        {% elseif row.registry_name %}
+                            <span class="text-muted ms-2">(
+                            {{ __('Registre', 'dockerinventory') }} : {{ row.registry_name }})</span>
+                        {% endif %}
+                    </dd>
+                    <dt class="col-sm-3">{{ __('Empreinte déployée', 'dockerinventory') }}</dt>
+                    <dd class="col-sm-9"><code>{{ row.deployed_digest ?: '-' }}</code></dd>
+                    {% if row.digest_changed %}
+                        <dt class="col-sm-3">{{ __('Dernière empreinte', 'dockerinventory') }}</dt>
+                        <dd class="col-sm-9"><code>{{ row.latest_digest }}</code></dd>
+                    {% endif %}
+                    <dt class="col-sm-3">{{ __('Conteneurs WUD', 'dockerinventory') }}</dt>
+                    <dd class="col-sm-9">
+                        {% for name in row.containers %}
+                            <span class="badge bg-secondary-lt me-1 mb-1">{{ name }}</span>
+                        {% endfor %}
+                    </dd>
+                    <dt class="col-sm-3">{{ __('Rattachement', 'dockerinventory') }}</dt>
+                    <dd class="col-sm-9">{{ row.match }}</dd>
+                    <dt class="col-sm-3">{{ __('Source', 'dockerinventory') }}</dt>
+                    <dd class="col-sm-9">{{ row.source }} ({{ row.connection_name }})</dd>
+                    <dt class="col-sm-3">{{ __('Vérifié le', 'dockerinventory') }}</dt>
+                    <dd class="col-sm-9">{{ row.date_checked|formatted_datetime }}</dd>
+                    {% if row.error %}
+                        <dt class="col-sm-3">{{ __('Erreur WUD', 'dockerinventory') }}</dt>
+                        <dd class="col-sm-9 text-danger">{{ row.error }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="ti ti-versions me-2" aria-hidden="true"></i>
+                {{ __('Versions des images de cette application', 'dockerinventory') }}
+            </h3>
+        </div>
+        <div class="table-responsive">
+            {{ include('@dockerinventory/_version_rows.html.twig', {rows: rows}) }}
+        </div>
+    </div>
+{% endif %}
+<p class="text-muted small mt-2">
+    {{ __('Versions lues dans What’s Up Docker, sans rien y modifier.', 'dockerinventory') }}
+    <a href="{{ overview_url }}">{{ __('Voir toutes les versions des images', 'dockerinventory') }}</a>
+</p>

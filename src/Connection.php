@@ -26,11 +26,19 @@ use GlpiPlugin\Dockerinventory\Compat\Base\ConnectionBase;
 use GlpiPlugin\Dockerinventory\Portainer\PortainerClient;
 use GlpiPlugin\Dockerinventory\Portainer\PortainerException;
 use GlpiPlugin\Dockerinventory\Portainer\UrlPolicy;
+use GlpiPlugin\Dockerinventory\Wud\WudClient;
+use GlpiPlugin\Dockerinventory\Wud\WudContext;
+use GlpiPlugin\Dockerinventory\Wud\WudException;
+use GlpiPlugin\Dockerinventory\Wud\WudImporter;
 use Session;
 
 /**
- * Connexion à un serveur Portainer : adresse, clé d'API (chiffrée avec la clé de GLPI, jamais
- * réaffichée), environnement GLPI des applications créées pour ses stacks.
+ * Connexion à une source de l'inventaire, de l'un des types :
+ * - Portainer : adresse, clé d'API (chiffrée avec la clé de GLPI, jamais réaffichée),
+ *   environnement GLPI des applications créées pour ses stacks ;
+ * - What's Up Docker (WUD) : adresse, utilisateur et mot de passe facultatifs (authentification
+ *   basique ; mot de passe chiffré dans la même colonne que la clé Portainer, jamais réaffiché).
+ * Le type se choisit à la création et ne change plus.
  *
  * Réservé aux administrateurs de la configuration de GLPI (droit « Configuration » en
  * modification), pour la lecture comme pour l'écriture : une connexion donne accès à toute
@@ -46,9 +54,28 @@ class Connection extends ConnectionBase
     public const STATUS_PARTIAL = 2;
     public const STATUS_ERROR = 3;
 
+    public const TYPE_PORTAINER = 'portainer';
+    public const TYPE_WUD = 'wud';
+
     public static function getTypeName($nb = 0)
     {
-        return $nb > 1 ? __('Connexions Portainer', 'dockerinventory') : __('Connexion Portainer', 'dockerinventory');
+        return $nb > 1 ? __('Connexions Docker', 'dockerinventory') : __('Connexion Docker', 'dockerinventory');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function typeLabels(): array
+    {
+        return [
+            self::TYPE_PORTAINER => 'Portainer',
+            self::TYPE_WUD       => "What's Up Docker (WUD)",
+        ];
+    }
+
+    public function isWud(): bool
+    {
+        return ($this->fields['type'] ?? self::TYPE_PORTAINER) === self::TYPE_WUD;
     }
 
     public static function getIcon()
@@ -96,8 +123,17 @@ class Connection extends ConnectionBase
             'id'         => 3,
             'table'      => static::getTable(),
             'field'      => 'url',
-            'name'       => __('Adresse de Portainer', 'dockerinventory'),
+            'name'       => __('Adresse', 'dockerinventory'),
             'datatype'   => 'string',
+        ];
+        $options[] = [
+            'id'            => 7,
+            'table'         => static::getTable(),
+            'field'         => 'type',
+            'name'          => __('Type', 'dockerinventory'),
+            'datatype'      => 'specific',
+            'searchtype'    => ['equals', 'notequals'],
+            'massiveaction' => false,
         ];
         $options[] = [
             'id'         => 4,
@@ -133,24 +169,75 @@ class Connection extends ConnectionBase
         return $options;
     }
 
+    /**
+     * @param array<string, mixed>|string $values
+     * @param array<string, mixed> $options
+     */
+    public static function getSpecificValueToDisplay($field, $values, array $options = [])
+    {
+        if ($field === 'type') {
+            $value = is_array($values) ? (string) ($values[$field] ?? '') : (string) $values;
+
+            return htmlescape(self::typeLabels()[$value] ?? $value);
+        }
+
+        return parent::getSpecificValueToDisplay($field, $values, $options);
+    }
+
+    /**
+     * @param array<string, mixed>|string $values
+     * @param array<string, mixed> $options
+     */
+    public static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = [])
+    {
+        if ($field === 'type') {
+            $value = is_array($values) ? (string) ($values[$field] ?? '') : (string) $values;
+
+            return \Dropdown::showFromArray(
+                (string) $name,
+                self::typeLabels(),
+                ['display' => false, 'value' => $value] + $options
+            );
+        }
+
+        return parent::getSpecificValueToSelect($field, $name, $values, $options);
+    }
+
     public function showForm($ID, array $options = [])
     {
         $this->initForm($ID, $options);
-        $report = json_decode((string) ($this->fields['last_import_report'] ?? ''), true);
-
         $renderer = TemplateRenderer::getInstance();
+        if ($this->isNewItem()) {
+            $type = (string) ($options['type'] ?? '');
+            if (!isset(self::typeLabels()[$type])) {
+                // Nouvelle connexion : d'abord le type (les champs en dépendent).
+                $renderer->display('@dockerinventory/connection_type_choice.html.twig', [
+                    'form_url' => self::getFormURL(),
+                ]);
+
+                return true;
+            }
+            $this->fields['type'] = $type;
+        }
+        $report = json_decode((string) ($this->fields['last_import_report'] ?? ''), true);
+        $actions = $this->isWud() ? 'wud_actions' : 'connection_actions';
+
         $renderer->display('@dockerinventory/connection_form.html.twig', [
             'item'        => $this,
             'params'      => $options,
+            'is_wud'      => $this->isWud(),
+            'type_label'  => self::typeLabels()[(string) $this->fields['type']] ?? '',
             'has_api_key' => trim((string) ($this->fields['api_key'] ?? '')) !== '',
         ]);
         if (!$this->isNewItem()) {
-            $renderer->display('@dockerinventory/connection_actions.html.twig', [
+            $renderer->display('@dockerinventory/' . $actions . '.html.twig', [
                 'item'          => $this,
                 'status_label'  => self::statusLabel((int) ($this->fields['last_import_status'] ?? 0)),
                 'report'        => is_array($report) ? $report : null,
                 'error_labels'  => self::errorLabels(),
-                'context_class' => Portainer\PortainerContext::class,
+                'gaps'          => ImageVersion::gapInfos(),
+                'versions_url'  => ImageVersion::getOverviewURL(),
+                'context_class' => $this->isWud() ? WudContext::class : Portainer\PortainerContext::class,
             ]);
         }
 
@@ -159,7 +246,12 @@ class Connection extends ConnectionBase
 
     public function prepareInputForAdd($input)
     {
-        if (trim((string) ($input['api_key'] ?? '')) === '') {
+        $input['type'] = (string) ($input['type'] ?? self::TYPE_PORTAINER);
+        if (!isset(self::typeLabels()[$input['type']])) {
+            return false;
+        }
+        $this->fields['type'] = $input['type'];
+        if ($input['type'] === self::TYPE_PORTAINER && trim((string) ($input['api_key'] ?? '')) === '') {
             Session::addMessageAfterRedirect(
                 __("La clé d'API Portainer est obligatoire.", 'dockerinventory'),
                 false,
@@ -182,26 +274,36 @@ class Connection extends ConnectionBase
      */
     private function prepareInput(array $input, bool $isNew): array|false
     {
+        if (!$isNew) {
+            // Le type ne change pas après la création (les champs en dépendent).
+            unset($input['type']);
+        }
+        if (array_key_exists('username', $input)) {
+            $input['username'] = mb_substr(trim((string) $input['username']), 0, 255);
+        }
         if (array_key_exists('url', $input) || $isNew) {
             $input['url'] = UrlPolicy::normalize((string) ($input['url'] ?? ''));
             $allowHttp = (bool) ($input['allow_http'] ?? ($this->fields['allow_http'] ?? false));
             $error = UrlPolicy::check($input['url'], $allowHttp);
             if ($error !== null) {
-                Session::addMessageAfterRedirect(self::urlErrorLabel($error), false, ERROR);
+                Session::addMessageAfterRedirect($this->urlErrorLabel($error), false, ERROR);
                 return false;
             }
         } elseif (array_key_exists('allow_http', $input) && !(bool) $input['allow_http']) {
             // HTTP retiré : l'adresse enregistrée doit alors être en HTTPS.
             $error = UrlPolicy::check((string) ($this->fields['url'] ?? ''), false);
             if ($error !== null) {
-                Session::addMessageAfterRedirect(self::urlErrorLabel($error), false, ERROR);
+                Session::addMessageAfterRedirect($this->urlErrorLabel($error), false, ERROR);
                 return false;
             }
         }
 
-        // Clé laissée vide en modification : la clé enregistrée est conservée.
+        // Clé (ou mot de passe WUD) laissée vide en modification : celle enregistrée est conservée.
+        // Case « Effacer le mot de passe » (WUD sans authentification) : vidée explicitement.
         $key = trim((string) ($input['api_key'] ?? ''));
-        if ($key === '') {
+        if (!empty($input['_clear_api_key']) && $this->isWud()) {
+            $input['api_key'] = '';
+        } elseif ($key === '') {
             unset($input['api_key']);
         } else {
             $input['api_key'] = (new GLPIKey())->encrypt($key);
@@ -214,7 +316,21 @@ class Connection extends ConnectionBase
 
     public function getDecryptedApiKey(): string
     {
-        return (string) (new GLPIKey())->decrypt((string) ($this->fields['api_key'] ?? ''));
+        $stored = (string) ($this->fields['api_key'] ?? '');
+
+        return $stored === '' ? '' : (string) (new GLPIKey())->decrypt($stored);
+    }
+
+    /**
+     * Client de lecture de ce serveur WUD.
+     */
+    public function getWudClient(): WudClient
+    {
+        return new WudClient(
+            (string) $this->fields['url'],
+            (string) ($this->fields['username'] ?? ''),
+            $this->getDecryptedApiKey()
+        );
     }
 
     /**
@@ -226,12 +342,80 @@ class Connection extends ConnectionBase
     }
 
     /**
-     * « Tester la connexion » : liste des environnements Portainer.
+     * Import de cette connexion, selon son type.
+     *
+     * @return array<string, mixed> Compte rendu (Importer ou WudImporter).
+     */
+    public function runImport(): array
+    {
+        return $this->isWud() ? (new WudImporter())->import($this) : (new Importer())->import($this);
+    }
+
+    /**
+     * Message du compte rendu d'un import, selon le type de connexion.
+     *
+     * @param array<string, mixed> $report
+     */
+    public function importMessage(array $report): string
+    {
+        if ($this->isWud()) {
+            return sprintf(
+                __(
+                    'Lecture de WUD terminée (%1$s) : %2$d conteneurs, %3$d services suivis, %4$d sans service.',
+                    'dockerinventory'
+                ),
+                self::statusLabel((int) $report['status']),
+                (int) ($report['containers'] ?? 0),
+                (int) ($report['services'] ?? 0),
+                (int) ($report['unmatched'] ?? 0)
+            );
+        }
+
+        return sprintf(
+            __('Import terminé (%1$s) : %2$d stacks, %3$d services, %4$d retirés, %5$d nœuds.', 'dockerinventory'),
+            self::statusLabel((int) $report['status']),
+            (int) ($report['stacks'] ?? 0),
+            (int) ($report['services'] ?? 0),
+            (int) ($report['retired'] ?? 0),
+            (int) ($report['nodes'] ?? 0)
+        );
+    }
+
+    /**
+     * « Tester la connexion » WUD : version de WUD et nombre de conteneurs suivis.
+     *
+     * @return array{ok: bool, message: string}
+     */
+    public function testWudConnection(?WudClient $client = null): array
+    {
+        $client ??= $this->getWudClient();
+        try {
+            $version = $client->version();
+            $containers = $client->containers();
+        } catch (WudException $e) {
+            return ['ok' => false, 'message' => self::errorLabels()[$e->getMessage()] ?? $e->getMessage()];
+        }
+
+        return [
+            'ok'      => true,
+            'message' => sprintf(
+                __('Connexion réussie : WUD %1$s, %2$d conteneur(s) suivi(s).', 'dockerinventory'),
+                $version !== '' ? $version : '?',
+                count($containers)
+            ),
+        ];
+    }
+
+    /**
+     * « Tester la connexion » : liste des environnements Portainer (ou appel à WUD).
      *
      * @return array{ok: bool, message: string}
      */
     public function testConnection(?PortainerClient $client = null): array
     {
+        if ($this->isWud()) {
+            return $this->testWudConnection();
+        }
         try {
             $endpoints = ($client ?? $this->getClient())->endpoints();
         } catch (PortainerException $e) {
@@ -270,17 +454,24 @@ class Connection extends ConnectionBase
             PortainerException::PRIVATE_NETWORK => __('Réseau privé refusé par GLPI (voir README).', 'dockerinventory'),
             PortainerException::UNEXPECTED => __("Réponse inattendue : est-ce bien Portainer ?", 'dockerinventory'),
             PortainerException::UNREACHABLE => __('Portainer injoignable (réseau, certificat...).', 'dockerinventory'),
+            WudException::UNAUTHORIZED => __('Identifiants refusés par WUD (401).', 'dockerinventory'),
+            WudException::FORBIDDEN => __('Accès refusé par WUD (403).', 'dockerinventory'),
+            WudException::NOT_FOUND => __("Adresse introuvable (404) : vérifier l'adresse.", 'dockerinventory'),
+            WudException::SERVER_ERROR => __('WUD a répondu par une erreur interne (5xx).', 'dockerinventory'),
+            WudException::PRIVATE_NETWORK => __('Réseau privé refusé par GLPI (voir README).', 'dockerinventory'),
+            WudException::UNEXPECTED => __("Réponse inattendue : est-ce bien What's Up Docker ?", 'dockerinventory'),
+            WudException::UNREACHABLE => __('WUD injoignable (réseau, certificat, délai...).', 'dockerinventory'),
         ];
     }
 
-    private static function urlErrorLabel(string $error): string
+    private function urlErrorLabel(string $error): string
     {
         return match ($error) {
             UrlPolicy::ERROR_HTTPS_REQUIRED => __('HTTPS obligatoire (sauf « Autoriser HTTP »).', 'dockerinventory'),
             UrlPolicy::ERROR_CREDENTIALS => __("L'adresse ne doit pas contenir d'identifiants.", 'dockerinventory'),
             default => sprintf(
                 __('Adresse invalide (exemple : %s).', 'dockerinventory'),
-                'https://portainer.exemple.test:9443'
+                $this->isWud() ? 'https://wud.exemple.test:3000' : 'https://portainer.exemple.test:9443'
             ),
         };
     }
@@ -290,7 +481,41 @@ class Connection extends ConnectionBase
      */
     public static function cronInfo(string $name): array
     {
+        if ($name === Install\Installer::CRON_WUD) {
+            return ['description' => __("Lecture des versions des images depuis What's Up Docker", 'dockerinventory')];
+        }
+
         return ['description' => __('Import des stacks et services Docker Swarm depuis Portainer', 'dockerinventory')];
+    }
+
+    /**
+     * Tâche automatique (toutes les heures) : lecture de chaque connexion WUD active.
+     */
+    public static function cronWudimport(CronTask $task): int
+    {
+        global $DB;
+
+        $done = 0;
+        $where = ['is_active' => 1, 'type' => self::TYPE_WUD];
+        foreach ($DB->request(['FROM' => static::getTable(), 'WHERE' => $where]) as $row) {
+            $connection = new self();
+            if (!$connection->getFromDB((int) $row['id'])) {
+                continue;
+            }
+            $report = (new WudImporter())->import($connection);
+            $task->addVolume($report['containers']);
+            $task->log(sprintf(
+                __('%1$s : %2$s (%3$d conteneurs, %4$d services suivis, %5$d sans service)', 'dockerinventory'),
+                $connection->fields['name'],
+                self::statusLabel($report['status']),
+                $report['containers'],
+                $report['services'],
+                $report['unmatched']
+            ));
+            $done++;
+        }
+
+        return $done > 0 ? 1 : 0;
     }
 
     /**
@@ -301,7 +526,8 @@ class Connection extends ConnectionBase
         global $DB;
 
         $done = 0;
-        foreach ($DB->request(['FROM' => static::getTable(), 'WHERE' => ['is_active' => 1]]) as $row) {
+        $where = ['is_active' => 1, 'type' => self::TYPE_PORTAINER];
+        foreach ($DB->request(['FROM' => static::getTable(), 'WHERE' => $where]) as $row) {
             $connection = new self();
             if (!$connection->getFromDB((int) $row['id'])) {
                 continue;

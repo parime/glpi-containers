@@ -1,0 +1,159 @@
+{#
+ # -------------------------------------------------------------------------
+ # Docker Inventory plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-docker-inventory
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Page « Versions des images » : compteurs par écart (cliquables), filtres par écart et par
+   environnement, tableau des services, conteneurs sans service à part. Lecture seule (GET). #}
+{% set outdated_count = counts['major'] + counts['minor'] + counts['patch']
+    + counts['prerelease'] + counts['digest'] %}
+<div class="container-fluid">
+    <div class="card mb-3">
+        <div class="card-header d-flex flex-wrap align-items-center gap-2">
+            <h2 class="card-title mb-0">
+                <i class="ti ti-versions me-2" aria-hidden="true"></i>{{ __('Versions des images', 'dockerinventory') }}
+            </h2>
+            <div class="ms-auto">
+                <a href="{{ search_url }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ti ti-search me-1" aria-hidden="true"></i>
+                    {{ __('Recherche avancée et export', 'dockerinventory') }}
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">
+                {{ __(
+                    'Pour chaque service : version déployée, dernière version disponible et écart.',
+                    'dockerinventory'
+                ) }}
+                {{ __('Les données viennent de What’s Up Docker, lu sans rien y modifier.', 'dockerinventory') }}
+            </p>
+            {% if not has_wud %}
+                <div class="alert alert-info mb-3">
+                    <i class="ti ti-info-circle me-2" aria-hidden="true"></i>
+                    {{ __(
+                        'Aucune connexion What’s Up Docker n’est déclarée : la version disponible est inconnue.',
+                        'dockerinventory'
+                    ) }}
+                    {% if can_configure %}
+                        <a href="{{ connection_url }}" class="ms-1">
+                        {{ __('Ajouter une connexion WUD', 'dockerinventory') }}</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# Compteurs : un clic filtre sur l'écart. #}
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <a href="{{ page_url }}?environment={{ environment }}"
+                   class="btn btn-sm {{ gap == '' ? 'btn-dark' : 'btn-outline-dark' }}">
+                    {{ __('Tous', 'dockerinventory') }}
+                </a>
+                <a href="{{ page_url }}?gap={{ outdated }}&environment={{ environment }}"
+                   class="btn btn-sm {{ gap == outdated ? 'btn-danger' : 'btn-outline-danger' }}">
+                    <i class="ti ti-arrow-big-up-lines me-1" aria-hidden="true"></i>
+                    {{ __('À mettre à jour', 'dockerinventory') }}
+                    <span class="badge bg-white text-danger ms-1">{{ outdated_count }}</span>
+                </a>
+                {% for code, info in gaps %}
+                    <a href="{{ page_url }}?gap={{ code }}&environment={{ environment }}" title="{{ info.help }}"
+                       class="btn btn-sm {{ gap == code ? 'btn-' ~ info.color : 'btn-outline-' ~ info.color }}">
+                        <i class="{{ info.icon }} me-1" aria-hidden="true"></i>{{ info.label }}
+                        <span class="badge bg-{{ info.color }}-lt ms-1">{{ counts[code]|default(0) }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+
+            <form method="get" action="{{ page_url }}" class="row g-2 align-items-end">
+                <div class="col-sm-4 col-lg-3">
+                    <label class="form-label" for="dockerinventory-gap">{{ __('Écart', 'dockerinventory') }}</label>
+                    <select id="dockerinventory-gap" name="gap" class="form-select">
+                        <option value="">{{ __('Tous', 'dockerinventory') }}</option>
+                        <option value="{{ outdated }}" {{ gap == outdated ? 'selected' : '' }}>
+                            {{ __('À mettre à jour', 'dockerinventory') }}
+                        </option>
+                        {% for code, info in gaps %}
+                            <option value="{{ code }}" {{ gap == code ? 'selected' : '' }}>{{ info.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-sm-4 col-lg-3">
+                    <label class="form-label" for="dockerinventory-environment">
+                        {{ __('Environnement', 'dockerinventory') }}
+                    </label>
+                    <select id="dockerinventory-environment" name="environment" class="form-select">
+                        <option value="0">{{ __('Tous', 'dockerinventory') }}</option>
+                        {% for id, name in environments %}
+                            <option value="{{ id }}" {{ environment == id ? 'selected' : '' }}>{{ name }}</option>
+                        {% endfor %}
+                        <option value="-1" {{ environment == -1 ? 'selected' : '' }}>
+                            {{ __('Sans environnement', 'dockerinventory') }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ti ti-filter me-1" aria-hidden="true"></i>{{ __('Filtrer', 'dockerinventory') }}
+                    </button>
+                    {% if gap or environment %}
+                        <a href="{{ page_url }}" class="btn btn-link">{{ __('Réinitialiser', 'dockerinventory') }}</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="ti ti-brand-docker me-2" aria-hidden="true"></i>{{ __('Services', 'dockerinventory') }}
+                <span class="badge bg-secondary-lt ms-2">{{ rows|length }}</span>
+            </h3>
+        </div>
+        {% if rows is empty %}
+            <div class="card-body text-muted">
+            {{ __('Aucun service ne correspond à ces filtres.', 'dockerinventory') }}</div>
+        {% else %}
+            <div class="table-responsive">
+                {{ include('@dockerinventory/_version_rows.html.twig', {rows: rows}) }}
+            </div>
+        {% endif %}
+    </div>
+
+    {% if unmatched is not empty %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="ti ti-unlink me-2" aria-hidden="true"></i>
+                    {{ __('Conteneurs sans service Swarm', 'dockerinventory') }}
+                    <span class="badge bg-secondary-lt ms-2">{{ unmatched|length }}</span>
+                </h3>
+            </div>
+            <div class="card-body pb-0 text-muted">
+                {{ __(
+                    'Conteneurs suivis par WUD qui ne correspondent à aucun service importé de Portainer.',
+                    'dockerinventory'
+                ) }}
+                {{ __('Ils ne sont pas ignorés : leur version est suivie ici.', 'dockerinventory') }}
+            </div>
+            <div class="table-responsive">
+                {{ include('@dockerinventory/_version_rows.html.twig', {rows: unmatched, containers_mode: true}) }}
+            </div>
+        </div>
+    {% endif %}
+
+    <p class="text-muted small">
+        <i class="ti ti-eye-off me-1" aria-hidden="true"></i>
+        {{ __('« Non suivable » : tag mobile (latest...) ou sans numéro de version.', 'dockerinventory') }}
+        {{ __('Préférer un tag versionné (1.2.3) pour savoir ce qui tourne vraiment.', 'dockerinventory') }}
+    </p>
+</div>

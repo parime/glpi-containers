@@ -1,0 +1,57 @@
+{#
+ # -------------------------------------------------------------------------
+ # Docker Inventory plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-docker-inventory
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Nouvelle connexion : choix du type, dont dépendent les champs du formulaire. #}
+<div class="container-fluid py-3">
+    <h3 class="mb-1">{{ __('Quelle source voulez-vous connecter ?', 'dockerinventory') }}</h3>
+    <p class="text-muted mb-4">
+        {{ __('Le plugin lit ces outils sans jamais rien y modifier.', 'dockerinventory') }}
+        {{ __('Commencez par Portainer : WUD complète les services que Portainer a importés.', 'dockerinventory') }}
+    </p>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <a class="card card-link card-link-pop h-100 text-reset text-decoration-none"
+               href="{{ form_url }}?type=portainer">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="avatar bg-blue text-white me-3">
+                            <i class="ti ti-brand-docker fs-2" aria-hidden="true"></i>
+                        </span>
+                        <h4 class="card-title mb-0">Portainer</h4>
+                    </div>
+                    <p class="text-muted mb-0">
+                        {{ __('Stacks, services Docker Swarm et nœuds : ce qui tourne, et où.', 'dockerinventory') }}
+                    </p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a class="card card-link card-link-pop h-100 text-reset text-decoration-none"
+               href="{{ form_url }}?type=wud">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="avatar bg-teal text-white me-3">
+                            <i class="ti ti-versions fs-2" aria-hidden="true"></i>
+                        </span>
+                        <h4 class="card-title mb-0">What's Up Docker (WUD)</h4>
+                    </div>
+                    <p class="text-muted mb-0">
+                        {{ __('Version déployée et dernière version disponible de chaque image.', 'dockerinventory') }}
+                    </p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>

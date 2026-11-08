@@ -13,46 +13,85 @@
  # -------------------------------------------------------------------------
  #}
 
-{# Connexion Portainer. La clé d'API n'est jamais renvoyée au navigateur : le champ reste vide,
-   et le laisser vide en modification conserve la clé enregistrée. #}
+{# Connexion Portainer ou WUD. La clé d'API (ou le mot de passe WUD) n'est jamais renvoyée au
+   navigateur : le champ reste vide, et le laisser vide en modification conserve la valeur
+   enregistrée. Le type est choisi avant (connection_type_choice) et ne change plus. #}
 {% extends 'generic_show_form.html.twig' %}
 {% import 'components/form/fields_macros.html.twig' as fields %}
 
 {% block form_fields %}
-    {% set key_helper = has_api_key
-        ? __('Une clé est enregistrée (chiffrée) : laisser vide pour la conserver.', 'dockerinventory')
-        : __("Jeton d'accès d'un utilisateur Portainer dédié, aux droits de lecture seuls.", 'dockerinventory') %}
+    <input type="hidden" name="type" value="{{ item.fields['type'] }}">
+    {% if is_wud %}
+        {% set key_helper = has_api_key
+            ? __('Un mot de passe est enregistré (chiffré) : laisser vide pour le conserver.', 'dockerinventory')
+            : __('Facultatif : seulement si WUD demande une authentification.', 'dockerinventory') %}
+    {% else %}
+        {% set key_helper = has_api_key
+            ? __('Une clé est enregistrée (chiffrée) : laisser vide pour la conserver.', 'dockerinventory')
+            : __("Jeton d'accès d'un utilisateur Portainer dédié, aux droits de lecture seuls.", 'dockerinventory') %}
+    {% endif %}
     {% set environment_helper = __(
         "Appliqué seulement aux applications créées par l'import, jamais aux applications existantes.",
         'dockerinventory'
     ) %}
+    {% set type_html %}
+        <span class="badge {{ is_wud ? 'bg-teal' : 'bg-blue' }} text-white">
+            <i class="ti {{ is_wud ? 'ti-versions' : 'ti-brand-docker' }} me-1" aria-hidden="true"></i>{{ type_label }}
+        </span>
+    {% endset %}
 
+    {{ fields.field('type_display', type_html, __('Type', 'dockerinventory')) }}
     {{ fields.textField('name', item.fields['name'], __('Name'), {
         required: true,
-        helper: __('Nom libre, par exemple « Portainer production ».', 'dockerinventory'),
+        helper: is_wud
+            ? __('Nom libre, par exemple « WUD production ».', 'dockerinventory')
+            : __('Nom libre, par exemple « Portainer production ».', 'dockerinventory'),
     }) }}
     {{ fields.dropdownYesNo('is_active', item.isNewItem() ? 1 : item.fields['is_active'], __('Active'), {
         helper: __("Une connexion inactive n'est pas importée par la tâche automatique.", 'dockerinventory'),
     }) }}
-    {{ fields.textField('url', item.fields['url'], __('Adresse de Portainer', 'dockerinventory'), {
-        required: true,
-        placeholder: 'https://portainer.exemple.test:9443',
-        helper: __("Adresse de l'interface Portainer, sans /api à la fin.", 'dockerinventory'),
-    }) }}
-    {{ fields.passwordField('api_key', '', __("Clé d'API", 'dockerinventory'), {
-        required: item.isNewItem(),
-        clearable: false,
-        helper: key_helper,
-    }) }}
-    {{ fields.dropdownYesNo('allow_http', item.fields['allow_http'] ?? 0, __('Autoriser HTTP', 'dockerinventory'), {
-        helper: __("Déconseillé : la clé d'API circule alors en clair.", 'dockerinventory'),
-    }) }}
-    {{ fields.dropdownField(
-        'ApplianceEnvironment',
-        'applianceenvironments_id',
-        item.fields['applianceenvironments_id'],
-        __('Environnement des applications créées', 'dockerinventory'),
-        {helper: environment_helper}
-    ) }}
+    {% if is_wud %}
+        {{ fields.textField('url', item.fields['url'], __('Adresse de WUD', 'dockerinventory'), {
+            required: true,
+            placeholder: 'https://wud.exemple.test:3000',
+            helper: __("Adresse de l'interface de What's Up Docker, sans /api à la fin.", 'dockerinventory'),
+        }) }}
+        {{ fields.textField('username', item.fields['username'] ?? '', __('Utilisateur', 'dockerinventory'), {
+            helper: __("Laisser vide si WUD n'a pas d'authentification.", 'dockerinventory'),
+        }) }}
+        {{ fields.passwordField('api_key', '', __('Mot de passe', 'dockerinventory'), {
+            clearable: false,
+            helper: key_helper,
+        }) }}
+        {% if has_api_key %}
+            {{ fields.dropdownYesNo('_clear_api_key', 0, __('Effacer le mot de passe', 'dockerinventory'), {
+                helper: __('Oui : le mot de passe enregistré est supprimé (WUD sans mot de passe).', 'dockerinventory'),
+            }) }}
+        {% endif %}
+        {{ fields.dropdownYesNo('allow_http', item.fields['allow_http'] ?? 0, __('Autoriser HTTP', 'dockerinventory'), {
+            helper: __('Déconseillé : le mot de passe circule alors en clair.', 'dockerinventory'),
+        }) }}
+    {% else %}
+        {{ fields.textField('url', item.fields['url'], __('Adresse de Portainer', 'dockerinventory'), {
+            required: true,
+            placeholder: 'https://portainer.exemple.test:9443',
+            helper: __("Adresse de l'interface Portainer, sans /api à la fin.", 'dockerinventory'),
+        }) }}
+        {{ fields.passwordField('api_key', '', __("Clé d'API", 'dockerinventory'), {
+            required: item.isNewItem(),
+            clearable: false,
+            helper: key_helper,
+        }) }}
+        {{ fields.dropdownYesNo('allow_http', item.fields['allow_http'] ?? 0, __('Autoriser HTTP', 'dockerinventory'), {
+            helper: __("Déconseillé : la clé d'API circule alors en clair.", 'dockerinventory'),
+        }) }}
+        {{ fields.dropdownField(
+            'ApplianceEnvironment',
+            'applianceenvironments_id',
+            item.fields['applianceenvironments_id'],
+            __('Environnement des applications créées', 'dockerinventory'),
+            {helper: environment_helper}
+        ) }}
+    {% endif %}
     {{ fields.textareaField('comment', item.fields['comment'], _n('Comment', 'Comments', 1)) }}
 {% endblock %}

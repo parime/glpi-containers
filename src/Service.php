@@ -83,6 +83,7 @@ class Service extends ServiceBase
     {
         $tabs = [];
         $this->addDefaultFormTab($tabs);
+        $this->addStandardTab(ImageVersion::class, $tabs, $options);
 
         return $tabs;
     }

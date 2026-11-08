@@ -18,9 +18,10 @@
 /**
  * Jeu de données des contrôles de sécurité communs (parime/glpi-plugin-security), lancé avant la
  * désinstallation pour que le contrôle des restes porte sur de vraies données : une connexion
- * Portainer et une connexion WUD, un import complet depuis les jeux fictifs des faux Portainer et
- * WUD (versions des images), des recherches enregistrées et des préférences d'affichage
- * personnelles sur les services et les versions. Données fictives uniquement.
+ * Portainer, une connexion WUD et une connexion Harbor, un import complet depuis les jeux fictifs
+ * des faux Portainer, WUD et registre (versions des images, cache de Docker Hub), des recherches
+ * enregistrées et des préférences d'affichage personnelles sur les services et les versions.
+ * Données fictives uniquement ; le vrai Docker Hub n'est jamais appelé.
  *
  * Usage (dossier de GLPI, utilisateur www-data) : php plugins/dockerinventory/tests/security/setup.php
  */
@@ -29,6 +30,8 @@ use GlpiPlugin\Dockerinventory\Connection;
 use GlpiPlugin\Dockerinventory\ImageVersion;
 use GlpiPlugin\Dockerinventory\Importer;
 use GlpiPlugin\Dockerinventory\Portainer\PortainerClient;
+use GlpiPlugin\Dockerinventory\Registry\RegistryClient;
+use GlpiPlugin\Dockerinventory\Registry\RegistryImporter;
 use GlpiPlugin\Dockerinventory\Service;
 use GlpiPlugin\Dockerinventory\Wud\WudClient;
 use GlpiPlugin\Dockerinventory\Wud\WudImporter;
@@ -121,10 +124,48 @@ $DB->insert(DisplayPreference::getTable(), [
     'users_id' => $userId,
 ] + ($DB->fieldExists(DisplayPreference::getTable(), 'interface') ? ['interface' => 'central'] : []));
 
+// Harbor (compte robot fictif) et Docker Hub, servis en mémoire par le jeu du faux registre.
+$registryFixture = json_decode((string) file_get_contents(dirname(__DIR__) . '/mock-registry/fixture.json'), true);
+$harborId = (int) (new Connection())->add([
+    'name'          => 'Harbor fictif (sécurité)',
+    'type'          => Connection::TYPE_HARBOR,
+    'entities_id'   => 0,
+    'url'           => 'https://harbor.exemple.test',
+    'registry_host' => 'registry.exemple.test:5000',
+    'username'      => 'robot$lecture',
+    'api_key'       => 'robot_mot_de_passe_securite',
+]);
+$registryReport = (new RegistryImporter(static function (?Connection $harbor) use ($registryFixture): RegistryClient {
+    $transport = static function (string $url) use ($registryFixture): string {
+        $path = (string) parse_url($url, PHP_URL_PATH);
+        if (preg_match('#^/v2/repositories/(.+)/tags$#', $path, $m) === 1) {
+            $tags = $registryFixture['hub'][$m[1]] ?? throw new RuntimeException('HTTP 404 returned');
+
+            return (string) json_encode(['next' => null, 'results' => $tags]);
+        }
+        preg_match('#^/v2/(.+)/tags/list$#', $path, $m);
+        $tags = $registryFixture['v2'][$m[1] ?? ''] ?? throw new RuntimeException('HTTP 404 returned');
+
+        return (string) json_encode(['name' => $m[1], 'tags' => $tags]);
+    };
+
+    return $harbor === null
+        ? RegistryClient::dockerHub('https://hub.exemple.test', $transport)
+        : RegistryClient::harbor(
+            'https://harbor.exemple.test',
+            'robot$lecture',
+            'robot_mot_de_passe_securite',
+            $transport
+        );
+}))->run();
+
 echo sprintf(
-    "connexion %d, %d services importés ; connexion WUD %d, %d versions de services\n",
+    "connexion %d, %d services importés ; connexion WUD %d, %d versions de services ; "
+        . "connexion Harbor %d, %d versions depuis les registres\n",
     $id,
     $report['services'],
     $wudId,
-    $wudReport['services']
+    $wudReport['services'],
+    $harborId,
+    $registryReport['services']
 );

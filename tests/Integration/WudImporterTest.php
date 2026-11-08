@@ -222,7 +222,7 @@ final class WudImporterTest extends TestCase
             'name' => 'Portainer sans clé', 'entities_id' => $this->entityId, 'url' => 'https://p.exemple.test',
         ]));
         $this->assertFalse((new Connection())->add([
-            'name' => 'Type inconnu', 'type' => 'harbor', 'entities_id' => $this->entityId,
+            'name' => 'Type inconnu', 'type' => 'kubernetes', 'entities_id' => $this->entityId,
             'url'  => 'https://h.exemple.test',
         ]));
     }

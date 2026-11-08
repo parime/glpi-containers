@@ -17,19 +17,20 @@
 {% if rows is empty %}
     <div class="alert alert-info">
         <i class="ti ti-info-circle me-2" aria-hidden="true"></i>
-        {% if not has_wud %}
+        {% if not has_wud and not has_registry %}
+            {{ __('Aucune version connue pour le moment.', 'dockerinventory') }}
             {{ __(
-                'Aucune connexion What’s Up Docker n’est déclarée : la version disponible est inconnue.',
+                'Ajoutez une connexion WUD, ou lancez la vérification des registres (toutes les heures).',
                 'dockerinventory'
             ) }}
             {% if can_configure %}
-                <a href="{{ connection_url }}" class="ms-1">{{ __('Ajouter une connexion WUD', 'dockerinventory') }}</a>
+                <a href="{{ connection_url }}" class="ms-1">{{ __('Connexions Docker', 'dockerinventory') }}</a>
             {% endif %}
         {% elseif for_service %}
-            {{ __('Aucun conteneur suivi par WUD n’a été rattaché à ce service.', 'dockerinventory') }}
-            {{ __('Vérifier que WUD surveille ce service, puis relire WUD.', 'dockerinventory') }}
+            {{ __('Aucune version connue pour ce service (ni WUD, ni registre).', 'dockerinventory') }}
+            {{ __('Les registres sont vérifiés toutes les heures pour les services sans WUD.', 'dockerinventory') }}
         {% else %}
-            {{ __('Aucun service de cette application n’est suivi par WUD.', 'dockerinventory') }}
+            {{ __('Aucune version connue pour les services de cette application.', 'dockerinventory') }}
         {% endif %}
     </div>
 {% elseif for_service %}
@@ -76,7 +77,7 @@
                             'dockerinventory'
                         ) }}
                         {% if row.update_available %}
-                            {{ __('WUD signale une nouvelle empreinte pour ce tag.', 'dockerinventory') }}
+                            {{ __('Une nouvelle empreinte est disponible pour ce tag.', 'dockerinventory') }}
                         {% endif %}
                     </div>
                 {% endif %}
@@ -100,21 +101,36 @@
                         <dt class="col-sm-3">{{ __('Dernière empreinte', 'dockerinventory') }}</dt>
                         <dd class="col-sm-9"><code>{{ row.latest_digest }}</code></dd>
                     {% endif %}
-                    <dt class="col-sm-3">{{ __('Conteneurs WUD', 'dockerinventory') }}</dt>
-                    <dd class="col-sm-9">
-                        {% for name in row.containers %}
-                            <span class="badge bg-secondary-lt me-1 mb-1">{{ name }}</span>
-                        {% endfor %}
-                    </dd>
-                    <dt class="col-sm-3">{{ __('Rattachement', 'dockerinventory') }}</dt>
-                    <dd class="col-sm-9">{{ row.match }}</dd>
+                    {% if row.source_code != 'registry' %}
+                        <dt class="col-sm-3">{{ __('Conteneurs WUD', 'dockerinventory') }}</dt>
+                        <dd class="col-sm-9">
+                            {% for name in row.containers %}
+                                <span class="badge bg-secondary-lt me-1 mb-1">{{ name }}</span>
+                            {% endfor %}
+                        </dd>
+                        <dt class="col-sm-3">{{ __('Rattachement', 'dockerinventory') }}</dt>
+                        <dd class="col-sm-9">{{ row.match }}</dd>
+                    {% endif %}
                     <dt class="col-sm-3">{{ __('Source', 'dockerinventory') }}</dt>
-                    <dd class="col-sm-9">{{ row.source }} ({{ row.connection_name }})</dd>
+                    <dd class="col-sm-9">
+                        {{ row.source }}
+                        {% if row.connection_name %}({{ row.connection_name }}){% endif %}
+                        {% if row.source_code == 'registry' and row.registry_name %}
+                            <span class="text-muted">
+                                : {{ row.registry_name == 'hub' ? 'Docker Hub' : row.registry_name }}
+                            </span>
+                        {% endif %}
+                    </dd>
                     <dt class="col-sm-3">{{ __('Vérifié le', 'dockerinventory') }}</dt>
                     <dd class="col-sm-9">{{ row.date_checked|formatted_datetime }}</dd>
                     {% if row.error %}
-                        <dt class="col-sm-3">{{ __('Erreur WUD', 'dockerinventory') }}</dt>
-                        <dd class="col-sm-9 text-danger">{{ row.error }}</dd>
+                        {% if row.source_code == 'registry' %}
+                            <dt class="col-sm-3">{{ __('Pourquoi non vérifié', 'dockerinventory') }}</dt>
+                            <dd class="col-sm-9 text-warning">{{ row.error }}</dd>
+                        {% else %}
+                            <dt class="col-sm-3">{{ __('Erreur WUD', 'dockerinventory') }}</dt>
+                            <dd class="col-sm-9 text-danger">{{ row.error }}</dd>
+                        {% endif %}
                     {% endif %}
                 </dl>
             </div>
@@ -134,6 +150,9 @@
     </div>
 {% endif %}
 <p class="text-muted small mt-2">
-    {{ __('Versions lues dans What’s Up Docker, sans rien y modifier.', 'dockerinventory') }}
+    {{ __(
+        'Versions lues dans What’s Up Docker ou dans le registre de l’image, sans rien y modifier.',
+        'dockerinventory'
+    ) }}
     <a href="{{ overview_url }}">{{ __('Voir toutes les versions des images', 'dockerinventory') }}</a>
 </p>

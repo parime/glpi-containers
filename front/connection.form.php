@@ -16,6 +16,7 @@
  */
 
 use GlpiPlugin\Dockerinventory\Connection;
+use GlpiPlugin\Dockerinventory\Registry\RegistryImporter;
 
 Session::checkRight(Connection::RIGHTNAME, UPDATE);
 
@@ -40,6 +41,11 @@ if (isset($_POST['add'])) {
     $connection->check($id, UPDATE);
     $result = $connection->testConnection();
     Session::addMessageAfterRedirect(htmlescape($result['message']), false, $result['ok'] ? INFO : ERROR);
+    Html::back();
+} elseif (isset($_POST['registry_check'])) {
+    // Page des versions : vérification des registres (Docker Hub, Harbor) sans attendre la tâche.
+    $report = (new RegistryImporter())->run();
+    Session::addMessageAfterRedirect(htmlescape(Connection::registryMessage($report)), false, INFO);
     Html::back();
 } elseif (isset($_POST['import'])) {
     $connection->check($id, UPDATE);

@@ -32,7 +32,8 @@ use GlpiPlugin\Dockerinventory\Wud\WudMapper;
 
 /**
  * Version déployée et dernière version disponible de l'image d'un service (ou d'un conteneur
- * suivi par WUD sans service correspondant). Données recalculées à chaque import WUD, en lecture
+ * suivi par WUD sans service correspondant). Données recalculées à chaque lecture de WUD, ou à
+ * chaque vérification des registres pour les services sans WUD (source « registry »), en lecture
  * seule : aucune page ne les modifie.
  *
  * Affichage : onglet « Versions » des services et des applications, page « Versions des images »
@@ -42,6 +43,7 @@ use GlpiPlugin\Dockerinventory\Wud\WudMapper;
 class ImageVersion extends CommonDBTM
 {
     public const SOURCE_WUD = 'wud';
+    public const SOURCE_REGISTRY = 'registry';
 
     /** Filtre « à mettre à jour » de la page des versions : tous les écarts connus. */
     public const FILTER_OUTDATED = 'outdated';
@@ -165,7 +167,10 @@ class ImageVersion extends CommonDBTM
                 'label' => __('Non vérifié', 'dockerinventory'),
                 'color' => 'secondary',
                 'icon'  => 'ti ti-help-circle',
-                'help'  => __('WUD n’a pas encore trouvé de version pour cette image.', 'dockerinventory'),
+                'help'  => __(
+                    'Aucune version trouvée pour cette image (WUD ou registre), ou registre non pris en charge.',
+                    'dockerinventory'
+                ),
             ],
             VersionComparator::GAP_NONE => [
                 'label' => __('À jour', 'dockerinventory'),
@@ -204,7 +209,10 @@ class ImageVersion extends CommonDBTM
      */
     public static function sourceLabels(): array
     {
-        return [self::SOURCE_WUD => "What's Up Docker"];
+        return [
+            self::SOURCE_WUD      => "What's Up Docker",
+            self::SOURCE_REGISTRY => __("Registre de l'image", 'dockerinventory'),
+        ];
     }
 
     public function rawSearchOptions()
@@ -365,6 +373,7 @@ class ImageVersion extends CommonDBTM
             'for_service'   => $item instanceof Service,
             'overview_url'  => self::getOverviewURL(),
             'has_wud'       => countElementsInTable(Connection::getTable(), ['type' => Connection::TYPE_WUD]) > 0,
+            'has_registry'  => countElementsInTable(static::getTable(), ['source' => self::SOURCE_REGISTRY]) > 0,
             'can_configure' => Connection::canView(),
             'connection_url' => Connection::getSearchURL(),
         ]);
@@ -515,6 +524,11 @@ class ImageVersion extends CommonDBTM
         $deployedDigest = (string) ($row['deployed_digest'] ?? '');
         $latestDigest = (string) ($row['latest_digest'] ?? '');
         $source = (string) ($row['source'] ?? '');
+        $error = (string) ($row['error'] ?? '');
+        if ($source === self::SOURCE_REGISTRY && $error !== '') {
+            // Code stable enregistré par la vérification des registres : libellé traduit.
+            $error = Connection::registryErrorLabels()[$error] ?? $error;
+        }
 
         return [
             'id'               => (int) ($row['id'] ?? 0),
@@ -553,8 +567,9 @@ class ImageVersion extends CommonDBTM
             'match'            => self::matchLabels()[$method] ?? $method,
             'match_code'       => $method,
             'source'           => self::sourceLabels()[$source] ?? $source,
+            'source_code'      => $source,
             'connection_name'  => (string) ($row['connection_name'] ?? ''),
-            'error'            => (string) ($row['error'] ?? ''),
+            'error'            => $error,
             'date_checked'     => (string) ($row['date_checked'] ?? ''),
         ];
     }

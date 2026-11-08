@@ -1,0 +1,44 @@
+{
+  "simulate": "",
+  "hub": {
+    "library/postgres": [
+      {"name": "17.2-alpine", "digest": "sha256:a17a17a17a17a17a17a17a17a17a17a17a17a17a17a17a17a17a17a17a17a17a"},
+      {"name": "18.0-beta1", "digest": "sha256:b18b18b18b18b18b18b18b18b18b18b18b18b18b18b18b18b18b18b18b18b18b1"},
+      {"name": "17.2", "digest": "sha256:c172c172c172c172c172c172c172c172c172c172c172c172c172c172c172c172"},
+      {"name": "latest", "digest": "sha256:c172c172c172c172c172c172c172c172c172c172c172c172c172c172c172c172"},
+      {"name": "17.0", "digest": "sha256:c170c170c170c170c170c170c170c170c170c170c170c170c170c170c170c170"},
+      {"name": "16.6", "digest": "sha256:c166c166c166c166c166c166c166c166c166c166c166c166c166c166c166c166"},
+      {"name": "16.5", "digest": "sha256:c165c165c165c165c165c165c165c165c165c165c165c165c165c165c165c165"},
+      {"name": "16.4", "digest": "sha256:c164c164c164c164c164c164c164c164c164c164c164c164c164c164c164c164"},
+      {"name": "16", "digest": "sha256:c166c166c166c166c166c166c166c166c166c166c166c166c166c166c166c166"}
+    ],
+    "library/redis": [
+      {"name": "8.0-rc1", "digest": "sha256:d80d80d80d80d80d80d80d80d80d80d80d80d80d80d80d80d80d80d80d80d80d8"},
+      {"name": "7.4.3-alpine", "digest": "sha256:d743d743d743d743d743d743d743d743d743d743d743d743d743d743d743d743"},
+      {"name": "7.4.2", "digest": "sha256:d742d742d742d742d742d742d742d742d742d742d742d742d742d742d742d742"},
+      {"name": "7.4.1", "digest": "sha256:d741d741d741d741d741d741d741d741d741d741d741d741d741d741d741d741"}
+    ],
+    "grafana/grafana": [
+      {"name": "12.0.0-preview", "digest": "sha256:e120e120e120e120e120e120e120e120e120e120e120e120e120e120e120e120"},
+      {"name": "11.3.1", "digest": "sha256:e1131e1131e1131e1131e1131e1131e1131e1131e1131e1131e1131e1131e113"},
+      {"name": "11.3.0", "digest": "sha256:e1130e1130e1130e1130e1130e1130e1130e1130e1130e1130e1130e1130e113"},
+      {"name": "11.2.1", "digest": "sha256:e1121e1121e1121e1121e1121e1121e1121e1121e1121e1121e1121e1121e112"},
+      {"name": "11.2.0", "digest": "sha256:e1120e1120e1120e1120e1120e1120e1120e1120e1120e1120e1120e1120e112"}
+    ],
+    "grafana/alloy": [
+      {"name": "latest", "digest": "sha256:f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0"},
+      {"name": "v1.5.0", "digest": "sha256:f150f150f150f150f150f150f150f150f150f150f150f150f150f150f150f150"}
+    ],
+    "library/nginx": [
+      {"name": "latest", "digest": "sha256:a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0"},
+      {"name": "1.27.3", "digest": "sha256:a273a273a273a273a273a273a273a273a273a273a273a273a273a273a273a273"}
+    ]
+  },
+  "v2_requires_auth": true,
+  "v2": {
+    "boutique/api": ["1.9.0", "1.9.1", "1.10.0", "2.0.0-rc1", "latest"]
+  },
+  "public": {
+    "outils/annuaire": ["3.0.0", "3.1.0"]
+  }
+}

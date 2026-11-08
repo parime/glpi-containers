@@ -90,7 +90,7 @@
                            title="{{ registry_title }}" aria-label="{{ registry_title }}" data-bs-toggle="tooltip">
                             <i class="ti ti-external-link" aria-hidden="true"></i>
                         </a>
-                    {% elseif row.registry_name %}
+                    {% elseif row.registry_name and row.registry_name != 'hub' %}
                         <div class="small text-muted">
                             {{ __('Registre', 'dockerinventory') }} : {{ row.registry_name }}
                         </div>
@@ -123,7 +123,11 @@
                         <div class="small text-muted mt-1">
                         {{ __('Nouvelle empreinte disponible', 'dockerinventory') }}</div>
                     {% endif %}
-                    {% if row.error %}
+                    {% if row.error and row.source_code == 'registry' %}
+                        <div class="small text-warning mt-1">
+                            <i class="ti ti-info-circle me-1" aria-hidden="true"></i>{{ row.error }}
+                        </div>
+                    {% elseif row.error %}
                         <div class="small text-danger mt-1" title="{{ row.error }}">
                             <i class="ti ti-alert-circle me-1" aria-hidden="true"></i>
                             {{ __('Erreur WUD', 'dockerinventory') }}

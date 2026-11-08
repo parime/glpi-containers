@@ -37,6 +37,9 @@ use GlpiPlugin\Dockerinventory\Portainer\PortainerMapper;
  *   connexion et ses sous-entités, s'il est unique. Aucun ordinateur n'est créé ni modifié ;
  * - service, stack ou nœud absent d'un environnement lu avec succès (ou d'un environnement
  *   disparu) => marqué « retiré ». Rien n'est supprimé. Un environnement en erreur ne retire rien.
+ *
+ * @phpstan-type Report array{status: int, stacks: int, services: int, retired: int, nodes: int,
+ *     linked_nodes: int, appliances_created: int, errors: list<array{endpoint: string, code: string}>}
  */
 final class Importer
 {
@@ -55,8 +58,7 @@ final class Importer
     }
 
     /**
-     * @return array{status: int, stacks: int, services: int, retired: int, nodes: int, linked_nodes: int,
-     *     appliances_created: int, errors: list<array{endpoint: string, code: string}>}
+     * @return Report
      */
     public function import(Connection $connection): array
     {
@@ -172,7 +174,7 @@ final class Importer
 
     /**
      * @param array<string, mixed> $stack
-     * @param array{appliances_created: int} $report
+     * @param Report $report
      * @return array{id: int, appliances_id: int}
      */
     private function upsertStack(
@@ -221,7 +223,7 @@ final class Importer
      * fois, d'une application absente. Une application existante n'est jamais modifiée ; une
      * application mise à la corbeille reste liée et n'est pas restaurée.
      *
-     * @param array{appliances_created: int} $report
+     * @param Report $report
      */
     private function ensureAppliance(
         Connection $connection,
@@ -270,7 +272,7 @@ final class Importer
     /**
      * @param array{node_uid: string, hostname: string, role: string, availability: string, state: string,
      *     engine_version: string, address: string} $node
-     * @param array{linked_nodes: int} $report
+     * @param Report $report
      */
     private function upsertNode(Connection $connection, int $endpointId, array $node, array &$report): int
     {
@@ -457,7 +459,7 @@ final class Importer
     }
 
     /**
-     * @param array<string, mixed> $report
+     * @param Report $report
      */
     private function saveReport(Connection $connection, array $report): void
     {

@@ -1,0 +1,19 @@
+# Contrôles de sécurité communs à tous les plugins GLPI (parime/glpi-plugin-security) : règles
+# Semgrep, onglets sans droit, droits attribuables, traductions, archive, restes après désinstallation.
+name: Sécurité commune
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security:
+    uses: parime/glpi-plugin-security/.github/workflows/plugin-security.yml@v1.6.0
+    with:
+      plugin-key: dockerinventory
+      seed-command: php plugins/dockerinventory/tests/security/setup.php

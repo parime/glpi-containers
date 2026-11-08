@@ -1,0 +1,12 @@
+# Analyse contre les sources de GLPI 12 (job GLPI 12 de la CI) : appels à des méthodes du cœur
+# supprimées en GLPI 12. Seules les branches GLPI 11 de la couche de compatibilité sont ignorées.
+includes:
+    - phpstan.neon
+
+parameters:
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - identifier: booleanAnd.rightAlwaysTrue
+          path: src/Compat/GlpiVersion.php
+        - message: '#Toolbox::getGuzzleClient\(\)#'
+          path: src/Compat/Http.php

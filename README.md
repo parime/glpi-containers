@@ -51,10 +51,41 @@ Pas encore de version publiée. Pour un essai depuis les sources :
 ```sh
 cd /var/www/glpi/plugins
 git clone https://github.com/parime/glpi-docker-inventory.git dockerinventory
-cd dockerinventory && composer install --no-dev
 ```
 
 Puis **Configuration > Plugins**, installer et activer « Inventaire Docker ».
+
+## Utilisation (lot 1 : Portainer)
+
+1. **Dans Portainer**, créer un utilisateur dédié aux droits minimaux (lecture seule sur les
+   environnements à inventorier) et un jeton d'accès pour lui (*My account > Access tokens*).
+2. **Dans GLPI**, *Configuration > Connexions Portainer* (ou le nom du plugin dans *Configuration >
+   Plugins*) : ajouter une connexion avec l'adresse de Portainer (`https://portainer.exemple.test:9443`)
+   et la clé. Choisir l'environnement (Production, Préproduction...) à donner aux applications que
+   l'import créera. « Tester la connexion », puis « Importer maintenant ».
+3. L'import tourne ensuite **toutes les heures** (*Configuration > Actions automatiques*,
+   `portainerimport`).
+
+Ce qui apparaît :
+
+- *Parc > Services de conteneurs* : tous les services, avec image, tag, empreinte, réplicas, état ;
+- sur chaque **Application** créée pour une stack, l'onglet « Services » ;
+- sur chaque **ordinateur** dont le nom correspond à un nœud du Swarm, l'onglet « Services du nœud ».
+
+Ce que le plugin écrit **hors de ses propres tables** : uniquement la création, une fois, de
+l'Application d'une stack quand aucune application de ce nom n'existe dans l'entité de la
+connexion. Une application existante, un ordinateur ou un environnement ne sont jamais modifiés ni
+créés. Le droit de lecture des services se donne dans *Administration > Profils*, onglet
+« Conteneurs » ; les connexions sont réservées au droit *Configuration* en modification.
+
+**Portainer sur un réseau privé (GLPI 12).** GLPI 12 refuse par défaut les appels vers une adresse
+privée. Pour les autoriser pour Portainer seulement, ajouter dans `config/local_define.php` :
+
+```php
+define('GLPI_SERVERSIDE_URL_ALLOWED_PRIVATE_NETWORKS_CONTEXTS', [
+    \GlpiPlugin\Dockerinventory\Portainer\PortainerContext::class,
+]);
+```
 
 ## Liens avec les autres plugins
 

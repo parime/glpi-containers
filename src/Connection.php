@@ -21,11 +21,11 @@ namespace GlpiPlugin\Dockerinventory;
 
 use CronTask;
 use Glpi\Application\View\TemplateRenderer;
+use GLPIKey;
 use GlpiPlugin\Dockerinventory\Compat\Base\ConnectionBase;
 use GlpiPlugin\Dockerinventory\Portainer\PortainerClient;
 use GlpiPlugin\Dockerinventory\Portainer\PortainerException;
 use GlpiPlugin\Dockerinventory\Portainer\UrlPolicy;
-use GLPIKey;
 use Session;
 
 /**

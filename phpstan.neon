@@ -1,0 +1,31 @@
+# Analyse contre le vrai cœur GLPI (.phpstan-bootstrap.php charge /var/www/glpi/vendor/autoload.php) :
+# lancée par la CI officielle GLPI (GLPI 11) et par le job GLPI 12 (phpstan.glpi12.neon).
+parameters:
+    level: 6
+    tmpDir: .phpstan.cache
+    bootstrapFiles:
+        - .phpstan-bootstrap.php
+    paths:
+        - src
+        - front
+        - hook.php
+        - setup.php
+        - tests
+    excludePaths:
+        analyseAndScan:
+            - vendor/*
+        # Classes parentes de compatibilité : leur branche GLPI 12 (propriétés typées) n'est jamais
+        # déclarée face au cœur GLPI 11 qui sert à l'analyse. Toujours scannées, plus analysées.
+        analyse:
+            - src/Compat/Base/*
+    ignoreErrors:
+        -
+            # GLPI_VERSION est figée à la version du cœur qui sert à l'analyse : la branche de
+            # l'autre version paraît impossible.
+            identifier: booleanAnd.rightAlwaysFalse
+            path: src/Compat/GlpiVersion.php
+            reportUnmatched: false
+        -
+            identifier: if.alwaysFalse
+            path: setup.php
+            reportUnmatched: false

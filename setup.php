@@ -60,6 +60,9 @@ function plugin_init_dockerinventory(): void
     $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['dockerinventory'] = 'front/connection.php';
 }
 
+/**
+ * @return array<string, mixed>
+ */
 function plugin_version_dockerinventory(): array
 {
     return [
@@ -90,7 +93,7 @@ function plugin_dockerinventory_check_prerequisites(): bool
     return true;
 }
 
-function plugin_dockerinventory_check_config($verbose = false): bool
+function plugin_dockerinventory_check_config(bool $verbose = false): bool
 {
     return true;
 }

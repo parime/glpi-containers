@@ -71,6 +71,9 @@ class Service extends ServiceBase
         return false;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getRights($interface = 'central')
     {
         return [READ => __('Read')];

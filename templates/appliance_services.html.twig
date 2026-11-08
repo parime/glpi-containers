@@ -1,0 +1,40 @@
+{#
+ # -------------------------------------------------------------------------
+ # Containers plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-containers
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Onglet « Services » d'une application : services Docker Swarm de la stack correspondante. #}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="ti ti-brand-docker me-2" aria-hidden="true"></i>
+            {{ __('Services Docker Swarm de cette stack', 'containers') }}
+        </h3>
+    </div>
+    {% if services is empty %}
+        <div class="card-body">
+            <p class="text-muted mb-0">
+                {{ __('Aucun service importé pour cette application.', 'containers') }}
+                {{ __("Elle n'est peut-être liée à aucune stack Portainer.", 'containers') }}
+            </p>
+        </div>
+    {% else %}
+        <div class="table-responsive">
+            {{ include('@containers/_service_rows.html.twig', {services: services}) }}
+        </div>
+        <div class="card-footer text-muted small">
+            {{ __('Données importées de Portainer en lecture seule.', 'containers') }}
+            {{ __('Un service disparu est marqué « Retiré », jamais supprimé.', 'containers') }}
+        </div>
+    {% endif %}
+</div>

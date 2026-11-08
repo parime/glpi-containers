@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * -------------------------------------------------------------------------
+ * Containers plugin for GLPI
+ * Copyright (C) 2026 Vincent GUILLOTTE
+ * https://github.com/parime/glpi-containers
+ * -------------------------------------------------------------------------
+ * LICENSE
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version. See LICENSE for the full text.
+ * -------------------------------------------------------------------------
+ */
+
+namespace GlpiPlugin\Containers\Portainer;
+
+/**
+ * Contexte des appels sortants vers Portainer. GLPI 12 refuse par défaut les appels vers un réseau
+ * privé ; un administrateur dont Portainer est sur le réseau interne ajoute cette classe à la
+ * constante GLPI_SERVERSIDE_URL_ALLOWED_PRIVATE_NETWORKS_CONTEXTS (config/local_define.php), sans
+ * ouvrir les réseaux privés aux autres appels de GLPI :
+ *
+ *     define('GLPI_SERVERSIDE_URL_ALLOWED_PRIVATE_NETWORKS_CONTEXTS', [
+ *         \GlpiPlugin\Containers\Portainer\PortainerContext::class,
+ *     ]);
+ */
+class PortainerContext extends \CommonGLPI
+{
+    public static function getTypeName($nb = 0)
+    {
+        return 'Portainer';
+    }
+}

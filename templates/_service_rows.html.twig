@@ -1,0 +1,73 @@
+{#
+ # -------------------------------------------------------------------------
+ # Containers plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-containers
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Tableau de services (onglet des applications et des ordinateurs). `show_tasks` : colonne des
+   tâches en cours sur le nœud affiché. #}
+{% set latest_title = __('Tag mobile : la version réelle est donnée par l’empreinte.', 'containers') %}
+<table class="table table-hover table-sm card-table">
+    <thead>
+        <tr>
+            <th>{{ __('Service', 'containers') }}</th>
+            <th>{{ __('Image', 'containers') }}</th>
+            <th>{{ __('Tag', 'containers') }}</th>
+            <th>{{ __('Empreinte (digest)', 'containers') }}</th>
+            <th>{{ __('Réplicas', 'containers') }}</th>
+            {% if show_tasks|default(false) %}
+                <th>{{ __('Tâches sur ce nœud', 'containers') }}</th>
+            {% endif %}
+            <th>{{ __('Ports publiés', 'containers') }}</th>
+            <th>{{ __('Statut', 'containers') }}</th>
+            <th>{{ __('Vu la dernière fois', 'containers') }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for service in services %}
+            <tr class="{{ service.is_retired ? 'text-muted' : '' }}">
+                <td>
+                    <a href="{{ service.url }}"><i class="ti ti-brand-docker me-1"></i>{{ service.name }}</a>
+                    {% if service.stack_name %}
+                        <div class="small text-muted">{{ __('Stack', 'containers') }} : {{ service.stack_name }}</div>
+                    {% endif %}
+                </td>
+                <td>{{ service.image }}</td>
+                <td>
+                    {% if service.tag == 'latest' %}
+                        <span class="badge bg-warning text-white" title="{{ latest_title }}">latest</span>
+                    {% else %}
+                        <span class="badge bg-blue-lt">{{ service.tag ?: '-' }}</span>
+                    {% endif %}
+                </td>
+                <td><code title="{{ service.digest }}">{{ service.digest_short ?: '-' }}</code></td>
+                <td>
+                    <span class="badge {{ service.replicas_ok ? 'bg-success' : 'bg-warning' }} text-white">
+                        {{ service.replicas }}
+                    </span>
+                </td>
+                {% if show_tasks|default(false) %}
+                    <td>{{ service.running_tasks }}</td>
+                {% endif %}
+                <td>
+                    {% for port in service.ports %}
+                        <span class="badge bg-secondary-lt me-1">{{ port }}</span>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endfor %}
+                </td>
+                <td>{{ include('@containers/_status_badge.html.twig', {retired: service.is_retired}) }}</td>
+                <td>{{ service.last_seen|formatted_datetime }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

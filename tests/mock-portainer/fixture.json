@@ -1,0 +1,130 @@
+{
+  "endpoints": [
+    {"Id": 1, "Name": "swarm-production", "Type": 2, "Status": 1, "URL": "tcp://swarm-node-01.exemple.test:9001"},
+    {"Id": 2, "Name": "docker-recette", "Type": 1, "Status": 1, "URL": "unix:///var/run/docker.sock"},
+    {"Id": 3, "Name": "k8s-labo", "Type": 5, "Status": 1, "URL": "https://kubernetes.default.svc"}
+  ],
+  "stacks": [
+    {"Id": 11, "Name": "boutique", "Type": 1, "EndpointId": 1, "SwarmId": "swarm-exemple-0001", "Status": 1},
+    {"Id": 12, "Name": "supervision", "Type": 1, "EndpointId": 1, "SwarmId": "swarm-exemple-0001", "Status": 1},
+    {"Id": 13, "Name": "outils-recette", "Type": 2, "EndpointId": 2, "Status": 1}
+  ],
+  "docker": {
+    "1": {
+      "swarm": true,
+      "networks": [
+        {"Id": "net-ingress-0001", "Name": "ingress"},
+        {"Id": "net-front-0001", "Name": "boutique_front"},
+        {"Id": "net-back-0001", "Name": "boutique_back"},
+        {"Id": "net-supervision-0001", "Name": "supervision_default"}
+      ],
+      "nodes": [
+        {
+          "ID": "node-0001",
+          "Description": {"Hostname": "swarm-node-01.exemple.test", "Engine": {"EngineVersion": "27.3.1"}},
+          "Spec": {"Role": "manager", "Availability": "active"},
+          "Status": {"State": "ready", "Addr": "192.0.2.11"},
+          "ManagerStatus": {"Leader": true, "Reachability": "reachable"}
+        },
+        {
+          "ID": "node-0002",
+          "Description": {"Hostname": "swarm-node-02.exemple.test", "Engine": {"EngineVersion": "27.3.1"}},
+          "Spec": {"Role": "worker", "Availability": "active"},
+          "Status": {"State": "ready", "Addr": "192.0.2.12"}
+        },
+        {
+          "ID": "node-0003",
+          "Description": {"Hostname": "swarm-node-03.exemple.test", "Engine": {"EngineVersion": "27.2.0"}},
+          "Spec": {"Role": "worker", "Availability": "drain"},
+          "Status": {"State": "ready", "Addr": "192.0.2.13"}
+        }
+      ],
+      "services": [
+        {
+          "ID": "svc-boutique-web",
+          "Spec": {
+            "Name": "boutique_web",
+            "Labels": {"com.docker.stack.namespace": "boutique"},
+            "Mode": {"Replicated": {"Replicas": 3}},
+            "TaskTemplate": {
+              "ContainerSpec": {
+                "Image": "boutique/web:2.4.1@sha256:1f1e1d1c1b1a19181716151413121110f1e1d1c1b1a191817161514131211100",
+                "Secrets": [
+                  {"SecretID": "sec-0001", "SecretName": "boutique_tls_cert", "File": {"Name": "tls.crt"}},
+                  {"SecretID": "sec-0002", "SecretName": "boutique_db_password", "File": {"Name": "db_password"}}
+                ]
+              },
+              "Networks": [{"Target": "net-front-0001"}]
+            }
+          },
+          "Endpoint": {
+            "Ports": [{"Protocol": "tcp", "TargetPort": 8443, "PublishedPort": 443, "PublishMode": "ingress"}]
+          }
+        },
+        {
+          "ID": "svc-boutique-api",
+          "Spec": {
+            "Name": "boutique_api",
+            "Labels": {"com.docker.stack.namespace": "boutique"},
+            "Mode": {"Replicated": {"Replicas": 2}},
+            "TaskTemplate": {
+              "ContainerSpec": {
+                "Image": "registry.exemple.test:5000/boutique/api:1.9.0",
+                "Secrets": [{"SecretID": "sec-0002", "SecretName": "boutique_db_password"}]
+              },
+              "Networks": [{"Target": "net-front-0001"}, {"Target": "net-back-0001"}]
+            }
+          }
+        },
+        {
+          "ID": "svc-boutique-db",
+          "Spec": {
+            "Name": "boutique_db",
+            "Labels": {"com.docker.stack.namespace": "boutique"},
+            "Mode": {"Replicated": {"Replicas": 1}},
+            "TaskTemplate": {
+              "ContainerSpec": {
+                "Image": "postgres:16.4",
+                "Secrets": [{"SecretID": "sec-0002", "SecretName": "boutique_db_password"}]
+              },
+              "Networks": [{"Target": "net-back-0001"}]
+            }
+          }
+        },
+        {
+          "ID": "svc-supervision-agent",
+          "Spec": {
+            "Name": "supervision_agent",
+            "Labels": {"com.docker.stack.namespace": "supervision"},
+            "Mode": {"Global": {}},
+            "TaskTemplate": {
+              "ContainerSpec": {"Image": "grafana/alloy:latest"},
+              "Networks": [{"Target": "net-supervision-0001"}]
+            }
+          }
+        },
+        {
+          "ID": "svc-outil-isole",
+          "Spec": {
+            "Name": "outil_isole",
+            "Mode": {"Replicated": {"Replicas": 1}},
+            "TaskTemplate": {"ContainerSpec": {"Image": "nginx"}}
+          },
+          "Endpoint": {"Ports": [{"Protocol": "tcp", "TargetPort": 80, "PublishedPort": 8080, "PublishMode": "host"}]}
+        }
+      ],
+      "tasks": [
+        {"ID": "t01", "ServiceID": "svc-boutique-web", "NodeID": "node-0001", "Status": {"State": "running"}},
+        {"ID": "t02", "ServiceID": "svc-boutique-web", "NodeID": "node-0002", "Status": {"State": "running"}},
+        {"ID": "t03", "ServiceID": "svc-boutique-web", "NodeID": "node-0002", "Status": {"State": "running"}},
+        {"ID": "t04", "ServiceID": "svc-boutique-api", "NodeID": "node-0001", "Status": {"State": "running"}},
+        {"ID": "t05", "ServiceID": "svc-boutique-api", "NodeID": "node-0002", "Status": {"State": "starting"}},
+        {"ID": "t06", "ServiceID": "svc-boutique-db", "NodeID": "node-0001", "Status": {"State": "running"}},
+        {"ID": "t07", "ServiceID": "svc-supervision-agent", "NodeID": "node-0001", "Status": {"State": "running"}},
+        {"ID": "t08", "ServiceID": "svc-supervision-agent", "NodeID": "node-0002", "Status": {"State": "running"}},
+        {"ID": "t09", "ServiceID": "svc-outil-isole", "NodeID": "node-0002", "Status": {"State": "running"}}
+      ]
+    },
+    "2": {"swarm": false}
+  }
+}

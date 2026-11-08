@@ -1,0 +1,286 @@
+<?php
+
+/**
+ * -------------------------------------------------------------------------
+ * Containers plugin for GLPI
+ * Copyright (C) 2026 Vincent GUILLOTTE
+ * https://github.com/parime/glpi-containers
+ * -------------------------------------------------------------------------
+ * LICENSE
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version. See LICENSE for the full text.
+ * -------------------------------------------------------------------------
+ */
+
+declare(strict_types=1);
+
+namespace GlpiPlugin\Containers;
+
+use Appliance;
+use CommonGLPI;
+use DbUtils;
+use Glpi\Application\View\TemplateRenderer;
+use GlpiPlugin\Containers\Compat\Base\ServiceBase;
+use Session;
+
+/**
+ * Service Docker Swarm importé depuis Portainer. Lecture seule : seul l'import écrit ces fiches,
+ * et ne les supprime jamais (un service disparu est marqué « retiré »).
+ */
+class Service extends ServiceBase
+{
+    public const RIGHTNAME = 'plugin_containers_service';
+
+    public static function getTypeName($nb = 0)
+    {
+        return $nb > 1 ? __('Services de conteneurs', 'containers') : __('Service de conteneur', 'containers');
+    }
+
+    public static function getIcon()
+    {
+        return 'ti ti-brand-docker';
+    }
+
+    public static function canView(): bool
+    {
+        return (bool) Session::haveRight(self::RIGHTNAME, READ);
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canUpdate(): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(): bool
+    {
+        return false;
+    }
+
+    public static function canPurge(): bool
+    {
+        return false;
+    }
+
+    public function getRights($interface = 'central')
+    {
+        return [READ => __('Read')];
+    }
+
+    public function defineTabs($options = [])
+    {
+        $tabs = [];
+        $this->addDefaultFormTab($tabs);
+
+        return $tabs;
+    }
+
+    public function rawSearchOptions()
+    {
+        $table = static::getTable();
+        $own = [
+            2  => ['id', __('ID'), 'number'],
+            3  => ['image', __('Image', 'containers'), 'string'],
+            4  => ['tag', __('Tag', 'containers'), 'string'],
+            5  => ['digest', __('Empreinte (digest)', 'containers'), 'string'],
+            6  => ['replicas', __('Réplicas voulus', 'containers'), 'number'],
+            7  => ['running_replicas', __('Réplicas en cours', 'containers'), 'number'],
+            9  => ['stack_name', __('Stack', 'containers'), 'string'],
+            10 => ['is_retired', __('Retiré', 'containers'), 'bool'],
+            11 => ['last_seen', __('Vu la dernière fois', 'containers'), 'datetime'],
+            12 => ['endpoint_name', __('Environnement Portainer', 'containers'), 'string'],
+            14 => ['ports', __('Ports publiés', 'containers'), 'text'],
+            15 => ['networks', __('Réseaux', 'containers'), 'text'],
+            16 => ['secrets', __('Secrets (noms)', 'containers'), 'text'],
+            17 => ['date_retired', __('Retiré le', 'containers'), 'datetime'],
+        ];
+        $options = parent::rawSearchOptions();
+        foreach ($own as $id => [$field, $name, $datatype]) {
+            $options[] = [
+                'id'            => $id,
+                'table'         => $table,
+                'field'         => $field,
+                'name'          => $name,
+                'datatype'      => $datatype,
+                'massiveaction' => false,
+            ];
+        }
+        $options[] = [
+            'id'            => 8,
+            'table'         => Appliance::getTable(),
+            'field'         => 'name',
+            'linkfield'     => 'appliances_id',
+            'name'          => Appliance::getTypeName(1),
+            'datatype'      => 'dropdown',
+            'massiveaction' => false,
+        ];
+        $options[] = [
+            'id'            => 13,
+            'table'         => Connection::getTable(),
+            'field'         => 'name',
+            'linkfield'     => 'plugin_containers_connections_id',
+            'name'          => Connection::getTypeName(1),
+            'datatype'      => 'itemlink',
+            'massiveaction' => false,
+        ];
+        $options[] = [
+            'id'            => 80,
+            'table'         => 'glpi_entities',
+            'field'         => 'completename',
+            'name'          => \Entity::getTypeName(1),
+            'datatype'      => 'dropdown',
+            'massiveaction' => false,
+        ];
+
+        return $options;
+    }
+
+    public function showForm($ID, array $options = [])
+    {
+        $this->initForm($ID, $options);
+        TemplateRenderer::getInstance()->display('@containers/service_form.html.twig', [
+            'item'      => $this,
+            'params'    => ['canedit' => false] + $options,
+            'service'   => self::present($this->fields),
+            'appliance' => self::applianceLink((int) $this->fields['appliances_id']),
+            'nodes'     => $this->getNodes(),
+        ]);
+
+        return true;
+    }
+
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        if (!$item instanceof Appliance || $item->isNewItem() || !self::canView()) {
+            return '';
+        }
+        $count = 0;
+        if ($_SESSION['glpishow_count_on_tabs'] ?? false) {
+            $count = countElementsInTable(static::getTable(), self::criteriaForAppliance((int) $item->getID()));
+        }
+
+        return self::createTabEntry(__('Services', 'containers'), $count, static::class, self::getIcon());
+    }
+
+    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
+        // ajax/common.tabs.php sert le contenu sans passer par getTabNameForItem().
+        if (!$item instanceof Appliance || !self::canView() || !$item->can($item->getID(), READ)) {
+            return false;
+        }
+        global $DB;
+
+        $services = [];
+        $iterator = $DB->request([
+            'FROM'  => static::getTable(),
+            'WHERE' => self::criteriaForAppliance((int) $item->getID()),
+            'ORDER' => ['is_retired', 'name'],
+        ]);
+        foreach ($iterator as $row) {
+            $services[] = self::present($row);
+        }
+        TemplateRenderer::getInstance()->display('@containers/appliance_services.html.twig', [
+            'services' => $services,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * @return array<int|string, mixed>
+     */
+    private static function criteriaForAppliance(int $applianceId): array
+    {
+        return ['appliances_id' => $applianceId]
+            + (new DbUtils())->getEntitiesRestrictCriteria(static::getTable(), '', '', true);
+    }
+
+    /**
+     * Valeurs prêtes à afficher (échappées par Twig).
+     *
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    public static function present(array $row): array
+    {
+        $digest = (string) ($row['digest'] ?? '');
+        $replicas = $row['replicas'] ?? null;
+        $running = (int) ($row['running_replicas'] ?? 0);
+
+        return [
+            'id'           => (int) ($row['id'] ?? 0),
+            'url'          => self::getFormURLWithID((int) ($row['id'] ?? 0)),
+            'name'         => (string) ($row['name'] ?? ''),
+            'stack_name'   => (string) ($row['stack_name'] ?? ''),
+            'image'        => (string) ($row['image'] ?? ''),
+            'tag'          => (string) ($row['tag'] ?? ''),
+            'digest'       => $digest,
+            'digest_short' => strlen($digest) > 19 ? substr($digest, 0, 19) . '...' : $digest,
+            'mode'         => (string) ($row['mode'] ?? ''),
+            'replicas'     => $replicas === null ? sprintf(__('%d (global)', 'containers'), $running)
+                : sprintf('%d / %d', $running, (int) $replicas),
+            'replicas_ok'  => $replicas === null ? $running > 0 : $running >= (int) $replicas,
+            'ports'        => self::split((string) ($row['ports'] ?? '')),
+            'networks'     => self::split((string) ($row['networks'] ?? '')),
+            'secrets'      => self::split((string) ($row['secrets'] ?? '')),
+            'endpoint'     => (string) ($row['endpoint_name'] ?? ''),
+            'is_retired'   => (bool) ($row['is_retired'] ?? false),
+            'date_retired' => (string) ($row['date_retired'] ?? ''),
+            'last_seen'    => (string) ($row['last_seen'] ?? ''),
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function split(string $value): array
+    {
+        return $value === '' ? [] : explode(', ', $value);
+    }
+
+    /**
+     * @return array{name: string, url: string}|null Null si absente ou non visible.
+     */
+    private static function applianceLink(int $applianceId): ?array
+    {
+        $appliance = new Appliance();
+        if ($applianceId <= 0 || !$appliance->can($applianceId, READ)) {
+            return null;
+        }
+
+        return ['name' => (string) $appliance->fields['name'], 'url' => Appliance::getFormURLWithID($applianceId)];
+    }
+
+    /**
+     * Nœuds où tournent les tâches du service, avec l'ordinateur rattaché quand il est visible.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function getNodes(): array
+    {
+        global $DB;
+
+        $nodes = [];
+        $iterator = $DB->request([
+            'SELECT'     => ['n.*', 'sn.running_tasks'],
+            'FROM'       => 'glpi_plugin_containers_services_nodes AS sn',
+            'INNER JOIN' => [
+                Node::getTable() . ' AS n' => ['ON' => ['sn' => 'plugin_containers_nodes_id', 'n' => 'id']],
+            ],
+            'WHERE'      => ['sn.plugin_containers_services_id' => (int) $this->getID()],
+            'ORDER'      => 'n.hostname',
+        ]);
+        foreach ($iterator as $row) {
+            $nodes[] = Node::present($row);
+        }
+
+        return $nodes;
+    }
+}

@@ -1,0 +1,60 @@
+{#
+ # -------------------------------------------------------------------------
+ # Containers plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-containers
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Onglet « Services du nœud » d'un ordinateur : nœud(s) Swarm rattachés et leurs services. #}
+{% if nodes is empty %}
+    <div class="alert alert-info">
+        <i class="ti ti-info-circle me-2" aria-hidden="true"></i>
+        {{ __("Cet ordinateur n'est rattaché à aucun nœud Docker Swarm.", 'containers') }}
+        {{ __("Le rattachement se fait à l'import Portainer, par nom d'hôte.", 'containers') }}
+    </div>
+{% endif %}
+{% for node in nodes %}
+    <div class="card mb-3">
+        <div class="card-header d-flex flex-wrap align-items-center gap-2">
+            <h3 class="card-title mb-0">
+                <i class="ti ti-server me-2" aria-hidden="true"></i>{{ node.hostname }}
+            </h3>
+            <span class="badge {{ node.role == 'manager' ? 'bg-purple' : 'bg-blue' }} text-white">{{ node.role }}</span>
+            {% set state_class = node.state == 'ready' ? 'bg-success' : 'bg-danger' %}
+            <span class="badge {{ state_class }} text-white">{{ node.state }}</span>
+            {% if node.availability and node.availability != 'active' %}
+                <span class="badge bg-warning text-white">{{ node.availability }}</span>
+            {% endif %}
+            {% if node.is_retired %}
+                <span class="badge bg-secondary text-white">{{ __('Retiré', 'containers') }}</span>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">{{ __('Version de Docker', 'containers') }}</dt>
+                <dd class="col-sm-9">{{ node.engine_version ?: '-' }}</dd>
+                <dt class="col-sm-3">{{ __('Adresse', 'containers') }}</dt>
+                <dd class="col-sm-9">{{ node.address ?: '-' }}</dd>
+                <dt class="col-sm-3">{{ __('Vu la dernière fois', 'containers') }}</dt>
+                <dd class="col-sm-9">{{ node.last_seen|formatted_datetime }}</dd>
+            </dl>
+        </div>
+        {% if node.services is empty %}
+            <div class="card-body pt-0 text-muted">
+                {{ __('Aucune tâche de service en cours sur ce nœud.', 'containers') }}
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                {{ include('@containers/_service_rows.html.twig', {services: node.services, show_tasks: true}) }}
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}

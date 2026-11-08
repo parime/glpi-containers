@@ -1,0 +1,96 @@
+<?php
+
+/**
+ * -------------------------------------------------------------------------
+ * Containers plugin for GLPI
+ * Copyright (C) 2026 Vincent GUILLOTTE
+ * https://github.com/parime/glpi-containers
+ * -------------------------------------------------------------------------
+ * LICENSE
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version. See LICENSE for the full text.
+ * -------------------------------------------------------------------------
+ */
+
+use Glpi\Plugin\Hooks;
+use GlpiPlugin\Containers\Connection;
+use GlpiPlugin\Containers\Node;
+use GlpiPlugin\Containers\Profile;
+use GlpiPlugin\Containers\Service;
+
+define('PLUGIN_CONTAINERS_VERSION', '0.1.0');
+define('PLUGIN_CONTAINERS_MIN_GLPI', '11.0.0');
+// GLPI 11 et 12 depuis un seul code source (voir src/Compat/).
+define('PLUGIN_CONTAINERS_MAX_GLPI', '12.99.99');
+define('PLUGIN_CONTAINERS_MIN_PHP', '8.2.0');
+
+function plugin_init_containers(): void
+{
+    global $PLUGIN_HOOKS;
+
+    // Clé littérale : GLPI 12 a supprimé la constante Hooks::CSRF_COMPLIANT (la clé reste la même).
+    $PLUGIN_HOOKS['csrf_compliant']['containers'] = true;
+
+    // Version majeure de GLPI non vérifiée : rien n'est déclaré (les classes pourraient ne pas
+    // se charger). Comparaison de version et non isPluginActive() : cette fonction sert aussi
+    // pendant l'installation, avant l'activation.
+    if (version_compare(GLPI_VERSION, PLUGIN_CONTAINERS_MAX_GLPI, '>')) {
+        return;
+    }
+
+    // Clé d'API Portainer chiffrée avec la clé de GLPI : rechiffrée par « glpi:security:change_key ».
+    $PLUGIN_HOOKS[Hooks::SECURED_FIELDS]['containers'] = ['glpi_plugin_containers_connections.api_key'];
+
+    // Onglet « Services » sur les applications, « Services du nœud » sur les ordinateurs, droits
+    // du plugin sur les profils.
+    Plugin::registerClass(Service::class, ['addtabon' => ['Appliance']]);
+    Plugin::registerClass(Node::class, ['addtabon' => ['Computer']]);
+    Plugin::registerClass(Profile::class, ['addtabon' => ['Profile']]);
+    Plugin::registerClass(Connection::class);
+
+    // Liste des services dans Parc ; connexions Portainer dans Configuration (et depuis le nom du
+    // plugin dans Configuration > Plugins).
+    $PLUGIN_HOOKS[Hooks::MENU_TOADD]['containers'] = [
+        'assets' => [Service::class],
+        'config' => [Connection::class],
+    ];
+    $PLUGIN_HOOKS[Hooks::CONFIG_PAGE]['containers'] = 'front/connection.php';
+}
+
+function plugin_version_containers(): array
+{
+    return [
+        'name'         => 'Containers',
+        'version'      => PLUGIN_CONTAINERS_VERSION,
+        'author'       => 'Vincent GUILLOTTE',
+        'license'      => 'GPL-3.0-or-later',
+        'homepage'     => 'https://github.com/parime/glpi-containers',
+        'requirements' => [
+            'glpi' => [
+                'min' => PLUGIN_CONTAINERS_MIN_GLPI,
+                'max' => PLUGIN_CONTAINERS_MAX_GLPI,
+            ],
+            'php'  => [
+                'min' => PLUGIN_CONTAINERS_MIN_PHP,
+            ],
+        ],
+    ];
+}
+
+function plugin_containers_check_prerequisites(): bool
+{
+    if (version_compare(PHP_VERSION, PLUGIN_CONTAINERS_MIN_PHP, '<')) {
+        echo sprintf('PHP %s or later is required.', PLUGIN_CONTAINERS_MIN_PHP);
+        return false;
+    }
+
+    return true;
+}
+
+function plugin_containers_check_config($verbose = false): bool
+{
+    return true;
+}

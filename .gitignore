@@ -1,0 +1,10 @@
+/vendor/
+/.phpstan.cache/
+/.phpunit-cache/
+/.php-cs-fixer.cache
+/.phpcs-cache
+/coverage/
+*.log
+.idea/
+.vscode/
+__pycache__/

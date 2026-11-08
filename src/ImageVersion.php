@@ -106,7 +106,9 @@ class ImageVersion extends CommonDBTM
 
     public static function getOverviewURL(bool $full = true): string
     {
-        return \Plugin::getWebDir('dockerinventory', $full) . '/front/version.php';
+        global $CFG_GLPI;
+
+        return ($full ? (string) $CFG_GLPI['root_doc'] : '') . '/plugins/dockerinventory/front/version.php';
     }
 
     /**

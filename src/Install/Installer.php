@@ -61,8 +61,10 @@ final class Installer
         $this->migrate($migration);
 
         $firstInstall = countElementsInTable('glpi_profilerights', ['name' => Service::RIGHTNAME]) === 0;
-        ProfileRight::addProfileRights([Service::RIGHTNAME]);
         if ($firstInstall) {
+            // Une seule fois : addProfileRights() insère sans vérifier, et la mise à jour d'une
+            // version à l'autre repasse par install() (doublon refusé par la clé unique).
+            ProfileRight::addProfileRights([Service::RIGHTNAME]);
             $this->grantReadToAdministrators();
             $this->installDisplayPreferences(Service::class, self::DEFAULT_COLUMNS);
         }

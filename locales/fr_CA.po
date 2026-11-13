@@ -15,7 +15,7 @@ msgstr ""
 msgid "Tag mobile : la version réelle est donnée par l’empreinte."
 msgstr "Tag mobile : la version réelle est donnée par l’empreinte."
 
-#: templates/_service_rows.html.twig templates/_version_rows.html.twig
+#: templates/_service_rows.html.twig templates/_version_rows.html.twig templates/ticket_content.html.twig
 msgid "Service"
 msgstr "Service"
 
@@ -47,7 +47,7 @@ msgstr "Statut"
 msgid "Vu la dernière fois"
 msgstr "Vu la dernière fois"
 
-#: templates/_service_rows.html.twig templates/_version_rows.html.twig src/ImageVersion.php src/Service.php
+#: templates/_service_rows.html.twig templates/_version_rows.html.twig templates/ticket_content.html.twig src/ImageVersion.php src/Service.php
 msgid "Stack"
 msgstr "Stack"
 
@@ -75,19 +75,19 @@ msgstr "Pourquoi sans service"
 msgid "Application et environnement"
 msgstr "Application et environnement"
 
-#: templates/_version_rows.html.twig templates/service_form.html.twig templates/version_tab.html.twig src/ImageVersion.php src/Service.php
+#: templates/_version_rows.html.twig templates/service_form.html.twig templates/ticket_content.html.twig templates/version_tab.html.twig src/ImageVersion.php src/Service.php
 msgid "Image"
 msgstr "Image"
 
-#: templates/_version_rows.html.twig src/ImageVersion.php
+#: templates/_version_rows.html.twig templates/ticket_content.html.twig src/ImageVersion.php
 msgid "Version déployée"
 msgstr "Version déployée"
 
-#: templates/_version_rows.html.twig src/ImageVersion.php
+#: templates/_version_rows.html.twig templates/ticket_content.html.twig src/ImageVersion.php
 msgid "Dernière version"
 msgstr "Dernière version"
 
-#: templates/_version_rows.html.twig templates/versions.html.twig src/ImageVersion.php
+#: templates/_version_rows.html.twig templates/ticket_content.html.twig templates/versions.html.twig src/ImageVersion.php
 msgid "Écart"
 msgstr "Écart"
 
@@ -339,6 +339,54 @@ msgstr "Déconseillé : la clé d'API circule alors en clair."
 msgid "Environnement des applications créées"
 msgstr "Environnement des applications créées"
 
+#: templates/connection_form.html.twig src/Connection.php
+msgid "Tickets de mise à jour"
+msgstr "Tickets de mise à jour"
+
+#: templates/connection_form.html.twig
+msgid "Créer des tickets de mise à jour"
+msgstr "Créer des tickets de mise à jour"
+
+#: templates/connection_form.html.twig
+msgid "Désactivé par défaut. Un ticket par service, puis des suivis : jamais de doublon."
+msgstr "Désactivé par défaut. Un ticket par service, puis des suivis : jamais de doublon."
+
+#: templates/connection_form.html.twig
+msgid "Seuil"
+msgstr "Seuil"
+
+#: templates/connection_form.html.twig
+msgid "Écart minimal entre la version déployée et la dernière version."
+msgstr "Écart minimal entre la version déployée et la dernière version."
+
+#: templates/connection_form.html.twig
+msgid "Catégorie"
+msgstr "Catégorie"
+
+#: templates/connection_form.html.twig
+msgid "Groupe chargé du ticket"
+msgstr "Groupe chargé du ticket"
+
+#: templates/connection_form.html.twig
+msgid "Affecté à la création seulement ; jamais modifié ensuite."
+msgstr "Affecté à la création seulement ; jamais modifié ensuite."
+
+#: templates/connection_form.html.twig
+msgid "Modèle de ticket"
+msgstr "Modèle de ticket"
+
+#: templates/connection_form.html.twig
+msgid "Ses champs prédéfinis (type, urgence, demandeur...) servent de départ."
+msgstr "Ses champs prédéfinis (type, urgence, demandeur...) servent de départ."
+
+#: templates/connection_form.html.twig
+msgid "Vulnérabilité critique de l’image : avec Harbor, au lot 3."
+msgstr "Vulnérabilité critique de l’image : avec Harbor, au lot 3."
+
+#: templates/connection_form.html.twig
+msgid "Autre déclencheur"
+msgstr "Autre déclencheur"
+
 #: templates/connection_type_choice.html.twig
 msgid "Quelle source voulez-vous connecter ?"
 msgstr "Quelle source voulez-vous connecter ?"
@@ -475,6 +523,54 @@ msgstr "Tâches en cours"
 msgid "Non rattaché"
 msgstr "Non rattaché"
 
+#: templates/ticket_content.html.twig
+msgid "Une version plus récente de l’image de ce service est disponible."
+msgstr "Une version plus récente de l’image de ce service est disponible."
+
+#: templates/ticket_content.html.twig
+msgid "Application"
+msgstr "Application"
+
+#: templates/ticket_content.html.twig templates/version_tab.html.twig src/ImageVersion.php
+msgid "Source"
+msgstr "Source"
+
+#: templates/ticket_content.html.twig templates/ticket_followup.html.twig
+msgid "Voir le service dans GLPI"
+msgstr "Voir le service dans GLPI"
+
+#: templates/ticket_content.html.twig
+msgid "Ticket créé par Inventaire Docker, seuil choisi :"
+msgstr "Ticket créé par Inventaire Docker, seuil choisi :"
+
+#: templates/ticket_content.html.twig
+msgid "Un suivi sera ajouté si la situation change ; jamais de changement de statut, de priorité ni d’affectation."
+msgstr "Un suivi sera ajouté si la situation change ; jamais de changement de statut, de priorité ni d’affectation."
+
+#: templates/ticket_followup.html.twig
+msgid "Écart résolu"
+msgstr "Écart résolu"
+
+#: templates/ticket_followup.html.twig
+msgid "le service est à jour en version"
+msgstr "le service est à jour en version"
+
+#: templates/ticket_followup.html.twig
+msgid "Écart sous le seuil"
+msgstr "Écart sous le seuil"
+
+#: templates/ticket_followup.html.twig
+msgid "Nouvelle situation"
+msgstr "Nouvelle situation"
+
+#: templates/ticket_followup.html.twig
+msgid "Situation précédente"
+msgstr "Situation précédente"
+
+#: templates/ticket_followup.html.twig
+msgid "Suivi ajouté par Inventaire Docker : le statut du ticket n’est pas modifié."
+msgstr "Suivi ajouté par Inventaire Docker : le statut du ticket n’est pas modifié."
+
 #: templates/version_tab.html.twig templates/versions.html.twig
 msgid "Aucune version connue pour le moment."
 msgstr "Aucune version connue pour le moment."
@@ -498,6 +594,10 @@ msgstr "Les registres sont vérifiés toutes les heures pour les services sans W
 #: templates/version_tab.html.twig
 msgid "Aucune version connue pour les services de cette application."
 msgstr "Aucune version connue pour les services de cette application."
+
+#: templates/version_tab.html.twig
+msgid "Ticket de mise à jour"
+msgstr "Ticket de mise à jour"
 
 #: templates/version_tab.html.twig
 msgid "Version de l’image"
@@ -534,10 +634,6 @@ msgstr "Conteneurs WUD"
 #: templates/version_tab.html.twig src/ImageVersion.php
 msgid "Rattachement"
 msgstr "Rattachement"
-
-#: templates/version_tab.html.twig src/ImageVersion.php
-msgid "Source"
-msgstr "Source"
 
 #: templates/version_tab.html.twig
 msgid "Pourquoi non vérifié"
@@ -672,6 +768,18 @@ msgid "Connexion Docker"
 msgstr "Connexion Docker"
 
 #: src/Connection.php
+msgid "Version majeure seulement"
+msgstr "Version majeure seulement"
+
+#: src/Connection.php
+msgid "Version mineure ou majeure"
+msgstr "Version mineure ou majeure"
+
+#: src/Connection.php
+msgid "Tout écart de version, correctifs compris"
+msgstr "Tout écart de version, correctifs compris"
+
+#: src/Connection.php
 msgid "La clé d'API Portainer est obligatoire."
 msgstr "La clé d'API Portainer est obligatoire."
 
@@ -686,13 +794,18 @@ msgstr "Échec : %s"
 
 #: src/Connection.php
 #, php-format
-msgid "Lecture de WUD terminée (%1$s) : %2$d conteneurs, %3$d services suivis, %4$d sans service."
-msgstr "Lecture de WUD terminée (%1$s) : %2$d conteneurs, %3$d services suivis, %4$d sans service."
+msgid "Import terminé (%1$s) : %2$d stacks, %3$d services, %4$d retirés, %5$d nœuds."
+msgstr "Import terminé (%1$s) : %2$d stacks, %3$d services, %4$d retirés, %5$d nœuds."
 
 #: src/Connection.php
 #, php-format
-msgid "Import terminé (%1$s) : %2$d stacks, %3$d services, %4$d retirés, %5$d nœuds."
-msgstr "Import terminé (%1$s) : %2$d stacks, %3$d services, %4$d retirés, %5$d nœuds."
+msgid "Tickets de mise à jour : %1$d créé(s), %2$d suivi(s) ajouté(s)."
+msgstr "Tickets de mise à jour : %1$d créé(s), %2$d suivi(s) ajouté(s)."
+
+#: src/Connection.php
+#, php-format
+msgid "Lecture de WUD terminée (%1$s) : %2$d conteneurs, %3$d services suivis, %4$d sans service."
+msgstr "Lecture de WUD terminée (%1$s) : %2$d conteneurs, %3$d services suivis, %4$d sans service."
 
 #: src/Connection.php
 #, php-format
@@ -1009,3 +1122,13 @@ msgstr "Retiré le"
 #, php-format
 msgid "%d (global)"
 msgstr "%d (global)"
+
+#: src/Ticket/UpdateTickets.php
+#, php-format
+msgid "Mettre à jour le service %1$s : %2$s → %3$s"
+msgstr "Mettre à jour le service %1$s : %2$s → %3$s"
+
+#: src/Ticket/UpdateTickets.php
+#, php-format
+msgid "Mettre à jour le service %1$s de la stack %2$s : %3$s → %4$s"
+msgstr "Mettre à jour le service %1$s de la stack %2$s : %3$s → %4$s"

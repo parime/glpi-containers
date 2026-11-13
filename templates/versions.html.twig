@@ -23,7 +23,21 @@
             <h2 class="card-title mb-0">
                 <i class="ti ti-tags me-2" aria-hidden="true"></i>{{ __('Versions des images', 'dockerinventory') }}
             </h2>
-            <div class="ms-auto">
+            <div class="ms-auto d-flex flex-wrap gap-2">
+                {% if can_configure %}
+                    <form method="post" action="{{ connection_form_url }}" class="d-inline">
+                        <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+                        {% set check_help = __(
+                            'Docker Hub au plus une fois par jour et par image.',
+                            'dockerinventory'
+                        ) %}
+                        <button type="submit" name="registry_check" value="1" class="btn btn-outline-primary btn-sm"
+                                title="{{ check_help }}" data-bs-toggle="tooltip">
+                            <i class="ti ti-refresh me-1" aria-hidden="true"></i>
+                            {{ __('Vérifier les registres maintenant', 'dockerinventory') }}
+                        </button>
+                    </form>
+                {% endif %}
                 <a href="{{ search_url }}" class="btn btn-outline-secondary btn-sm">
                     <i class="ti ti-search me-1" aria-hidden="true"></i>
                     {{ __('Recherche avancée et export', 'dockerinventory') }}
@@ -36,18 +50,22 @@
                     'Pour chaque service : version déployée, dernière version disponible et écart.',
                     'dockerinventory'
                 ) }}
-                {{ __('Les données viennent de What’s Up Docker, lu sans rien y modifier.', 'dockerinventory') }}
+                {{ __(
+                'Source : What’s Up Docker, sinon le registre de l’image (Docker Hub, Harbor), sans rien y modifier.',
+                'dockerinventory'
+                ) }}
             </p>
-            {% if not has_wud %}
+            {% if not has_wud and not has_registry %}
                 <div class="alert alert-info mb-3">
                     <i class="ti ti-info-circle me-2" aria-hidden="true"></i>
+                    {{ __('Aucune version connue pour le moment.', 'dockerinventory') }}
                     {{ __(
-                        'Aucune connexion What’s Up Docker n’est déclarée : la version disponible est inconnue.',
+                        'Ajoutez une connexion WUD, ou lancez la vérification des registres (toutes les heures).',
                         'dockerinventory'
                     ) }}
                     {% if can_configure %}
                         <a href="{{ connection_url }}" class="ms-1">
-                        {{ __('Ajouter une connexion WUD', 'dockerinventory') }}</a>
+                        {{ __('Connexions Docker', 'dockerinventory') }}</a>
                     {% endif %}
                 </div>
             {% endif %}

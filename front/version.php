@@ -44,6 +44,8 @@ TemplateRenderer::getInstance()->display('@dockerinventory/versions.html.twig', 
     'page_url'       => ImageVersion::getOverviewURL(),
     'search_url'     => ImageVersion::getSearchURL(),
     'has_wud'        => countElementsInTable(Connection::getTable(), ['type' => Connection::TYPE_WUD]) > 0,
+    'has_registry'   => countElementsInTable(ImageVersion::getTable(), ['source' => ImageVersion::SOURCE_REGISTRY]) > 0,
+    'connection_form_url' => Connection::getFormURL(),
     'can_configure'  => Connection::canView(),
     'connection_url' => Connection::getSearchURL(),
 ]);

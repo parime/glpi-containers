@@ -1,0 +1,106 @@
+{#
+ # -------------------------------------------------------------------------
+ # Docker Inventory plugin for GLPI
+ # Copyright (C) 2026 Vincent GUILLOTTE
+ # https://github.com/parime/glpi-docker-inventory
+ # -------------------------------------------------------------------------
+ # LICENSE
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version. See LICENSE for the full text.
+ # -------------------------------------------------------------------------
+ #}
+
+{# Sous le formulaire d'une connexion Harbor enregistrée : test, vérification immédiate des
+   registres, dernier compte rendu pour ce Harbor. #}
+{% set status_colors = {0: 'secondary', 1: 'success', 2: 'warning', 3: 'danger'} %}
+{% set status = item.fields['last_import_status']|default(0) %}
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="ti ti-building-warehouse me-2" aria-hidden="true"></i>
+            {{ __('Versions depuis le registre Harbor', 'dockerinventory') }}
+        </h3>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">
+            {{ __(
+                'Pour les services qu’aucune connexion WUD ne suit, le plugin lit la liste des tags de leur image.',
+                'dockerinventory'
+            ) }}
+            {{ __('Seule cette liste est lue : rien n’est modifié dans Harbor.', 'dockerinventory') }}
+            {{ __('La vérification tourne toutes les heures ; le bouton la lance tout de suite.', 'dockerinventory') }}
+        </p>
+        <div class="alert alert-info">
+            <i class="ti ti-info-circle me-2" aria-hidden="true"></i>
+            {{ __('Images concernées : celles qui commencent par', 'dockerinventory') }}
+            <code>{{ registry_host ?: '-' }}/</code>
+            {{ __('dans l’entité de cette connexion et ses sous-entités.', 'dockerinventory') }}
+        </div>
+
+        <div class="mb-3">
+            <span class="me-2">{{ __('Dernière vérification', 'dockerinventory') }} :</span>
+            <span class="badge bg-{{ status_colors[status] ?? 'secondary' }} text-white">{{ status_label }}</span>
+            {% if item.fields['last_import_date'] %}
+                <span class="ms-2 text-muted">{{ item.fields['last_import_date']|formatted_datetime }}</span>
+            {% endif %}
+        </div>
+
+        {% if report %}
+            <ul class="list-inline mb-3">
+                <li class="list-inline-item">
+                    <i class="ti ti-brand-docker" aria-hidden="true"></i>
+                    {{ __('Services de ce registre', 'dockerinventory') }} :
+                    <strong>{{ report.services|default(0) }}</strong>
+                </li>
+                <li class="list-inline-item">
+                    <i class="ti ti-arrows-exchange" aria-hidden="true"></i>
+                    {{ __('Requêtes', 'dockerinventory') }} :
+                    <strong>{{ report.requests|default(0) }}</strong>
+                </li>
+            </ul>
+            {% if report.errors is not empty %}
+                <div class="alert alert-warning">
+                    <ul class="mb-0">
+                        {% for error in report.errors %}
+                            <li>
+                                <strong>{{ error.endpoint }}</strong> : {{ error_labels[error.code] ?? error.code }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <form method="post" action="{{ item.getFormURL() }}" class="d-flex flex-wrap gap-2">
+            <input type="hidden" name="id" value="{{ item.getID() }}">
+            <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" name="test" value="1" class="btn btn-outline-secondary">
+                <i class="ti ti-plug-connected me-1" aria-hidden="true"></i>
+                {{ __('Tester la connexion', 'dockerinventory') }}
+            </button>
+            <button type="submit" name="import" value="1" class="btn btn-primary">
+                <i class="ti ti-refresh me-1" aria-hidden="true"></i>
+                {{ __('Vérifier les registres maintenant', 'dockerinventory') }}
+            </button>
+            <a href="{{ versions_url }}" class="btn btn-outline-primary">
+                <i class="ti ti-tags me-1" aria-hidden="true"></i>
+                {{ __('Voir les versions des images', 'dockerinventory') }}
+            </a>
+        </form>
+
+        <details class="mt-3 text-muted">
+            <summary>{{ __('Harbor sur un réseau privé (GLPI 12)', 'dockerinventory') }}</summary>
+            <p class="mt-2 mb-1">
+                {{ __('GLPI 12 refuse par défaut les appels vers un réseau privé.', 'dockerinventory') }}
+                {{ __('Pour les registres seulement, ajouter dans config/local_define.php :', 'dockerinventory') }}
+            </p>
+            <pre class="mb-0"><code>define('GLPI_SERVERSIDE_URL_ALLOWED_PRIVATE_NETWORKS_CONTEXTS', [
+    '{{ context_class }}',
+]);</code></pre>
+        </details>
+    </div>
+</div>

@@ -8,7 +8,7 @@ Chaque lot fini et testé part en version, sans attendre le suivant.
 - [#1](https://github.com/parime/glpi-docker-inventory/issues/1) Import Portainer : stacks en Applications,
   services, nœuds rattachés aux ordinateurs, services retirés.
 
-## Lot 2 : WUD et registres
+## Lot 2 : WUD et registres (cœur publié en 0.2.0)
 
 Objectif : pour chaque service, version déployée, dernière version disponible et écart.
 
@@ -17,7 +17,7 @@ Objectif : pour chaque service, version déployée, dernière version disponible
 | [#2](https://github.com/parime/glpi-docker-inventory/issues/2) | Connexion WUD et lecture de `/api/containers` | Fait, à valider sur une vraie instance WUD 8.x |
 | [#3](https://github.com/parime/glpi-docker-inventory/issues/3) | Rattachement des conteneurs WUD aux services Swarm | Fait |
 | [#4](https://github.com/parime/glpi-docker-inventory/issues/4) | Comparaison des versions (correctif, mineure, majeure, `latest` non suivable) | Fait |
-| [#5](https://github.com/parime/glpi-docker-inventory/issues/5) | Repli sans WUD : Docker Hub et API v2 de Harbor | À faire |
+| [#5](https://github.com/parime/glpi-docker-inventory/issues/5) | Repli sans WUD : Docker Hub et API v2 de Harbor | Fait, Harbor à valider sur une vraie instance 2.x |
 | [#6](https://github.com/parime/glpi-docker-inventory/issues/6) | Tableau des versions : onglet du service et vue d'ensemble | Fait |
 | [#7](https://github.com/parime/glpi-docker-inventory/issues/7) | Tickets de mise à jour selon des seuils | À faire |
 | [#8](https://github.com/parime/glpi-docker-inventory/issues/8) | Faux WUD et jeu de données fictif | Fait |

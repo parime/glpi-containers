@@ -44,10 +44,12 @@ final class Installer
         'glpi_plugin_dockerinventory_nodes',
         'glpi_plugin_dockerinventory_services_nodes',
         'glpi_plugin_dockerinventory_imageversions',
+        'glpi_plugin_dockerinventory_registrytags',
     ];
 
     public const CRON_NAME = 'portainerimport';
     public const CRON_WUD = 'wudimport';
+    public const CRON_REGISTRY = 'registrycheck';
 
     /** Colonnes affichées par défaut dans la liste des services (options de recherche de Service). */
     private const DEFAULT_COLUMNS = [8, 3, 4, 6, 7, 10, 11];
@@ -78,7 +80,7 @@ final class Installer
             }
         }
 
-        foreach ([self::CRON_NAME, self::CRON_WUD] as $cron) {
+        foreach ([self::CRON_NAME, self::CRON_WUD, self::CRON_REGISTRY] as $cron) {
             CronTask::register(Connection::class, $cron, HOUR_TIMESTAMP, [
                 'state'         => CronTask::STATE_WAITING,
                 'logs_lifetime' => 30,
@@ -125,6 +127,7 @@ final class Installer
                 `url` varchar(255) NOT NULL DEFAULT '',
                 `username` varchar(255) NOT NULL DEFAULT '',
                 `api_key` text,
+                `registry_host` varchar(255) NOT NULL DEFAULT '',
                 `allow_http` tinyint NOT NULL DEFAULT '0',
                 `applianceenvironments_id` int {$sign} NOT NULL DEFAULT '0',
                 `last_import_date` timestamp NULL DEFAULT NULL,
@@ -216,7 +219,9 @@ final class Installer
                 UNIQUE KEY `unicity` (`plugin_dockerinventory_services_id`, `plugin_dockerinventory_nodes_id`),
                 KEY `plugin_dockerinventory_nodes_id` (`plugin_dockerinventory_nodes_id`)",
             // Une ligne par service suivi (container_uid vide) ou par conteneur sans service
-            // (plugin_dockerinventory_services_id = 0), pour chaque connexion WUD.
+            // (plugin_dockerinventory_services_id = 0), pour chaque connexion WUD ; repli sans WUD
+            // (source « registry ») : une ligne par service, connexion Harbor ou 0 (Docker Hub,
+            // registre inconnu).
             'glpi_plugin_dockerinventory_imageversions' => "
                 `id` int {$sign} NOT NULL AUTO_INCREMENT,
                 `entities_id` int {$sign} NOT NULL DEFAULT '0',
@@ -250,6 +255,17 @@ final class Installer
                 KEY `is_recursive` (`is_recursive`),
                 KEY `plugin_dockerinventory_services_id` (`plugin_dockerinventory_services_id`),
                 KEY `gap` (`gap`)",
+            // Cache des tags de Docker Hub (une lecture par image et par jour au plus).
+            'glpi_plugin_dockerinventory_registrytags' => "
+                `id` int {$sign} NOT NULL AUTO_INCREMENT,
+                `registry` varchar(16) NOT NULL DEFAULT '',
+                `repository` varchar(255) NOT NULL DEFAULT '',
+                `tags` mediumtext,
+                `error` varchar(64) NOT NULL DEFAULT '',
+                `date_checked` timestamp NULL DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `unicity` (`registry`, `repository`),
+                KEY `date_checked` (`date_checked`)",
         ];
 
         foreach ($definitions as $table => $columns) {
@@ -260,13 +276,15 @@ final class Installer
     }
 
     /**
-     * Mise à jour d'une installation existante (0.1.0 : connexions Portainer seulement).
+     * Mise à jour d'une installation existante (0.1.0 : connexions Portainer seulement ; 0.2.0 :
+     * sans l'hôte du registre des connexions Harbor ni le cache des registres, créé plus haut).
      */
     private function migrate(Migration $migration): void
     {
         $table = Connection::getTable();
         $migration->addField($table, 'type', "varchar(32) NOT NULL DEFAULT 'portainer'", ['after' => 'is_active']);
         $migration->addField($table, 'username', "varchar(255) NOT NULL DEFAULT ''", ['after' => 'url']);
+        $migration->addField($table, 'registry_host', "varchar(255) NOT NULL DEFAULT ''", ['after' => 'api_key']);
         $migration->addKey($table, 'type');
         $migration->migrationOneTable($table);
     }

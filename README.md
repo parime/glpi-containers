@@ -13,8 +13,8 @@ vulnérable ? », que GLPI ne sait pas traiter seul : son onglet « Virtualisati
 conteneurs isolés, sans stack, sans service, sans réplicas ni version.
 
 > **État** : version 0.2.0 publiée (lot 1 : Portainer ; cœur du lot 2 : What's Up Docker). Le
-> repli sans WUD par les registres (Docker Hub, Harbor) est prêt pour la prochaine version ;
-> tickets et Harbor (lot 3) suivent. Voir [ROADMAP.md](ROADMAP.md).
+> repli sans WUD par les registres (Docker Hub, Harbor) et les tickets de mise à jour selon des
+> seuils sont prêts pour la prochaine version ; Harbor (lot 3) suit. Voir [ROADMAP.md](ROADMAP.md).
 
 ## Principes
 
@@ -155,6 +155,29 @@ Docker Hub, désactiver l'action automatique `registrycheck`.
 > L'appel à Harbor suit la spécification de l'API v2 des registres (authentification basique du
 > compte robot) et un faux registre (`tests/mock-registry`) ; il reste à valider sur un vrai Harbor
 > 2.x.
+
+## Utilisation (lot 2 : tickets de mise à jour)
+
+**Désactivés par défaut.** Sur la connexion **Portainer** des services, section « Tickets de mise à
+jour » : « Créer des tickets de mise à jour », le **seuil** (version majeure seulement, mineure ou
+majeure, tout écart correctifs compris), la **catégorie**, le **groupe chargé du ticket** et un
+**modèle de ticket** (ses champs prédéfinis : type, urgence, demandeur... servent de départ).
+
+Après chaque lecture de WUD ou des registres (tâches automatiques et boutons), pour chaque service
+au-delà du seuil : un ticket « Mettre à jour le service X de la stack Y : 1.2 → 1.4 », rattaché à
+l'application de la stack, avec l'image, les versions, l'écart et un lien vers le service.
+
+- **Un ticket par service** : tant qu'il est ouvert, un **suivi** est ajouté quand la situation
+  change (nouvelle version, autre version déployée, écart résolu), jamais un second ticket.
+- **Rien n'est changé automatiquement** sur un ticket existant : ni statut (pas de réouverture, pas
+  de clôture quand l'écart est résolu), ni priorité, ni affectation (le groupe n'est donné qu'à la
+  création).
+- Ticket résolu ou clos : un nouveau ticket seulement pour une nouvelle dernière version.
+- Sous le seuil, préversion, empreinte seule, tag non suivable ou version non vérifiée : pas de
+  ticket.
+- Le lien vers le ticket apparaît dans l'onglet « Versions » du service ; le compte rendu (tickets
+  créés, suivis ajoutés) dans le message de lecture et le journal des actions automatiques.
+- Vulnérabilité critique de l'image : déclencheur prévu avec Harbor au lot 3.
 
 **Portainer, WUD ou Harbor sur un réseau privé (GLPI 12).** GLPI 12 refuse par défaut les appels
 vers une adresse privée. Pour les autoriser pour ces sources seulement, ajouter dans

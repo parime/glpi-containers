@@ -64,7 +64,10 @@ dockerinventory/
 │   │   ├── RegistryResolver.php    registre d'une image : Docker Hub, Harbor déclaré (hôte, entité), inconnu
 │   │   └── RegistryImporter.php    services sans WUD → table des versions (source « registry »),
 │   │                               cache d'un jour pour Docker Hub
-│   ├── Ticket/                tickets de mise à jour selon des seuils           (prévu, #7)
+│   ├── Ticket/
+│   │   ├── TicketPolicy.php        seuil atteint, ticket, suivi ou rien (fonctions pures) ;
+│   │   │                           déclencheur « vulnérabilité critique » réservé au lot 3
+│   │   └── UpdateTickets.php       après chaque lecture : tickets et suivis, table de suivi
 │   └── Harbor/                projets, dépôts, artefacts, analyses           (prévu, lot 3)
 ├── templates/                 Twig uniquement (aucun HTML dans le PHP)
 ├── locales/                   fr_FR, en_GB, de_DE, es_ES, it_IT, pl_PL, pt_BR (+ variantes régionales)
@@ -87,6 +90,7 @@ dockerinventory/
 | `glpi_plugin_dockerinventory_nodes` | Nœud Swarm : nom d'hôte, rôle, état, version de Docker, ordinateur GLPI rattaché |
 | `glpi_plugin_dockerinventory_services_nodes` | Tâches en cours d'un service sur chaque nœud (recalculé à chaque import) |
 | `glpi_plugin_dockerinventory_imageversions` | Une ligne par service suivi (ou par conteneur sans service, `plugin_dockerinventory_services_id` = 0) et par connexion WUD : conteneurs, image et registre, tag et empreinte déployés, dernière version, écart, réplicas désynchronisés, méthode de rattachement (ou raison de l'absence), source (`wud` ou `registry`), raison d'une version non vérifiée, date de vérification. Recalculée à chaque lecture de WUD ; repli sans WUD : une ligne par service, connexion Harbor ou 0 (Docker Hub, registre inconnu) |
+| `glpi_plugin_dockerinventory_tickets` | Ticket de mise à jour suivi pour chaque service (un seul) et la situation qu'il décrit : écart, version déployée, dernière version (dernier ticket ou suivi) |
 | `glpi_plugin_dockerinventory_registrytags` | Cache des tags de Docker Hub : dépôt, tags et empreintes (JSON), raison d'un échec durable (introuvable), date de lecture ; valable un jour |
 
 ## Portainer (lot 1)
@@ -158,6 +162,27 @@ dockerinventory/
   variante, préversions ignorées sauf si une préversion est déployée (même canal), `v` facultatif.
   Docker Hub donne l'empreinte de chaque tag : même tag reconstruit → « empreinte seule » ; tag
   mobile → « non suivable », avec « nouvelle empreinte disponible » si elle a changé.
+
+## Tickets de mise à jour (lot 2, #7)
+
+- Réglages sur la connexion Portainer des services (colonnes `ticket_*`), désactivés par défaut :
+  seuil (`major`, `minor`, `patch` : écart minimal), catégorie, groupe affecté à la création, modèle
+  de ticket (champs prédéfinis appliqués comme valeurs de départ, sans contrôle des champs
+  obligatoires du modèle).
+- Appelé à la fin de chaque lecture de WUD (services rattachés) et de chaque vérification des
+  registres (services vérifiés), donc par les tâches automatiques et les boutons. Situation d'un
+  service : sa ligne de version la plus grave.
+- `TicketPolicy::decide()` : ticket si un déclencheur est atteint et qu'aucun ticket ouvert n'existe
+  (un ticket fermé pour la même dernière version n'est pas recréé) ; suivi si le ticket est ouvert
+  et que l'écart, la version déployée ou la dernière version a changé ; rien si la version n'est pas
+  vérifiée.
+- Ticket : type demande (sauf modèle), entité du service, application de la stack en élément lié,
+  description et suivis en Twig (`ticket_content`, `ticket_followup`). Suivis ajoutés avec
+  `_no_reopen`, `_do_not_compute_status` et `_do_not_compute_takeintoaccount` : ni statut, ni
+  priorité, ni affectation modifiés.
+- Lot 3 : `TicketPolicy::TRIGGER_VULNERABILITY` (paramètre `$signals` de `triggers()`), avec son
+  propre réglage sur la connexion.
+- Désinstallation : la table de suivi est supprimée, les tickets restent (objets GLPI).
 
 ## Règles communes
 

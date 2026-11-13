@@ -23,6 +23,7 @@ use DbUtils;
 use GlpiPlugin\Dockerinventory\Connection;
 use GlpiPlugin\Dockerinventory\ImageVersion;
 use GlpiPlugin\Dockerinventory\Service;
+use GlpiPlugin\Dockerinventory\Ticket\UpdateTickets;
 use GlpiPlugin\Dockerinventory\Version\VersionComparator;
 use GlpiPlugin\Dockerinventory\Version\VersionLinker;
 
@@ -37,12 +38,14 @@ use GlpiPlugin\Dockerinventory\Version\VersionLinker;
  * - seules les tables du plugin sont écrites ; les lignes de cette connexion qui ne correspondent
  *   plus à rien sont supprimées (données recalculées, comme la répartition des tâches) ;
  * - WUD injoignable ou en erreur : rien n'est modifié ;
- * - un service rattaché perd sa ligne du repli par les registres (source « registry »).
+ * - un service rattaché perd sa ligne du repli par les registres (source « registry ») ;
+ * - tickets de mise à jour ensuite, si la connexion Portainer du service les a activés.
  *
  * @phpstan-import-type WudContainer from WudMapper
  * @phpstan-type WudReport array{status: int, wud_version: string, containers: int, services: int,
  *     unmatched: int, out_of_sync: int, gaps: array<string, int>,
- *     errors: list<array{endpoint: string, code: string}>}
+ *     errors: list<array{endpoint: string, code: string}>,
+ *     tickets: array{created: int, followups: int, unchanged: int, errors: int}}
  */
 final class WudImporter
 {
@@ -77,6 +80,7 @@ final class WudImporter
             'out_of_sync' => 0,
             'gaps'        => array_fill_keys(VersionComparator::GAPS, 0),
             'errors'      => [],
+            'tickets'     => UpdateTickets::emptyReport(),
         ];
 
         try {
@@ -139,7 +143,7 @@ final class WudImporter
         }
 
         $this->deleteOthers((int) $connection->getID(), $kept);
-        $covered = array_keys(array_filter($links['linked']));
+        $covered = array_map('intval', array_keys(array_filter($links['linked'])));
         if ($covered !== []) {
             // Services désormais suivis par WUD : la ligne du repli par les registres ne sert plus.
             $DB->delete(ImageVersion::getTable(), [
@@ -147,6 +151,7 @@ final class WudImporter
                 'plugin_dockerinventory_services_id' => $covered,
             ]);
         }
+        $report['tickets'] = (new UpdateTickets())->process($covered);
         $this->saveReport($connection, $report);
 
         return $report;

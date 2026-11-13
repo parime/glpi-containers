@@ -23,6 +23,7 @@ use DbUtils;
 use GlpiPlugin\Dockerinventory\Connection;
 use GlpiPlugin\Dockerinventory\ImageVersion;
 use GlpiPlugin\Dockerinventory\Service;
+use GlpiPlugin\Dockerinventory\Ticket\UpdateTickets;
 use GlpiPlugin\Dockerinventory\Version\TagSelector;
 use GlpiPlugin\Dockerinventory\Version\VersionComparator;
 
@@ -39,11 +40,13 @@ use GlpiPlugin\Dockerinventory\Version\VersionComparator;
  *   l'entité du service ; compte robot facultatif (projets publics) ;
  * - registre inconnu, ou privé sans identifiants : version « non vérifiée », sans erreur bloquante ;
  * - une ligne par service dans la table des versions (source « registry »), comme avec WUD ; les
- *   lignes « registry » qui ne correspondent plus à rien sont supprimées.
+ *   lignes « registry » qui ne correspondent plus à rien sont supprimées ;
+ * - tickets de mise à jour ensuite, si la connexion Portainer du service les a activés.
  *
  * @phpstan-type RegistryReport array{status: int, services: int, checked: int, not_checked: int,
  *     untrackable: int, cached: int, requests: int, gaps: array<string, int>,
- *     errors: list<array{endpoint: string, code: string}>}
+ *     errors: list<array{endpoint: string, code: string}>,
+ *     tickets: array{created: int, followups: int, unchanged: int, errors: int}}
  */
 final class RegistryImporter
 {
@@ -104,9 +107,11 @@ final class RegistryImporter
             'requests'    => 0,
             'gaps'        => array_fill_keys(VersionComparator::GAPS, 0),
             'errors'      => [],
+            'tickets'     => UpdateTickets::emptyReport(),
         ];
         [$harbors, $targets] = $this->harbors();
         $kept = [];
+        $checked = [];
         foreach ($this->uncoveredServices() as $service) {
             $resolved = RegistryResolver::resolve($service['image'], $service['entities_id'], $targets);
             $harbor = $harbors[$resolved['connection_id']] ?? null;
@@ -123,6 +128,7 @@ final class RegistryImporter
                 $report['checked']++;
             }
             $kept[] = $this->upsert($service, $resolved, $harbor, $values, $lookup);
+            $checked[] = $service['id'];
             $report['services']++;
             $report['gaps'][$values['gap']] = ($report['gaps'][$values['gap']] ?? 0) + 1;
             if ($harbor !== null) {
@@ -145,6 +151,7 @@ final class RegistryImporter
         }
         $report['errors'] = $errors;
         $this->saveHarborReports($harbors);
+        $report['tickets'] = (new UpdateTickets())->process($checked);
 
         return $report;
     }

@@ -31,6 +31,7 @@ use GlpiPlugin\Dockerinventory\Registry\RegistryContext;
 use GlpiPlugin\Dockerinventory\Registry\RegistryException;
 use GlpiPlugin\Dockerinventory\Registry\RegistryImporter;
 use GlpiPlugin\Dockerinventory\Registry\RegistryResolver;
+use GlpiPlugin\Dockerinventory\Ticket\TicketPolicy;
 use GlpiPlugin\Dockerinventory\Wud\WudClient;
 use GlpiPlugin\Dockerinventory\Wud\WudContext;
 use GlpiPlugin\Dockerinventory\Wud\WudException;
@@ -40,7 +41,8 @@ use Session;
 /**
  * Connexion à une source de l'inventaire, de l'un des types :
  * - Portainer : adresse, clé d'API (chiffrée avec la clé de GLPI, jamais réaffichée),
- *   environnement GLPI des applications créées pour ses stacks ;
+ *   environnement GLPI des applications créées pour ses stacks, tickets de mise à jour de ses
+ *   services (désactivés par défaut : seuil, catégorie, groupe, modèle de ticket) ;
  * - What's Up Docker (WUD) : adresse, utilisateur et mot de passe facultatifs (authentification
  *   basique ; mot de passe chiffré dans la même colonne que la clé Portainer, jamais réaffiché) ;
  * - Harbor : adresse, compte robot en lecture seule facultatif (mot de passe chiffré de la même
@@ -86,6 +88,20 @@ class Connection extends ConnectionBase
     public function isWud(): bool
     {
         return ($this->fields['type'] ?? self::TYPE_PORTAINER) === self::TYPE_WUD;
+    }
+
+    /**
+     * Seuils des tickets de mise à jour : écart minimal qui donne un ticket.
+     *
+     * @return array<string, string>
+     */
+    public static function ticketThresholdLabels(): array
+    {
+        return [
+            TicketPolicy::THRESHOLD_MAJOR => __('Version majeure seulement', 'dockerinventory'),
+            TicketPolicy::THRESHOLD_MINOR => __('Version mineure ou majeure', 'dockerinventory'),
+            TicketPolicy::THRESHOLD_PATCH => __('Tout écart de version, correctifs compris', 'dockerinventory'),
+        ];
     }
 
     public function isHarbor(): bool
@@ -173,6 +189,14 @@ class Connection extends ConnectionBase
             'datatype'   => 'dropdown',
         ];
         $options[] = [
+            'id'            => 8,
+            'table'         => static::getTable(),
+            'field'         => 'ticket_enabled',
+            'name'          => __('Tickets de mise à jour', 'dockerinventory'),
+            'datatype'      => 'bool',
+            'massiveaction' => false,
+        ];
+        $options[] = [
             'id'         => 80,
             'table'      => 'glpi_entities',
             'field'      => 'completename',
@@ -248,6 +272,7 @@ class Connection extends ConnectionBase
             'is_harbor'   => $this->isHarbor(),
             'type_label'  => self::typeLabels()[(string) $this->fields['type']] ?? '',
             'has_api_key' => trim((string) ($this->fields['api_key'] ?? '')) !== '',
+            'thresholds'  => self::ticketThresholdLabels(),
         ]);
         if (!$this->isNewItem()) {
             $renderer->display('@dockerinventory/' . $actions . '.html.twig', [
@@ -350,6 +375,25 @@ class Connection extends ConnectionBase
         } else {
             $input['api_key'] = (new GLPIKey())->encrypt($key);
         }
+        $isPortainer = ($isNew ? (string) ($input['type'] ?? '') : (string) ($this->fields['type'] ?? ''))
+            === self::TYPE_PORTAINER;
+        $ticketFields = ['ticket_enabled', 'ticket_threshold', 'ticket_itilcategories_id', 'ticket_groups_id',
+            'ticket_tickettemplates_id'];
+        foreach ($ticketFields as $field) {
+            if (!array_key_exists($field, $input)) {
+                continue;
+            }
+            if (!$isPortainer) {
+                // Tickets réglés sur la connexion Portainer des services seulement.
+                unset($input[$field]);
+            } elseif ($field === 'ticket_threshold') {
+                $value = (string) $input[$field];
+                $valid = in_array($value, TicketPolicy::THRESHOLDS, true);
+                $input[$field] = $valid ? $value : TicketPolicy::THRESHOLD_MAJOR;
+            } else {
+                $input[$field] = max(0, (int) $input[$field]);
+            }
+        }
         // Champs tenus par l'import, jamais par le formulaire.
         unset($input['last_import_date'], $input['last_import_status'], $input['last_import_report']);
 
@@ -428,14 +472,9 @@ class Connection extends ConnectionBase
         }
         if ($this->isWud()) {
             return sprintf(
-                __(
-                    'Lecture de WUD terminée (%1$s) : %2$d conteneurs, %3$d services suivis, %4$d sans service.',
-                    'dockerinventory'
-                ),
-                self::statusLabel((int) $report['status']),
-                (int) ($report['containers'] ?? 0),
-                (int) ($report['services'] ?? 0),
-                (int) ($report['unmatched'] ?? 0)
+                '%s%s',
+                $this->wudMessage($report),
+                self::ticketsMessage(is_array($report['tickets'] ?? null) ? $report['tickets'] : [])
             );
         }
 
@@ -446,6 +485,43 @@ class Connection extends ConnectionBase
             (int) ($report['services'] ?? 0),
             (int) ($report['retired'] ?? 0),
             (int) ($report['nodes'] ?? 0)
+        );
+    }
+
+    /**
+     * Fin du message d'une lecture : tickets créés et suivis ajoutés, s'il y en a.
+     *
+     * @param array<string, mixed> $tickets
+     */
+    public static function ticketsMessage(array $tickets): string
+    {
+        $created = (int) ($tickets['created'] ?? 0);
+        $followups = (int) ($tickets['followups'] ?? 0);
+        if ($created === 0 && $followups === 0) {
+            return '';
+        }
+
+        return ' ' . sprintf(
+            __('Tickets de mise à jour : %1$d créé(s), %2$d suivi(s) ajouté(s).', 'dockerinventory'),
+            $created,
+            $followups
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $report
+     */
+    private function wudMessage(array $report): string
+    {
+        return sprintf(
+            __(
+                'Lecture de WUD terminée (%1$s) : %2$d conteneurs, %3$d services suivis, %4$d sans service.',
+                'dockerinventory'
+            ),
+            self::statusLabel((int) $report['status']),
+            (int) ($report['containers'] ?? 0),
+            (int) ($report['services'] ?? 0),
+            (int) ($report['unmatched'] ?? 0)
         );
     }
 
@@ -466,7 +542,7 @@ class Connection extends ConnectionBase
             (int) ($report['untrackable'] ?? 0),
             (int) ($report['not_checked'] ?? 0),
             (int) ($report['requests'] ?? 0)
-        );
+        ) . self::ticketsMessage(is_array($report['tickets'] ?? null) ? $report['tickets'] : []);
     }
 
     /**
@@ -695,7 +771,7 @@ class Connection extends ConnectionBase
                 $report['containers'],
                 $report['services'],
                 $report['unmatched']
-            ));
+            ) . self::ticketsMessage($report['tickets']));
             $done++;
         }
 

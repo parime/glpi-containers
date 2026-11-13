@@ -32,8 +32,8 @@ use ProfileRight;
  * Installation, mise à jour et désinstallation. Tables créées une fois (CREATE TABLE seulement
  * ici), évolutions futures par Migration. La désinstallation retire les données du plugin et tout
  * ce qu'il a écrit dans les tables du cœur (droit, tâche automatique, préférences d'affichage),
- * mais jamais les applications (Appliance) créées pour les stacks : ce sont des objets GLPI que
- * les utilisateurs ont pu compléter et lier.
+ * mais jamais les applications (Appliance) créées pour les stacks ni les tickets de mise à jour :
+ * ce sont des objets GLPI que les utilisateurs ont pu compléter et lier.
  */
 final class Installer
 {
@@ -45,6 +45,7 @@ final class Installer
         'glpi_plugin_dockerinventory_services_nodes',
         'glpi_plugin_dockerinventory_imageversions',
         'glpi_plugin_dockerinventory_registrytags',
+        'glpi_plugin_dockerinventory_tickets',
     ];
 
     public const CRON_NAME = 'portainerimport';
@@ -130,6 +131,11 @@ final class Installer
                 `registry_host` varchar(255) NOT NULL DEFAULT '',
                 `allow_http` tinyint NOT NULL DEFAULT '0',
                 `applianceenvironments_id` int {$sign} NOT NULL DEFAULT '0',
+                `ticket_enabled` tinyint NOT NULL DEFAULT '0',
+                `ticket_threshold` varchar(16) NOT NULL DEFAULT 'major',
+                `ticket_itilcategories_id` int {$sign} NOT NULL DEFAULT '0',
+                `ticket_groups_id` int {$sign} NOT NULL DEFAULT '0',
+                `ticket_tickettemplates_id` int {$sign} NOT NULL DEFAULT '0',
                 `last_import_date` timestamp NULL DEFAULT NULL,
                 `last_import_status` tinyint NOT NULL DEFAULT '0',
                 `last_import_report` text,
@@ -266,6 +272,20 @@ final class Installer
                 PRIMARY KEY (`id`),
                 UNIQUE KEY `unicity` (`registry`, `repository`),
                 KEY `date_checked` (`date_checked`)",
+            // Ticket de mise à jour suivi pour chaque service, et la situation qu'il décrit
+            // (dernier ticket ou suivi) : un seul ticket par service, suivi quand elle change.
+            'glpi_plugin_dockerinventory_tickets' => "
+                `id` int {$sign} NOT NULL AUTO_INCREMENT,
+                `plugin_dockerinventory_services_id` int {$sign} NOT NULL DEFAULT '0',
+                `tickets_id` int {$sign} NOT NULL DEFAULT '0',
+                `gap` varchar(16) NOT NULL DEFAULT '',
+                `deployed_tag` varchar(255) NOT NULL DEFAULT '',
+                `latest_tag` varchar(255) NOT NULL DEFAULT '',
+                `date_mod` timestamp NULL DEFAULT NULL,
+                `date_creation` timestamp NULL DEFAULT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `unicity` (`plugin_dockerinventory_services_id`),
+                KEY `tickets_id` (`tickets_id`)",
         ];
 
         foreach ($definitions as $table => $columns) {
@@ -277,7 +297,8 @@ final class Installer
 
     /**
      * Mise à jour d'une installation existante (0.1.0 : connexions Portainer seulement ; 0.2.0 :
-     * sans l'hôte du registre des connexions Harbor ni le cache des registres, créé plus haut).
+     * sans l'hôte du registre des connexions Harbor ni les réglages des tickets ; le cache des
+     * registres et le suivi des tickets sont des tables créées plus haut).
      */
     private function migrate(Migration $migration): void
     {
@@ -285,6 +306,20 @@ final class Installer
         $migration->addField($table, 'type', "varchar(32) NOT NULL DEFAULT 'portainer'", ['after' => 'is_active']);
         $migration->addField($table, 'username', "varchar(255) NOT NULL DEFAULT ''", ['after' => 'url']);
         $migration->addField($table, 'registry_host', "varchar(255) NOT NULL DEFAULT ''", ['after' => 'api_key']);
+        // Tickets de mise à jour (désactivés par défaut).
+        $sign = DBConnection::getDefaultPrimaryKeySignOption();
+        $ticketFields = [
+            'ticket_enabled'            => "tinyint NOT NULL DEFAULT '0'",
+            'ticket_threshold'          => "varchar(16) NOT NULL DEFAULT 'major'",
+            'ticket_itilcategories_id'  => "int {$sign} NOT NULL DEFAULT '0'",
+            'ticket_groups_id'          => "int {$sign} NOT NULL DEFAULT '0'",
+            'ticket_tickettemplates_id' => "int {$sign} NOT NULL DEFAULT '0'",
+        ];
+        $after = 'applianceenvironments_id';
+        foreach ($ticketFields as $field => $definition) {
+            $migration->addField($table, $field, $definition, ['after' => $after]);
+            $after = $field;
+        }
         $migration->addKey($table, 'type');
         $migration->migrationOneTable($table);
     }

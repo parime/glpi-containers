@@ -26,6 +26,7 @@ use CommonGLPI;
 use DbUtils;
 use Dropdown;
 use Glpi\Application\View\TemplateRenderer;
+use GlpiPlugin\Dockerinventory\Ticket\UpdateTickets;
 use GlpiPlugin\Dockerinventory\Version\VersionComparator;
 use GlpiPlugin\Dockerinventory\Version\VersionLinker;
 use GlpiPlugin\Dockerinventory\Wud\WudMapper;
@@ -376,9 +377,25 @@ class ImageVersion extends CommonDBTM
             'has_registry'  => countElementsInTable(static::getTable(), ['source' => self::SOURCE_REGISTRY]) > 0,
             'can_configure' => Connection::canView(),
             'connection_url' => Connection::getSearchURL(),
+            'update_ticket' => self::updateTicket($item),
         ]);
 
         return true;
+    }
+
+    /**
+     * Ticket de mise à jour d'un service (lien dans l'onglet), si l'utilisateur peut voir les tickets.
+     *
+     * @return array{id: int, name: string, status: string, is_open: bool, url: string}|null
+     */
+    private static function updateTicket(CommonGLPI $item): ?array
+    {
+        if (!$item instanceof Service || !\Ticket::canView()) {
+            return null;
+        }
+        $ticket = UpdateTickets::ticketFor((int) $item->getID());
+
+        return $ticket === null ? null : $ticket + ['url' => \Ticket::getFormURLWithID($ticket['id'])];
     }
 
     /**

@@ -138,4 +138,37 @@
         ) }}
     {% endif %}
     {{ fields.textareaField('comment', item.fields['comment'], _n('Comment', 'Comments', 1)) }}
+    {% if not is_wud and not is_harbor %}
+        {# Tickets de mise à jour des services de cette connexion (désactivés par défaut). #}
+        {{ fields.largeTitle(__('Tickets de mise à jour', 'dockerinventory'), 'ti ti-ticket') }}
+        {{ fields.dropdownYesNo('ticket_enabled', item.fields['ticket_enabled'] ?? 0,
+            __('Créer des tickets de mise à jour', 'dockerinventory'), {
+            helper: __(
+                'Désactivé par défaut. Un ticket par service, puis des suivis : jamais de doublon.',
+                'dockerinventory'
+            ),
+        }) }}
+        {{ fields.dropdownArrayField('ticket_threshold', item.fields['ticket_threshold'] ?? 'major', thresholds,
+            __('Seuil', 'dockerinventory'), {
+            helper: __('Écart minimal entre la version déployée et la dernière version.', 'dockerinventory'),
+        }) }}
+        {{ fields.dropdownField('ITILCategory', 'ticket_itilcategories_id',
+            item.fields['ticket_itilcategories_id'] ?? 0, __('Catégorie', 'dockerinventory')) }}
+        {{ fields.dropdownField('Group', 'ticket_groups_id', item.fields['ticket_groups_id'] ?? 0,
+            __('Groupe chargé du ticket', 'dockerinventory'), {
+            condition: {is_assign: 1},
+            helper: __('Affecté à la création seulement ; jamais modifié ensuite.', 'dockerinventory'),
+        }) }}
+        {{ fields.dropdownField('TicketTemplate', 'ticket_tickettemplates_id',
+            item.fields['ticket_tickettemplates_id'] ?? 0, __('Modèle de ticket', 'dockerinventory'), {
+            helper: __('Ses champs prédéfinis (type, urgence, demandeur...) servent de départ.', 'dockerinventory'),
+        }) }}
+        {% set vulnerability_html %}
+            <span class="text-muted">
+                <i class="ti ti-shield-lock me-1" aria-hidden="true"></i>
+                {{ __('Vulnérabilité critique de l’image : avec Harbor, au lot 3.', 'dockerinventory') }}
+            </span>
+        {% endset %}
+        {{ fields.htmlField('_ticket_vulnerability', vulnerability_html, __('Autre déclencheur', 'dockerinventory')) }}
+    {% endif %}
 {% endblock %}

@@ -15,6 +15,13 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions
   (préversions ignorées sauf si déployées) ; registre inconnu ou privé sans identifiants « non
   vérifié » avec la raison ; tâche automatique horaire `registrycheck` et bouton « Vérifier les
   registres maintenant » ; faux registre `tests/mock-registry`.
+- Tickets de mise à jour selon des seuils ([#7](https://github.com/parime/glpi-docker-inventory/issues/7)),
+  désactivés par défaut : réglés sur la connexion Portainer (seuil majeure, mineure ou correctif,
+  catégorie, groupe, modèle de ticket) ; « Mettre à jour le service X de la stack Y : 1.2 → 1.4 »
+  après chaque lecture de WUD ou des registres, un ticket par service puis des suivis quand la
+  situation change, jamais de doublon ni de changement de statut, de priorité ou d'affectation ;
+  lien vers le ticket dans l'onglet Versions du service ; déclencheur « vulnérabilité critique »
+  prévu pour le lot 3.
 
 ## [0.2.0] - 2026-11-08
 

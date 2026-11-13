@@ -13,8 +13,8 @@ cannot do on its own: its "Virtualization" tab lists isolated containers, with n
 replicas or version.
 
 > **Status**: version 0.2.0 released (batch 1: Portainer; core of batch 2: What's Up Docker). The
-> registry fallback without WUD (Docker Hub, Harbor) is ready for the next release; tickets and
-> Harbor (batch 3) follow. See [ROADMAP.md](ROADMAP.md).
+> registry fallback without WUD (Docker Hub, Harbor) and the update tickets above thresholds are
+> ready for the next release; Harbor (batch 3) follows. See [ROADMAP.md](ROADMAP.md).
 
 ## Principles
 
@@ -150,6 +150,28 @@ query Docker Hub, disable the `registrycheck` automatic action.
 > The Harbor call follows the registry API v2 specification (basic authentication of the robot
 > account) and a fake registry (`tests/mock-registry`); it still has to be validated against a
 > real Harbor 2.x.
+
+## Usage (batch 2: update tickets)
+
+**Disabled by default.** On the **Portainer** connection of the services, "Update tickets"
+section: "Create update tickets", the **threshold** (major version only, minor or major, any gap
+including patches), the **category**, the **group in charge of the ticket** and a **ticket
+template** (its predefined fields: type, urgency, requester... are used as a starting point).
+
+After each read of WUD or of the registries (automatic actions and buttons), for each service above
+the threshold: a ticket "Update the service X of the stack Y: 1.2 → 1.4", linked to the appliance
+of the stack, with the image, the versions, the gap and a link to the service.
+
+- **One ticket per service**: while it is open, a **follow-up** is added when the situation changes
+  (new version, other deployed version, gap resolved), never a second ticket.
+- **Nothing is changed automatically** on an existing ticket: neither status (no reopening, no
+  closing when the gap is resolved), nor priority, nor assignment (the group is only set at
+  creation).
+- Solved or closed ticket: a new ticket only for a new latest version.
+- Below the threshold, pre-release, digest only, untrackable tag or version not checked: no ticket.
+- The link to the ticket appears in the "Versions" tab of the service; the report (tickets created,
+  follow-ups added) in the read message and the automatic actions log.
+- Critical vulnerability of the image: trigger planned with Harbor in batch 3.
 
 **Portainer, WUD or Harbor on a private network (GLPI 12).** By default GLPI 12 refuses calls to a
 private address. To allow them for these sources only, add to `config/local_define.php`:

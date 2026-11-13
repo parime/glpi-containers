@@ -34,6 +34,16 @@
         {% endif %}
     </div>
 {% elseif for_service %}
+    {% if update_ticket %}
+        <div class="alert {{ update_ticket.is_open ? 'alert-warning' : 'alert-secondary' }} d-flex align-items-center">
+            <i class="ti ti-ticket me-2" aria-hidden="true"></i>
+            <div>
+                {{ __('Ticket de mise à jour', 'dockerinventory') }} :
+                <a href="{{ update_ticket.url }}">#{{ update_ticket.id }} {{ update_ticket.name }}</a>
+                <span class="badge bg-secondary-lt ms-1">{{ update_ticket.status }}</span>
+            </div>
+        </div>
+    {% endif %}
     {% for row in rows %}
         <div class="card mb-3">
             <div class="card-header d-flex flex-wrap align-items-center gap-2">

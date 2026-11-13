@@ -19,7 +19,7 @@ Objectif : pour chaque service, version déployée, dernière version disponible
 | [#4](https://github.com/parime/glpi-docker-inventory/issues/4) | Comparaison des versions (correctif, mineure, majeure, `latest` non suivable) | Fait |
 | [#5](https://github.com/parime/glpi-docker-inventory/issues/5) | Repli sans WUD : Docker Hub et API v2 de Harbor | Fait, Harbor à valider sur une vraie instance 2.x |
 | [#6](https://github.com/parime/glpi-docker-inventory/issues/6) | Tableau des versions : onglet du service et vue d'ensemble | Fait |
-| [#7](https://github.com/parime/glpi-docker-inventory/issues/7) | Tickets de mise à jour selon des seuils | À faire |
+| [#7](https://github.com/parime/glpi-docker-inventory/issues/7) | Tickets de mise à jour selon des seuils | Fait (vulnérabilité critique : lot 3) |
 | [#8](https://github.com/parime/glpi-docker-inventory/issues/8) | Faux WUD et jeu de données fictif | Fait |
 
 Ordre conseillé : #8 et #2 (on peut tester), puis #3 et #4, puis #6, enfin #5 et #7. Le cœur du lot

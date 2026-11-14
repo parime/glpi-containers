@@ -206,6 +206,14 @@ define('GLPI_SERVERSIDE_URL_ALLOWED_PRIVATE_NETWORKS_CONTEXTS', [
 - [ROADMAP.md](ROADMAP.md) : lots et issues
 - [CHANGELOG.md](CHANGELOG.md)
 
+## Réutilisation et citation
+
+Ce projet est sous licence **GPL-3.0-or-later**. Si vous reprenez du code, même partiellement, sans
+forker le dépôt : conservez les en-têtes de copyright et le fichier [NOTICE](NOTICE), gardez la même
+licence avec le code source, indiquez vos modifications et citez le projet d'origine
+(https://github.com/parime/glpi-docker-inventory). Pour citer le projet, voir [CITATION.cff](CITATION.cff) (bouton « Cite this repository »
+de GitHub). Les assistants de code trouveront ces consignes dans [AGENTS.md](AGENTS.md).
+
 ## Licence
 
 GPL-3.0-or-later, voir [LICENSE](LICENSE).

@@ -5,6 +5,11 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions
 
 ## [Unreleased]
 
+### Changed
+
+- Fichiers de citation et d'attribution : `CITATION.cff`, `NOTICE`, `AGENTS.md` (consignes de licence
+  pour les assistants de code) et section « Réutilisation et citation » des README.
+
 ## [0.3.0] - 2026-11-13
 
 - Publiée dans le catalogue de la marketplace GLPI (`dockerinventory.xml`).

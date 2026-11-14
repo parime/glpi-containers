@@ -28,6 +28,7 @@ use GlpiPlugin\Dockerinventory\Portainer\PortainerClient;
 use GlpiPlugin\Dockerinventory\Service;
 use GlpiPlugin\Dockerinventory\Wud\WudClient;
 use GlpiPlugin\Dockerinventory\Wud\WudImporter;
+use GlpiPlugin\Dockerinventory\Tests\PortainerFixture;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -60,10 +61,7 @@ final class WudImporterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->portainer = json_decode(
-            (string) file_get_contents(dirname(__DIR__) . '/mock-portainer/fixture.json'),
-            true
-        );
+        $this->portainer = PortainerFixture::load();
         $this->wud = json_decode((string) file_get_contents(dirname(__DIR__) . '/mock-wud/fixture.json'), true);
         $suffix = bin2hex(random_bytes(4));
         $this->entityId = (int) (new \Entity())->add(['name' => 'PHPUnit WUD ' . $suffix, 'entities_id' => 0]);
@@ -138,16 +136,7 @@ final class WudImporterTest extends TestCase
             'ptr_fictive_cle_wud',
             static function (string $url) use ($fixture): string {
                 $path = (string) parse_url($url, PHP_URL_PATH);
-                if ($path === '/api/endpoints' || $path === '/api/stacks') {
-                    return (string) json_encode($fixture[$path === '/api/stacks' ? 'stacks' : 'endpoints']);
-                }
-                preg_match('#^/api/endpoints/(\d+)/docker/(\w+)$#', $path, $m);
-                $endpoint = $fixture['docker'][$m[1] ?? ''] ?? ['swarm' => false];
-                if (!$endpoint['swarm']) {
-                    throw new \RuntimeException('HTTP 503 returned');
-                }
-
-                return (string) json_encode($endpoint[$m[2]]);
+                return PortainerFixture::respond($fixture, $path);
             }
         )))->import($this->connection($this->portainerId));
     }

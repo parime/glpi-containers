@@ -27,6 +27,7 @@ use GlpiPlugin\Dockerinventory\Importer;
 use GlpiPlugin\Dockerinventory\Node;
 use GlpiPlugin\Dockerinventory\Portainer\PortainerClient;
 use GlpiPlugin\Dockerinventory\Service;
+use GlpiPlugin\Dockerinventory\Tests\PortainerFixture;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -57,10 +58,7 @@ final class ImporterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fixture = json_decode(
-            (string) file_get_contents(dirname(__DIR__) . '/mock-portainer/fixture.json'),
-            true
-        );
+        $this->fixture = PortainerFixture::load();
         $suffix = bin2hex(random_bytes(4));
         $this->entityId = (int) (new \Entity())->add(['name' => 'PHPUnit Docker ' . $suffix, 'entities_id' => 0]);
         $this->assertGreaterThan(0, $this->entityId);
@@ -122,19 +120,7 @@ final class ImporterTest extends TestCase
                 if ($path === $this->failingPath) {
                     throw new \RuntimeException('HTTP 500 returned for "' . $url . '".');
                 }
-                if ($path === '/api/endpoints') {
-                    return (string) json_encode($this->fixture['endpoints']);
-                }
-                if ($path === '/api/stacks') {
-                    return (string) json_encode($this->fixture['stacks']);
-                }
-                preg_match('#^/api/endpoints/(\d+)/docker/(\w+)$#', $path, $m);
-                $endpoint = $this->fixture['docker'][$m[1]] ?? null;
-                if ($endpoint === null || !$endpoint['swarm']) {
-                    throw new \RuntimeException('HTTP 503 returned for "' . $url . '".');
-                }
-
-                return (string) json_encode($endpoint[$m[2]]);
+                return PortainerFixture::respond($this->fixture, $path);
             }
         ));
     }
